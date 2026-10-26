@@ -1,4 +1,4 @@
-ticker,name,sector
+ticker,name,sector,cik
 AAPL,Apple Inc.,Information Technology
 MSFT,Microsoft Corporation,Information Technology
 NVDA,NVIDIA Corporation,Information Technology
@@ -35,7 +35,7 @@ CAT,Caterpillar Inc.,Industrials
 HON,Honeywell International Inc.,Industrials
 UNP,Union Pacific Corporation,Industrials
 LMT,Lockheed Martin Corporation,Industrials
-XOM,Exxon Mobil Corporation,Energy
+XOM,Exxon Mobil Corporation,Energy,34088
 CVX,Chevron Corporation,Energy
 COP,ConocoPhillips,Energy
 NEE,NextEra Energy Inc.,Utilities

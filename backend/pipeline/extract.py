@@ -9,19 +9,28 @@ appears in several filings. We keep one value per period end date.
 from datetime import date
 
 # For each raw field: the us-gaap tags to try (in order, first one found wins) and the unit.
+# Tags after the ones listed in CLAUDE.md were added because real companies use them (example in the comment).
 FIELDS = {
-    "revenue": (["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet"], "USD"),
-    "net_income": (["NetIncomeLoss"], "USD"),
+    # RevenuesNetOfInterestExpense: banks' "total net revenue" (WFC, GS); RegulatedAndUnregulated...: utilities (NEE)
+    "revenue": (["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet",
+                 "RevenuesNetOfInterestExpense", "RegulatedAndUnregulatedOperatingRevenue"], "USD"),
+    # NetIncomeLossAvailableToCommonStockholdersBasic: CAT from 2025
+    "net_income": (["NetIncomeLoss", "NetIncomeLossAvailableToCommonStockholdersBasic"], "USD"),
     "operating_income": (["OperatingIncomeLoss"], "USD"),
     "eps_diluted": (["EarningsPerShareDiluted"], "USD/shares"),
     "total_assets": (["Assets"], "USD"),
     "current_assets": (["AssetsCurrent"], "USD"),
     "current_liabilities": (["LiabilitiesCurrent"], "USD"),
     "equity": (["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"], "USD"),
-    # LongTermDebtAndCapitalLeaseObligations: used by e.g. KO from 2024 (non-current debt incl. finance leases)
-    "long_term_debt": (["LongTermDebtNoncurrent", "LongTermDebt", "LongTermDebtAndCapitalLeaseObligations"], "USD"),
+    # LongTermDebtAndCapitalLeaseObligations: KO from 2024 (non-current debt incl. finance leases);
+    # LongTermNotesPayable: ORCL
+    "long_term_debt": (["LongTermDebtNoncurrent", "LongTermDebt", "LongTermDebtAndCapitalLeaseObligations",
+                        "LongTermNotesPayable"], "USD"),
     "operating_cash_flow": (["NetCashProvidedByUsedInOperatingActivities"], "USD"),
-    "capex": (["PaymentsToAcquirePropertyPlantAndEquipment"], "USD"),
+    # PaymentsToAcquireProductiveAssets (PP&E incl. software): NVDA, AMZN, HD, PEP, V, LMT, CVX;
+    # PaymentsToAcquireOtherPropertyPlantAndEquipment: LLY; PaymentsToAcquireOtherProductiveAssets: VZ
+    "capex": (["PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets",
+               "PaymentsToAcquireOtherPropertyPlantAndEquipment", "PaymentsToAcquireOtherProductiveAssets"], "USD"),
     # PaymentsOfOrdinaryDividends: used by e.g. JNJ
     "dividends_paid": (["PaymentsOfDividends", "PaymentsOfDividendsCommonStock", "PaymentsOfOrdinaryDividends"], "USD"),
 }
