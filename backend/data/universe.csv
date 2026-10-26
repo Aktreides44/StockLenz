@@ -1,0 +1,41 @@
+ticker,name,sector
+AAPL,Apple Inc.,Information Technology
+MSFT,Microsoft Corporation,Information Technology
+NVDA,NVIDIA Corporation,Information Technology
+ORCL,Oracle Corporation,Information Technology
+CSCO,Cisco Systems Inc.,Information Technology
+ADBE,Adobe Inc.,Information Technology
+GOOGL,Alphabet Inc.,Communication Services
+META,Meta Platforms Inc.,Communication Services
+NFLX,Netflix Inc.,Communication Services
+VZ,Verizon Communications Inc.,Communication Services
+DIS,The Walt Disney Company,Communication Services
+AMZN,Amazon.com Inc.,Consumer Discretionary
+HD,The Home Depot Inc.,Consumer Discretionary
+MCD,McDonald's Corporation,Consumer Discretionary
+NKE,Nike Inc.,Consumer Discretionary
+SBUX,Starbucks Corporation,Consumer Discretionary
+KO,The Coca-Cola Company,Consumer Staples
+PEP,PepsiCo Inc.,Consumer Staples
+PG,The Procter & Gamble Company,Consumer Staples
+WMT,Walmart Inc.,Consumer Staples
+COST,Costco Wholesale Corporation,Consumer Staples
+JNJ,Johnson & Johnson,Health Care
+UNH,UnitedHealth Group Inc.,Health Care
+PFE,Pfizer Inc.,Health Care
+MRK,Merck & Co. Inc.,Health Care
+ABBV,AbbVie Inc.,Health Care
+LLY,Eli Lilly and Company,Health Care
+JPM,JPMorgan Chase & Co.,Financials
+BAC,Bank of America Corporation,Financials
+WFC,Wells Fargo & Company,Financials
+GS,The Goldman Sachs Group Inc.,Financials
+V,Visa Inc.,Financials
+CAT,Caterpillar Inc.,Industrials
+HON,Honeywell International Inc.,Industrials
+UNP,Union Pacific Corporation,Industrials
+LMT,Lockheed Martin Corporation,Industrials
+XOM,Exxon Mobil Corporation,Energy
+CVX,Chevron Corporation,Energy
+COP,ConocoPhillips,Energy
+NEE,NextEra Energy Inc.,Utilities
