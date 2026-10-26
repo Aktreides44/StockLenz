@@ -20,7 +20,8 @@ COMPANY_COLUMNS = [
 
 
 def connect(path=DB_PATH):
-    conn = sqlite3.connect(path)
+    # check_same_thread=False: FastAPI may open the connection and use it on different worker threads
+    conn = sqlite3.connect(path, check_same_thread=False)
     conn.row_factory = sqlite3.Row  # lets us read rows like dicts: row["ticker"]
     return conn
 

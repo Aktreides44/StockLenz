@@ -160,9 +160,12 @@ METRIC_DEFINITIONS = [
     ("fcf", "Free cash flow", "Cash flow", "Operating cash flow − Capital expenditure", "USD", True),
     ("fcf_margin", "FCF margin", "Cash flow", "Free cash flow / Revenue × 100", "%", True),
     ("market_cap", "Market cap", "Valuation", "Price × Shares outstanding", "USD", True),
-    ("pe", "P/E", "Valuation", "Price / Diluted EPS; empty if EPS ≤ 0", "x", False),
-    ("pb", "P/B", "Valuation", "Market cap / Shareholders' equity; empty if equity ≤ 0", "x", False),
-    ("ps", "P/S", "Valuation", "Market cap / Revenue", "x", False),
+    ("pe", "P/E (FY)", "Valuation",
+     "Current price / Diluted EPS of the latest fiscal year (not trailing 12 months); empty if EPS ≤ 0", "x", False),
+    ("pb", "P/B (FY)", "Valuation",
+     "Current market cap / Shareholders' equity at the latest fiscal year end; empty if equity ≤ 0", "x", False),
+    ("ps", "P/S (FY)", "Valuation",
+     "Current market cap / Revenue of the latest fiscal year (not trailing 12 months)", "x", False),
 ]
 
 METRIC_KEYS = [definition[0] for definition in METRIC_DEFINITIONS]

@@ -4,3 +4,4 @@ requests
 yfinance
 python-dotenv
 pytest
+httpx2
