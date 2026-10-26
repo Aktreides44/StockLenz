@@ -55,10 +55,10 @@ Out of scope until after Wednesday (do NOT build unless asked):
 - Total assets: `Assets`
 - Current assets / liabilities: `AssetsCurrent`, `LiabilitiesCurrent`
 - Equity: `StockholdersEquity`, `StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest`
-- Long-term debt: `LongTermDebtNoncurrent`, `LongTermDebt`
+- Long-term debt: `LongTermDebtNoncurrent`, `LongTermDebt`, `LongTermDebtAndCapitalLeaseObligations`
 - Operating cash flow: `NetCashProvidedByUsedInOperatingActivities`
 - Capex: `PaymentsToAcquirePropertyPlantAndEquipment`
-- Dividends paid: `PaymentsOfDividends`, `PaymentsOfDividendsCommonStock`
+- Dividends paid: `PaymentsOfDividends`, `PaymentsOfDividendsCommonStock`, `PaymentsOfOrdinaryDividends`
 Record which tag was used per field and fiscal year end date; store it in the DB.
 
 ## Indicators for MVP (latest fiscal year unless noted)
