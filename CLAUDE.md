@@ -48,16 +48,19 @@ Out of scope until after Wednesday (do NOT build unless asked):
 - Max 10 requests/second; add a small sleep. Cache raw JSON in `backend/data/raw/` so reruns don't refetch.
 
 ## XBRL field mapping (us-gaap tags; try in order, first one found wins)
-- Revenue: `Revenues`, `RevenueFromContractWithCustomerExcludingAssessedTax`, `SalesRevenueNet`
-- Net income: `NetIncomeLoss`
+- Revenue: `Revenues`, `RevenueFromContractWithCustomerExcludingAssessedTax`, `SalesRevenueNet`,
+  `RevenuesNetOfInterestExpense` (banks), `RegulatedAndUnregulatedOperatingRevenue` (utilities)
+- Net income: `NetIncomeLoss`, `NetIncomeLossAvailableToCommonStockholdersBasic`
 - Operating income: `OperatingIncomeLoss`
 - Diluted EPS: `EarningsPerShareDiluted` (unit USD/shares)
 - Total assets: `Assets`
 - Current assets / liabilities: `AssetsCurrent`, `LiabilitiesCurrent`
 - Equity: `StockholdersEquity`, `StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest`
-- Long-term debt: `LongTermDebtNoncurrent`, `LongTermDebt`, `LongTermDebtAndCapitalLeaseObligations`
+- Long-term debt: `LongTermDebtNoncurrent`, `LongTermDebt`, `LongTermDebtAndCapitalLeaseObligations`,
+  `LongTermNotesPayable`
 - Operating cash flow: `NetCashProvidedByUsedInOperatingActivities`
-- Capex: `PaymentsToAcquirePropertyPlantAndEquipment`
+- Capex: `PaymentsToAcquirePropertyPlantAndEquipment`, `PaymentsToAcquireProductiveAssets`,
+  `PaymentsToAcquireOtherPropertyPlantAndEquipment`, `PaymentsToAcquireOtherProductiveAssets`
 - Dividends paid: `PaymentsOfDividends`, `PaymentsOfDividendsCommonStock`, `PaymentsOfOrdinaryDividends`
 Record which tag was used per field and fiscal year end date; store it in the DB.
 
