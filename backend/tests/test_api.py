@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 
 from api.main import app, get_db
 from pipeline import db
-from pipeline.metrics import compute_all
+from pipeline.metrics import compute_all, explain_missing
 from tests.test_calculations import make_years
 
 
@@ -18,7 +18,9 @@ def make_company(ticker, sector, years):
         "not_applicable": ["current_ratio", "debt_to_equity"] if is_financial else [],
         "years": years,
     }
-    company.update(compute_all(years, 100.0, 10, is_financial))
+    values = compute_all(years, 100.0, 10, is_financial)
+    company.update(values)
+    company["missing_reasons"] = explain_missing(values, years, 100.0, 10, is_financial)
     return company
 
 
@@ -61,12 +63,15 @@ def test_companies_list(client):
     assert aaa["revenue_growth"] == pytest.approx(20.0)
     assert aaa["pe"] == pytest.approx(25.0)
     assert aaa["operating_margin"] is None  # missing stays null in JSON, never 0
+    assert aaa["missing_reasons"]["operating_margin"] == "Operating income not reported in the FY2025 10-K"
+    assert "revenue_growth" not in aaa["missing_reasons"]
 
 
 def test_financials_are_flagged_not_applicable(client):
     bank = next(c for c in client.get("/companies").json() if c["ticker"] == "BNK")
     assert bank["not_applicable"] == ["current_ratio", "debt_to_equity"]
     assert bank["current_ratio"] is None
+    assert "Financials" in bank["missing_reasons"]["current_ratio"]
 
 
 def test_company_detail_has_history(client):

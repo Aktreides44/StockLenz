@@ -15,7 +15,7 @@ import yfinance as yf
 
 from pipeline import db
 from pipeline.extract import extract_company
-from pipeline.metrics import METRIC_KEYS, NOT_APPLICABLE_FOR_FINANCIALS, compute_all
+from pipeline.metrics import METRIC_KEYS, NOT_APPLICABLE_FOR_FINANCIALS, compute_all, explain_missing
 from pipeline.sec_client import BACKEND_DIR, load_companyfacts, load_ticker_to_cik
 
 UNIVERSE_CSV = BACKEND_DIR / "data" / "universe.csv"
@@ -68,7 +68,9 @@ def build_company(row, cik):
         "not_applicable": NOT_APPLICABLE_FOR_FINANCIALS if is_financial else [],
         "years": years,
     }
-    company.update(compute_all(years, price, shares, is_financial))
+    values = compute_all(years, price, shares, is_financial)
+    company.update(values)
+    company["missing_reasons"] = explain_missing(values, years, price, shares, is_financial)
     return company
 
 

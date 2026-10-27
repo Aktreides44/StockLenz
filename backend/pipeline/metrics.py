@@ -170,6 +170,86 @@ METRIC_DEFINITIONS = [
 
 METRIC_KEYS = [definition[0] for definition in METRIC_DEFINITIONS]
 
+FIELD_LABELS = {
+    "revenue": "Revenue",
+    "net_income": "Net income",
+    "operating_income": "Operating income",
+    "eps_diluted": "Diluted EPS",
+    "total_assets": "Total assets",
+    "current_assets": "Current assets",
+    "current_liabilities": "Current liabilities",
+    "equity": "Shareholders' equity",
+    "long_term_debt": "Long-term debt",
+    "operating_cash_flow": "Operating cash flow",
+    "capex": "Capital expenditure",
+    "dividends_paid": "Dividends paid",
+}
+
+# The inputs each metric needs: (raw field, how many years before the latest year).
+# "price" and "shares" come from Yahoo Finance instead of the 10-K.
+METRIC_INPUTS = {
+    "revenue_growth": [("revenue", 0), ("revenue", 1)],
+    "revenue_cagr_3y": [("revenue", 0), ("revenue", 3)],
+    "net_income_growth": [("net_income", 0), ("net_income", 1)],
+    "eps_growth": [("eps_diluted", 0), ("eps_diluted", 1)],
+    "net_margin": [("net_income", 0), ("revenue", 0)],
+    "operating_margin": [("operating_income", 0), ("revenue", 0)],
+    "roe": [("net_income", 0), ("equity", 0), ("equity", 1)],
+    "roa": [("net_income", 0), ("total_assets", 0), ("total_assets", 1)],
+    "debt_to_equity": [("long_term_debt", 0), ("equity", 0)],
+    "current_ratio": [("current_assets", 0), ("current_liabilities", 0)],
+    "fcf": [("operating_cash_flow", 0), ("capex", 0)],
+    "fcf_margin": [("operating_cash_flow", 0), ("capex", 0), ("revenue", 0)],
+    "market_cap": [("price", 0), ("shares", 0)],
+    "pe": [("price", 0), ("eps_diluted", 0)],
+    "pb": [("price", 0), ("shares", 0), ("equity", 0)],
+    "ps": [("price", 0), ("shares", 0), ("revenue", 0)],
+}
+
+
+def missing_reason(key, years, price, shares_outstanding, is_financial):
+    """Explain in plain words why metric `key` has no value. Shown as the tooltip on "—"."""
+    if is_financial and key in NOT_APPLICABLE_FOR_FINANCIALS:
+        return "Not meaningful for banks and insurers (Financials sector)"
+
+    latest = max(years)
+    for field, years_back in METRIC_INPUTS[key]:
+        if field == "price":
+            if price is None:
+                return "No current share price available"
+            continue
+        if field == "shares":
+            if shares_outstanding is None:
+                return "Shares outstanding not available"
+            continue
+        year = latest - years_back
+        if year not in years:
+            return f"No 10-K data for FY{year}"
+        if years[year]["fields"][field] is None:
+            return f"{FIELD_LABELS[field]} not reported in the FY{year} 10-K"
+
+    # All inputs exist, so one of the sign rules (or a zero denominator) left it empty.
+    if key == "roe":
+        return "Average shareholders' equity is zero or negative"
+    if key in ("debt_to_equity", "pb"):
+        return "Shareholders' equity is zero or negative"
+    if key == "pe":
+        return "Diluted EPS is zero or negative (a loss year)"
+    if key == "eps_growth":
+        return "Prior-year EPS is zero or negative, so growth is not meaningful"
+    if key == "revenue_cagr_3y":
+        return "Revenue is zero or negative"
+    return "Cannot be calculated: the denominator is zero"
+
+
+def explain_missing(values, years, price, shares_outstanding, is_financial):
+    """Return {metric_key: reason} for every metric in `values` that is None."""
+    return {
+        key: missing_reason(key, years, price, shares_outstanding, is_financial)
+        for key, value in values.items()
+        if value is None
+    }
+
 
 def compute_all(years, price, shares_outstanding, is_financial):
     """Compute every metric for the latest fiscal year in `years` (the output of extract_company).

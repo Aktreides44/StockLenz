@@ -5,6 +5,7 @@ Tables:
 - financials: the raw SEC values, one row per (company, fiscal year, field), incl. the XBRL tag used
 - metric_definitions: label, formula and unit for each metric, shown in the app
 """
+import json
 import sqlite3
 
 from pipeline.extract import FIELDS
@@ -44,6 +45,7 @@ CREATE TABLE companies (
     latest_fiscal_year INTEGER,
     latest_fiscal_year_end TEXT,
     not_applicable TEXT,  -- comma-separated metric keys, e.g. "current_ratio,debt_to_equity"
+    missing_reasons TEXT, -- JSON object mapping metric key to why it has no value
 {metric_columns}
 );
 
@@ -72,8 +74,8 @@ CREATE TABLE metric_definitions (
 def write_database(companies, path=DB_PATH):
     """Replace the whole database with the given companies.
 
-    Each company is a dict with the COMPANY_COLUMNS keys, plus "not_applicable" (list)
-    and "years" (the output of extract_company).
+    Each company is a dict with the COMPANY_COLUMNS keys, plus "not_applicable" (list),
+    "missing_reasons" (dict) and "years" (the output of extract_company).
     """
     conn = connect(path)
     with conn:
@@ -88,8 +90,10 @@ def write_database(companies, path=DB_PATH):
         placeholders = ", ".join("?" for _ in COMPANY_COLUMNS)
         for company in companies:
             conn.execute(
-                f"INSERT INTO companies ({', '.join(COMPANY_COLUMNS)}, not_applicable) VALUES ({placeholders}, ?)",
-                [company[column] for column in COMPANY_COLUMNS] + [",".join(company["not_applicable"])],
+                f"INSERT INTO companies ({', '.join(COMPANY_COLUMNS)}, not_applicable, missing_reasons) "
+                f"VALUES ({placeholders}, ?, ?)",
+                [company[column] for column in COMPANY_COLUMNS]
+                + [",".join(company["not_applicable"]), json.dumps(company["missing_reasons"])],
             )
             for year, data in company["years"].items():
                 for field in FIELDS:
@@ -108,6 +112,7 @@ def write_database(companies, path=DB_PATH):
 def company_row_to_dict(row):
     company = {column: row[column] for column in COMPANY_COLUMNS}
     company["not_applicable"] = row["not_applicable"].split(",") if row["not_applicable"] else []
+    company["missing_reasons"] = json.loads(row["missing_reasons"]) if row["missing_reasons"] else {}
     return company
 
 

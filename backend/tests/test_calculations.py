@@ -342,6 +342,34 @@ def test_compute_all_uses_latest_and_prior_years():
     assert result["net_income_growth"] is None  # no prior net income
 
 
+def test_missing_reasons():
+    years = make_years({
+        2024: {"revenue": 100, "equity": -40},
+        2025: {"revenue": 120, "net_income": 10, "equity": -20, "eps_diluted": -0.5,
+               "current_assets": 30, "current_liabilities": 20},
+    })
+    values = metrics.compute_all(years, price=50.0, shares_outstanding=10, is_financial=False)
+    reasons = metrics.explain_missing(values, years, 50.0, 10, is_financial=False)
+
+    assert reasons["roe"] == "Average shareholders' equity is zero or negative"
+    assert reasons["pb"] == "Shareholders' equity is zero or negative"
+    assert reasons["pe"] == "Diluted EPS is zero or negative (a loss year)"
+    assert reasons["operating_margin"] == "Operating income not reported in the FY2025 10-K"
+    assert reasons["revenue_cagr_3y"] == "No 10-K data for FY2022"
+    assert reasons["eps_growth"] == "Diluted EPS not reported in the FY2024 10-K"
+    # Metrics that have a value get no reason
+    assert "revenue_growth" not in reasons
+    assert "current_ratio" not in reasons
+
+
+def test_missing_reasons_financials_and_no_price():
+    years = make_years({2025: {"revenue": 50, "current_assets": 30, "current_liabilities": 20}})
+    values = metrics.compute_all(years, price=None, shares_outstanding=None, is_financial=True)
+    reasons = metrics.explain_missing(values, years, None, None, is_financial=True)
+    assert "Financials" in reasons["current_ratio"]
+    assert reasons["market_cap"] == "No current share price available"
+
+
 def test_compute_all_financials_flag():
     years = make_years({2024: {"current_assets": 300, "current_liabilities": 200,
                                "long_term_debt": 50, "equity": 100}})

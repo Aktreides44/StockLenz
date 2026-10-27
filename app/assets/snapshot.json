@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-26T23:33:12",
+ "generated_at": "2026-10-27T09:04:38",
  "metrics": [
   {
    "key": "revenue_growth",
@@ -138,7 +138,7 @@
    "cik": 320193,
    "price": 343.9100036621094,
    "shares_outstanding": 14594180000.0,
-   "price_fetched_at": "2026-10-26T23:32:45",
+   "price_fetched_at": "2026-10-27T09:04:24",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-09-27",
    "revenue_growth": 6.425511782832739,
@@ -157,7 +157,8 @@
    "pe": 46.10053668392887,
    "pb": 68.07107397292235,
    "ps": 12.06043934257531,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "ABBV",
@@ -166,7 +167,7 @@
    "cik": 1551152,
    "price": 286.739990234375,
    "shares_outstanding": 1767117285.0,
-   "price_fetched_at": "2026-10-26T23:33:00",
+   "price_fetched_at": "2026-10-27T09:04:32",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 8.566762523520431,
@@ -185,7 +186,11 @@
    "pe": 121.49999586202331,
    "pb": null,
    "ps": 8.28487889215002,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "debt_to_equity": "Shareholders' equity is zero or negative",
+    "pb": "Shareholders' equity is zero or negative"
+   }
   },
   {
    "ticker": "ADBE",
@@ -194,7 +199,7 @@
    "cik": 796343,
    "price": 258.6199951171875,
    "shares_outstanding": 389200000.0,
-   "price_fetched_at": "2026-10-26T23:32:50",
+   "price_fetched_at": "2026-10-27T09:04:25",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-11-28",
    "revenue_growth": 10.527784236224134,
@@ -213,7 +218,8 @@
    "pe": 15.486227252526199,
    "pb": 8.659976090476587,
    "ps": 4.234713370339913,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "AMZN",
@@ -222,7 +228,7 @@
    "cik": 1018724,
    "price": 249.08999633789062,
    "shares_outstanding": 10786313572.0,
-   "price_fetched_at": "2026-10-26T23:32:53",
+   "price_fetched_at": "2026-10-27T09:04:27",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 12.377754683294695,
@@ -241,7 +247,8 @@
    "pe": 34.74058526330413,
    "pb": 6.536102096137642,
    "ps": 3.7476257011186958,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "BAC",
@@ -250,7 +257,7 @@
    "cik": 70858,
    "price": 50.52000045776367,
    "shares_outstanding": 6922695323.0,
-   "price_fetched_at": "2026-10-26T23:33:01",
+   "price_fetched_at": "2026-10-27T09:04:33",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 6.840424727932286,
@@ -272,7 +279,14 @@
    "not_applicable": [
     "current_ratio",
     "debt_to_equity"
-   ]
+   ],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K",
+    "debt_to_equity": "Not meaningful for banks and insurers (Financials sector)",
+    "current_ratio": "Not meaningful for banks and insurers (Financials sector)",
+    "fcf": "Capital expenditure not reported in the FY2025 10-K",
+    "fcf_margin": "Capital expenditure not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "CAT",
@@ -281,7 +295,7 @@
    "cik": 18230,
    "price": 692.1300048828125,
    "shares_outstanding": 459674889.0,
-   "price_fetched_at": "2026-10-26T23:33:08",
+   "price_fetched_at": "2026-10-27T09:04:35",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 4.289527689055532,
@@ -300,7 +314,8 @@
    "pe": 36.79585352912348,
    "pb": 14.924232252935374,
    "ps": 4.707197667787307,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "COP",
@@ -309,7 +324,7 @@
    "cik": 1163165,
    "price": 151.3699951171875,
    "shares_outstanding": 1218294007.0,
-   "price_fetched_at": "2026-10-26T23:33:11",
+   "price_fetched_at": "2026-10-27T09:04:37",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 7.670106859073888,
@@ -328,7 +343,12 @@
    "pe": 23.837794506643704,
    "pb": 2.8596950996462667,
    "ps": 3.1286162780077498,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K",
+    "fcf": "Capital expenditure not reported in the FY2025 10-K",
+    "fcf_margin": "Capital expenditure not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "COST",
@@ -337,7 +357,7 @@
    "cik": 909832,
    "price": 1005.1599731445312,
    "shares_outstanding": 443129349.0,
-   "price_fetched_at": "2026-10-26T23:32:57",
+   "price_fetched_at": "2026-10-27T09:04:30",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-08-30",
    "revenue_growth": 10.143695387577887,
@@ -356,7 +376,8 @@
    "pe": 48.41811045975584,
    "pb": 12.440741964092217,
    "ps": 1.4692726618827183,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "CSCO",
@@ -365,7 +386,7 @@
    "cik": 858877,
    "price": 110.23999786376953,
    "shares_outstanding": 3942586873.0,
-   "price_fetched_at": "2026-10-26T23:32:49",
+   "price_fetched_at": "2026-10-27T09:04:25",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-07-25",
    "revenue_growth": 11.77498499664631,
@@ -384,7 +405,8 @@
    "pe": 33.10510446359445,
    "pb": 8.643348283926535,
    "ps": 6.8634941722423335,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "CVX",
@@ -393,7 +415,7 @@
    "cik": 93410,
    "price": 232.00999450683594,
    "shares_outstanding": 1961603274.0,
-   "price_fetched_at": "2026-10-26T23:33:10",
+   "price_fetched_at": "2026-10-27T09:04:37",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": -6.785770641839915,
@@ -412,7 +434,10 @@
    "pe": 34.993965988964696,
    "pb": 2.4409308920639927,
    "ps": 2.4076027996748226,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "DIS",
@@ -421,7 +446,7 @@
    "cik": 1744489,
    "price": 110.4000015258789,
    "shares_outstanding": 1726686902.0,
-   "price_fetched_at": "2026-10-26T23:32:52",
+   "price_fetched_at": "2026-10-27T09:04:27",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-09-27",
    "revenue_growth": 3.353728615054564,
@@ -440,7 +465,8 @@
    "pe": 16.116788543923928,
    "pb": 1.735032052858542,
    "ps": 2.0188110840933557,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "GOOGL",
@@ -449,7 +475,7 @@
    "cik": 1652044,
    "price": 316.79998779296875,
    "shares_outstanding": 12229934831.0,
-   "price_fetched_at": "2026-10-26T23:32:50",
+   "price_fetched_at": "2026-10-27T09:04:25",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 15.090081081544376,
@@ -468,7 +494,8 @@
    "pe": 29.30619683561228,
    "pb": 9.33004998054159,
    "ps": 9.617916981524997,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "GS",
@@ -477,7 +504,7 @@
    "cik": 886982,
    "price": 893.280029296875,
    "shares_outstanding": 291171408.0,
-   "price_fetched_at": "2026-10-26T23:33:06",
+   "price_fetched_at": "2026-10-27T09:04:34",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 8.915757213335326,
@@ -499,7 +526,12 @@
    "not_applicable": [
     "current_ratio",
     "debt_to_equity"
-   ]
+   ],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K",
+    "debt_to_equity": "Not meaningful for banks and insurers (Financials sector)",
+    "current_ratio": "Not meaningful for banks and insurers (Financials sector)"
+   }
   },
   {
    "ticker": "HD",
@@ -508,7 +540,7 @@
    "cik": 354950,
    "price": 319.3800048828125,
    "shares_outstanding": 997689626.0,
-   "price_fetched_at": "2026-10-26T23:32:53",
+   "price_fetched_at": "2026-10-27T09:04:27",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-02-01",
    "revenue_growth": 3.240467921310982,
@@ -527,7 +559,8 @@
    "pe": 22.444132458384573,
    "pb": 24.86865820833617,
    "ps": 1.934881667345211,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "HON",
@@ -536,7 +569,7 @@
    "cik": 773840,
    "price": 219.27999877929688,
    "shares_outstanding": 316940010.0,
-   "price_fetched_at": "2026-10-26T23:33:08",
+   "price_fetched_at": "2026-10-27T09:04:35",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 7.849180516749719,
@@ -555,7 +588,8 @@
    "pe": 29.79347809501316,
    "pb": 4.998461234602297,
    "ps": 1.8561670051255366,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "JNJ",
@@ -564,7 +598,7 @@
    "cik": 200406,
    "price": 266.29998779296875,
    "shares_outstanding": 2407310266.0,
-   "price_fetched_at": "2026-10-26T23:32:58",
+   "price_fetched_at": "2026-10-27T09:04:30",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-28",
    "revenue_growth": 6.048119251078011,
@@ -583,7 +617,10 @@
    "pe": 24.143244586851203,
    "pb": 7.861604709723442,
    "ps": 6.805884667116329,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "JPM",
@@ -592,7 +629,7 @@
    "cik": 19617,
    "price": 334.0400085449219,
    "shares_outstanding": 2655600000.0,
-   "price_fetched_at": "2026-10-26T23:33:01",
+   "price_fetched_at": "2026-10-27T09:04:33",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 2.7546238933069005,
@@ -614,7 +651,14 @@
    "not_applicable": [
     "current_ratio",
     "debt_to_equity"
-   ]
+   ],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K",
+    "debt_to_equity": "Not meaningful for banks and insurers (Financials sector)",
+    "current_ratio": "Not meaningful for banks and insurers (Financials sector)",
+    "fcf": "Capital expenditure not reported in the FY2025 10-K",
+    "fcf_margin": "Capital expenditure not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "KO",
@@ -623,7 +667,7 @@
    "cik": 21344,
    "price": 92.69999694824219,
    "shares_outstanding": 4302549243.0,
-   "price_fetched_at": "2026-10-26T23:32:55",
+   "price_fetched_at": "2026-10-27T09:04:29",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 1.8699135164998617,
@@ -642,7 +686,8 @@
    "pe": 30.493420048763877,
    "pb": 12.398467521395185,
    "ps": 8.319524033619693,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "LLY",
@@ -651,7 +696,7 @@
    "cik": 59478,
    "price": 1279.1400146484375,
    "shares_outstanding": 891741406.0,
-   "price_fetched_at": "2026-10-26T23:33:00",
+   "price_fetched_at": "2026-10-27T09:04:32",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 44.70394955930999,
@@ -670,7 +715,10 @@
    "pe": 55.73594835069444,
    "pb": 42.98707801520476,
    "ps": 17.500454366183252,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "LMT",
@@ -679,7 +727,7 @@
    "cik": 936468,
    "price": 635.2000122070312,
    "shares_outstanding": 231004640.0,
-   "price_fetched_at": "2026-10-26T23:33:09",
+   "price_fetched_at": "2026-10-27T09:04:36",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 5.63743085173768,
@@ -698,7 +746,8 @@
    "pe": 29.55793449078787,
    "pb": 21.832190172278064,
    "ps": 1.9552040047420431,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "MCD",
@@ -707,7 +756,7 @@
    "cik": 63908,
    "price": 250.8300018310547,
    "shares_outstanding": 707641531.0,
-   "price_fetched_at": "2026-10-26T23:32:54",
+   "price_fetched_at": "2026-10-27T09:04:28",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 3.7229938271604937,
@@ -726,7 +775,12 @@
    "pe": 20.98995831222215,
    "pb": null,
    "ps": 6.602109968996107,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "roe": "Average shareholders' equity is zero or negative",
+    "debt_to_equity": "Shareholders' equity is zero or negative",
+    "pb": "Shareholders' equity is zero or negative"
+   }
   },
   {
    "ticker": "META",
@@ -735,7 +789,7 @@
    "cik": 1326801,
    "price": 630.5599975585938,
    "shares_outstanding": 2547506225.0,
-   "price_fetched_at": "2026-10-26T23:32:51",
+   "price_fetched_at": "2026-10-27T09:04:26",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 22.16703849824621,
@@ -754,7 +808,8 @@
    "pe": 26.843763199599564,
    "pb": 7.394279765131684,
    "ps": 7.993170581175435,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "MRK",
@@ -763,7 +818,7 @@
    "cik": 310158,
    "price": 140.61000061035156,
    "shares_outstanding": 2467171638.0,
-   "price_fetched_at": "2026-10-26T23:32:59",
+   "price_fetched_at": "2026-10-27T09:04:31",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 1.313738935294851,
@@ -782,7 +837,10 @@
    "pe": 19.31456052339994,
    "pb": 6.594476020321296,
    "ps": 5.336158581240437,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "MSFT",
@@ -791,7 +849,7 @@
    "cik": 789019,
    "price": 532.5999755859375,
    "shares_outstanding": 7425545491.0,
-   "price_fetched_at": "2026-10-26T23:32:46",
+   "price_fetched_at": "2026-10-27T09:04:24",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-06-30",
    "revenue_growth": 17.78868679984666,
@@ -810,7 +868,8 @@
    "pe": 29.671307832085656,
    "pb": 8.939786538073832,
    "ps": 11.917964275503687,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "NEE",
@@ -819,7 +878,7 @@
    "cik": 753308,
    "price": 82.04000091552734,
    "shares_outstanding": 2097306049.0,
-   "price_fetched_at": "2026-10-26T23:33:12",
+   "price_fetched_at": "2026-10-27T09:04:38",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 10.742132266795943,
@@ -838,7 +897,11 @@
    "pe": 24.86060633803859,
    "pb": 3.150875149796752,
    "ps": 6.2769221574529785,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "fcf": "Capital expenditure not reported in the FY2025 10-K",
+    "fcf_margin": "Capital expenditure not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "NFLX",
@@ -847,7 +910,7 @@
    "cik": 1065280,
    "price": 63.900001525878906,
    "shares_outstanding": 4163939676.0,
-   "price_fetched_at": "2026-10-26T23:32:51",
+   "price_fetched_at": "2026-10-27T09:04:26",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 15.851068919677527,
@@ -866,7 +929,8 @@
    "pe": 25.256917599161625,
    "pb": 9.997026981059589,
    "ps": 5.8888418133316165,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "NKE",
@@ -875,7 +939,7 @@
    "cik": 320187,
    "price": 37.90999984741211,
    "shares_outstanding": 1485308829.0,
-   "price_fetched_at": "2026-10-26T23:32:54",
+   "price_fetched_at": "2026-10-27T09:04:28",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-05-31",
    "revenue_growth": 0.19218726381480922,
@@ -894,7 +958,10 @@
    "pe": 18.05238087972005,
    "pb": 3.7879621581399165,
    "ps": 1.2135880313968246,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2026 10-K"
+   }
   },
   {
    "ticker": "NVDA",
@@ -903,7 +970,7 @@
    "cik": 1045810,
    "price": 216.0,
    "shares_outstanding": 24147000000.0,
-   "price_fetched_at": "2026-10-26T23:32:47",
+   "price_fetched_at": "2026-10-27T09:04:24",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-01-25",
    "revenue_growth": 65.4735357900948,
@@ -922,7 +989,8 @@
    "pe": 44.08163265306122,
    "pb": 33.15946672769926,
    "ps": 24.153933073382174,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "ORCL",
@@ -931,7 +999,7 @@
    "cik": 1341439,
    "price": 126.05999755859375,
    "shares_outstanding": 3031501149.0,
-   "price_fetched_at": "2026-10-26T23:32:47",
+   "price_fetched_at": "2026-10-27T09:04:24",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-05-31",
    "revenue_growth": 17.348734298506944,
@@ -950,7 +1018,8 @@
    "pe": 21.62264109066788,
    "pb": 8.990096627501039,
    "ps": 5.673516151874551,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "PEP",
@@ -959,7 +1028,7 @@
    "cik": 77476,
    "price": 135.4600067138672,
    "shares_outstanding": 1362741092.0,
-   "price_fetched_at": "2026-10-26T23:32:56",
+   "price_fetched_at": "2026-10-27T09:04:29",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-27",
    "revenue_growth": 2.254665011866658,
@@ -978,7 +1047,8 @@
    "pe": 22.57666778564453,
    "pb": 9.046207854140091,
    "ps": 1.9653651048345244,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "PFE",
@@ -987,7 +1057,7 @@
    "cik": 78003,
    "price": 29.790000915527344,
    "shares_outstanding": 5699673589.0,
-   "price_fetched_at": "2026-10-26T23:32:59",
+   "price_fetched_at": "2026-10-27T09:04:31",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": -1.6470995017838341,
@@ -1006,7 +1076,10 @@
    "pe": 21.90441243788775,
    "pb": 1.9634728876742336,
    "ps": 2.7132629385978846,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "PG",
@@ -1015,7 +1088,7 @@
    "cik": 80424,
    "price": 159.9199981689453,
    "shares_outstanding": 2317783143.0,
-   "price_fetched_at": "2026-10-26T23:32:56",
+   "price_fetched_at": "2026-10-27T09:04:29",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-06-30",
    "revenue_growth": 3.260405296378909,
@@ -1034,7 +1107,8 @@
    "pe": 24.157099421290834,
    "pb": 6.824766179679481,
    "ps": 4.258891855691841,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "SBUX",
@@ -1043,7 +1117,7 @@
    "cik": 829224,
    "price": 102.69000244140625,
    "shares_outstanding": 1140000000.0,
-   "price_fetched_at": "2026-10-26T23:32:55",
+   "price_fetched_at": "2026-10-27T09:04:28",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-09-28",
    "revenue_growth": 2.786915154162129,
@@ -1062,7 +1136,12 @@
    "pe": 63.000001497795246,
    "pb": null,
    "ps": 3.148271930788264,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "roe": "Average shareholders' equity is zero or negative",
+    "debt_to_equity": "Shareholders' equity is zero or negative",
+    "pb": "Shareholders' equity is zero or negative"
+   }
   },
   {
    "ticker": "UNH",
@@ -1071,7 +1150,7 @@
    "cik": 731766,
    "price": 410.70001220703125,
    "shares_outstanding": 897594847.0,
-   "price_fetched_at": "2026-10-26T23:32:58",
+   "price_fetched_at": "2026-10-27T09:04:31",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 11.814039242726306,
@@ -1090,7 +1169,8 @@
    "pe": 31.043084822904856,
    "pb": 3.683107349584058,
    "ps": 0.8236581665311973,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "UNP",
@@ -1099,7 +1179,7 @@
    "cik": 100885,
    "price": 296.9700012207031,
    "shares_outstanding": 594075498.0,
-   "price_fetched_at": "2026-10-26T23:33:09",
+   "price_fetched_at": "2026-10-27T09:04:35",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 1.0721649484536082,
@@ -1118,7 +1198,8 @@
    "pe": 24.788814793047006,
    "pb": 9.553398027088852,
    "ps": 7.197984551866577,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "V",
@@ -1127,7 +1208,7 @@
    "cik": 1403161,
    "price": 404.1600036621094,
    "shares_outstanding": 1877355259.0,
-   "price_fetched_at": "2026-10-26T23:33:07",
+   "price_fetched_at": "2026-10-27T09:04:34",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-09-30",
    "revenue_growth": 11.339976618604911,
@@ -1149,7 +1230,13 @@
    "not_applicable": [
     "current_ratio",
     "debt_to_equity"
-   ]
+   ],
+   "missing_reasons": {
+    "eps_growth": "Diluted EPS not reported in the FY2025 10-K",
+    "debt_to_equity": "Not meaningful for banks and insurers (Financials sector)",
+    "current_ratio": "Not meaningful for banks and insurers (Financials sector)",
+    "pe": "Diluted EPS not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "VZ",
@@ -1158,7 +1245,7 @@
    "cik": 732712,
    "price": 43.099998474121094,
    "shares_outstanding": 4154775202.0,
-   "price_fetched_at": "2026-10-26T23:32:52",
+   "price_fetched_at": "2026-10-27T09:04:26",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 2.5247054633943673,
@@ -1177,7 +1264,8 @@
    "pe": 10.615763170965788,
    "pb": 1.6934850707532194,
    "ps": 1.2958210365835414,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "WFC",
@@ -1186,7 +1274,7 @@
    "cik": 72971,
    "price": 82.6500015258789,
    "shares_outstanding": 3001638935.0,
-   "price_fetched_at": "2026-10-26T23:33:02",
+   "price_fetched_at": "2026-10-27T09:04:34",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 1.704821619519782,
@@ -1208,7 +1296,14 @@
    "not_applicable": [
     "current_ratio",
     "debt_to_equity"
-   ]
+   ],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K",
+    "debt_to_equity": "Not meaningful for banks and insurers (Financials sector)",
+    "current_ratio": "Not meaningful for banks and insurers (Financials sector)",
+    "fcf": "Capital expenditure not reported in the FY2025 10-K",
+    "fcf_margin": "Capital expenditure not reported in the FY2025 10-K"
+   }
   },
   {
    "ticker": "WMT",
@@ -1217,7 +1312,7 @@
    "cik": 104169,
    "price": 120.29000091552734,
    "shares_outstanding": 7933746241.0,
-   "price_fetched_at": "2026-10-26T23:32:57",
+   "price_fetched_at": "2026-10-27T09:04:30",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-01-31",
    "revenue_growth": 4.725214211766779,
@@ -1236,7 +1331,8 @@
    "pe": 44.06227139762906,
    "pb": 9.580195574986716,
    "ps": 1.338193852728551,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {}
   },
   {
    "ticker": "XOM",
@@ -1245,7 +1341,7 @@
    "cik": 34088,
    "price": 184.5399932861328,
    "shares_outstanding": 4111911960.0,
-   "price_fetched_at": "2026-10-26T23:33:10",
+   "price_fetched_at": "2026-10-27T09:04:36",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": -4.962169429466367,
@@ -1264,7 +1360,10 @@
    "pe": 27.543282580019824,
    "pb": 2.9254169673443022,
    "ps": 2.2839416487324424,
-   "not_applicable": []
+   "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   }
   }
  ],
  "details": {
@@ -1275,7 +1374,7 @@
    "cik": 320193,
    "price": 343.9100036621094,
    "shares_outstanding": 14594180000.0,
-   "price_fetched_at": "2026-10-26T23:32:45",
+   "price_fetched_at": "2026-10-27T09:04:24",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-09-27",
    "revenue_growth": 6.425511782832739,
@@ -1295,6 +1394,7 @@
    "pb": 68.07107397292235,
    "ps": 12.06043934257531,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -1460,7 +1560,7 @@
    "cik": 1551152,
    "price": 286.739990234375,
    "shares_outstanding": 1767117285.0,
-   "price_fetched_at": "2026-10-26T23:33:00",
+   "price_fetched_at": "2026-10-27T09:04:32",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 8.566762523520431,
@@ -1480,6 +1580,10 @@
    "pb": null,
    "ps": 8.28487889215002,
    "not_applicable": [],
+   "missing_reasons": {
+    "debt_to_equity": "Shareholders' equity is zero or negative",
+    "pb": "Shareholders' equity is zero or negative"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -1645,7 +1749,7 @@
    "cik": 796343,
    "price": 258.6199951171875,
    "shares_outstanding": 389200000.0,
-   "price_fetched_at": "2026-10-26T23:32:50",
+   "price_fetched_at": "2026-10-27T09:04:25",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-11-28",
    "revenue_growth": 10.527784236224134,
@@ -1665,6 +1769,7 @@
    "pb": 8.659976090476587,
    "ps": 4.234713370339913,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -1830,7 +1935,7 @@
    "cik": 1018724,
    "price": 249.08999633789062,
    "shares_outstanding": 10786313572.0,
-   "price_fetched_at": "2026-10-26T23:32:53",
+   "price_fetched_at": "2026-10-27T09:04:27",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 12.377754683294695,
@@ -1850,6 +1955,7 @@
    "pb": 6.536102096137642,
    "ps": 3.7476257011186958,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -2015,7 +2121,7 @@
    "cik": 70858,
    "price": 50.52000045776367,
    "shares_outstanding": 6922695323.0,
-   "price_fetched_at": "2026-10-26T23:33:01",
+   "price_fetched_at": "2026-10-27T09:04:33",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 6.840424727932286,
@@ -2038,6 +2144,13 @@
     "current_ratio",
     "debt_to_equity"
    ],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K",
+    "debt_to_equity": "Not meaningful for banks and insurers (Financials sector)",
+    "current_ratio": "Not meaningful for banks and insurers (Financials sector)",
+    "fcf": "Capital expenditure not reported in the FY2025 10-K",
+    "fcf_margin": "Capital expenditure not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -2203,7 +2316,7 @@
    "cik": 18230,
    "price": 692.1300048828125,
    "shares_outstanding": 459674889.0,
-   "price_fetched_at": "2026-10-26T23:33:08",
+   "price_fetched_at": "2026-10-27T09:04:35",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 4.289527689055532,
@@ -2223,6 +2336,7 @@
    "pb": 14.924232252935374,
    "ps": 4.707197667787307,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -2388,7 +2502,7 @@
    "cik": 1163165,
    "price": 151.3699951171875,
    "shares_outstanding": 1218294007.0,
-   "price_fetched_at": "2026-10-26T23:33:11",
+   "price_fetched_at": "2026-10-27T09:04:37",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 7.670106859073888,
@@ -2408,6 +2522,11 @@
    "pb": 2.8596950996462667,
    "ps": 3.1286162780077498,
    "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K",
+    "fcf": "Capital expenditure not reported in the FY2025 10-K",
+    "fcf_margin": "Capital expenditure not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -2573,7 +2692,7 @@
    "cik": 909832,
    "price": 1005.1599731445312,
    "shares_outstanding": 443129349.0,
-   "price_fetched_at": "2026-10-26T23:32:57",
+   "price_fetched_at": "2026-10-27T09:04:30",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-08-30",
    "revenue_growth": 10.143695387577887,
@@ -2593,6 +2712,7 @@
    "pb": 12.440741964092217,
    "ps": 1.4692726618827183,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2022,
@@ -2758,7 +2878,7 @@
    "cik": 858877,
    "price": 110.23999786376953,
    "shares_outstanding": 3942586873.0,
-   "price_fetched_at": "2026-10-26T23:32:49",
+   "price_fetched_at": "2026-10-27T09:04:25",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-07-25",
    "revenue_growth": 11.77498499664631,
@@ -2778,6 +2898,7 @@
    "pb": 8.643348283926535,
    "ps": 6.8634941722423335,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2022,
@@ -2943,7 +3064,7 @@
    "cik": 93410,
    "price": 232.00999450683594,
    "shares_outstanding": 1961603274.0,
-   "price_fetched_at": "2026-10-26T23:33:10",
+   "price_fetched_at": "2026-10-27T09:04:37",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": -6.785770641839915,
@@ -2963,6 +3084,9 @@
    "pb": 2.4409308920639927,
    "ps": 2.4076027996748226,
    "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -3128,7 +3252,7 @@
    "cik": 1744489,
    "price": 110.4000015258789,
    "shares_outstanding": 1726686902.0,
-   "price_fetched_at": "2026-10-26T23:32:52",
+   "price_fetched_at": "2026-10-27T09:04:27",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-09-27",
    "revenue_growth": 3.353728615054564,
@@ -3148,6 +3272,7 @@
    "pb": 1.735032052858542,
    "ps": 2.0188110840933557,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -3313,7 +3438,7 @@
    "cik": 1652044,
    "price": 316.79998779296875,
    "shares_outstanding": 12229934831.0,
-   "price_fetched_at": "2026-10-26T23:32:50",
+   "price_fetched_at": "2026-10-27T09:04:25",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 15.090081081544376,
@@ -3333,6 +3458,7 @@
    "pb": 9.33004998054159,
    "ps": 9.617916981524997,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -3498,7 +3624,7 @@
    "cik": 886982,
    "price": 893.280029296875,
    "shares_outstanding": 291171408.0,
-   "price_fetched_at": "2026-10-26T23:33:06",
+   "price_fetched_at": "2026-10-27T09:04:34",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 8.915757213335326,
@@ -3521,6 +3647,11 @@
     "current_ratio",
     "debt_to_equity"
    ],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K",
+    "debt_to_equity": "Not meaningful for banks and insurers (Financials sector)",
+    "current_ratio": "Not meaningful for banks and insurers (Financials sector)"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -3686,7 +3817,7 @@
    "cik": 354950,
    "price": 319.3800048828125,
    "shares_outstanding": 997689626.0,
-   "price_fetched_at": "2026-10-26T23:32:53",
+   "price_fetched_at": "2026-10-27T09:04:27",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-02-01",
    "revenue_growth": 3.240467921310982,
@@ -3706,6 +3837,7 @@
    "pb": 24.86865820833617,
    "ps": 1.934881667345211,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2022,
@@ -3871,7 +4003,7 @@
    "cik": 773840,
    "price": 219.27999877929688,
    "shares_outstanding": 316940010.0,
-   "price_fetched_at": "2026-10-26T23:33:08",
+   "price_fetched_at": "2026-10-27T09:04:35",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 7.849180516749719,
@@ -3891,6 +4023,7 @@
    "pb": 4.998461234602297,
    "ps": 1.8561670051255366,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -4056,7 +4189,7 @@
    "cik": 200406,
    "price": 266.29998779296875,
    "shares_outstanding": 2407310266.0,
-   "price_fetched_at": "2026-10-26T23:32:58",
+   "price_fetched_at": "2026-10-27T09:04:30",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-28",
    "revenue_growth": 6.048119251078011,
@@ -4076,6 +4209,9 @@
    "pb": 7.861604709723442,
    "ps": 6.805884667116329,
    "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -4241,7 +4377,7 @@
    "cik": 19617,
    "price": 334.0400085449219,
    "shares_outstanding": 2655600000.0,
-   "price_fetched_at": "2026-10-26T23:33:01",
+   "price_fetched_at": "2026-10-27T09:04:33",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 2.7546238933069005,
@@ -4264,6 +4400,13 @@
     "current_ratio",
     "debt_to_equity"
    ],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K",
+    "debt_to_equity": "Not meaningful for banks and insurers (Financials sector)",
+    "current_ratio": "Not meaningful for banks and insurers (Financials sector)",
+    "fcf": "Capital expenditure not reported in the FY2025 10-K",
+    "fcf_margin": "Capital expenditure not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -4429,7 +4572,7 @@
    "cik": 21344,
    "price": 92.69999694824219,
    "shares_outstanding": 4302549243.0,
-   "price_fetched_at": "2026-10-26T23:32:55",
+   "price_fetched_at": "2026-10-27T09:04:29",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 1.8699135164998617,
@@ -4449,6 +4592,7 @@
    "pb": 12.398467521395185,
    "ps": 8.319524033619693,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -4614,7 +4758,7 @@
    "cik": 59478,
    "price": 1279.1400146484375,
    "shares_outstanding": 891741406.0,
-   "price_fetched_at": "2026-10-26T23:33:00",
+   "price_fetched_at": "2026-10-27T09:04:32",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 44.70394955930999,
@@ -4634,6 +4778,9 @@
    "pb": 42.98707801520476,
    "ps": 17.500454366183252,
    "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -4799,7 +4946,7 @@
    "cik": 936468,
    "price": 635.2000122070312,
    "shares_outstanding": 231004640.0,
-   "price_fetched_at": "2026-10-26T23:33:09",
+   "price_fetched_at": "2026-10-27T09:04:36",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 5.63743085173768,
@@ -4819,6 +4966,7 @@
    "pb": 21.832190172278064,
    "ps": 1.9552040047420431,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -4984,7 +5132,7 @@
    "cik": 63908,
    "price": 250.8300018310547,
    "shares_outstanding": 707641531.0,
-   "price_fetched_at": "2026-10-26T23:32:54",
+   "price_fetched_at": "2026-10-27T09:04:28",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 3.7229938271604937,
@@ -5004,6 +5152,11 @@
    "pb": null,
    "ps": 6.602109968996107,
    "not_applicable": [],
+   "missing_reasons": {
+    "roe": "Average shareholders' equity is zero or negative",
+    "debt_to_equity": "Shareholders' equity is zero or negative",
+    "pb": "Shareholders' equity is zero or negative"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -5169,7 +5322,7 @@
    "cik": 1326801,
    "price": 630.5599975585938,
    "shares_outstanding": 2547506225.0,
-   "price_fetched_at": "2026-10-26T23:32:51",
+   "price_fetched_at": "2026-10-27T09:04:26",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 22.16703849824621,
@@ -5189,6 +5342,7 @@
    "pb": 7.394279765131684,
    "ps": 7.993170581175435,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -5354,7 +5508,7 @@
    "cik": 310158,
    "price": 140.61000061035156,
    "shares_outstanding": 2467171638.0,
-   "price_fetched_at": "2026-10-26T23:32:59",
+   "price_fetched_at": "2026-10-27T09:04:31",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 1.313738935294851,
@@ -5374,6 +5528,9 @@
    "pb": 6.594476020321296,
    "ps": 5.336158581240437,
    "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -5539,7 +5696,7 @@
    "cik": 789019,
    "price": 532.5999755859375,
    "shares_outstanding": 7425545491.0,
-   "price_fetched_at": "2026-10-26T23:32:46",
+   "price_fetched_at": "2026-10-27T09:04:24",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-06-30",
    "revenue_growth": 17.78868679984666,
@@ -5559,6 +5716,7 @@
    "pb": 8.939786538073832,
    "ps": 11.917964275503687,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2022,
@@ -5724,7 +5882,7 @@
    "cik": 753308,
    "price": 82.04000091552734,
    "shares_outstanding": 2097306049.0,
-   "price_fetched_at": "2026-10-26T23:33:12",
+   "price_fetched_at": "2026-10-27T09:04:38",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 10.742132266795943,
@@ -5744,6 +5902,10 @@
    "pb": 3.150875149796752,
    "ps": 6.2769221574529785,
    "not_applicable": [],
+   "missing_reasons": {
+    "fcf": "Capital expenditure not reported in the FY2025 10-K",
+    "fcf_margin": "Capital expenditure not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -5909,7 +6071,7 @@
    "cik": 1065280,
    "price": 63.900001525878906,
    "shares_outstanding": 4163939676.0,
-   "price_fetched_at": "2026-10-26T23:32:51",
+   "price_fetched_at": "2026-10-27T09:04:26",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 15.851068919677527,
@@ -5929,6 +6091,7 @@
    "pb": 9.997026981059589,
    "ps": 5.8888418133316165,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -6094,7 +6257,7 @@
    "cik": 320187,
    "price": 37.90999984741211,
    "shares_outstanding": 1485308829.0,
-   "price_fetched_at": "2026-10-26T23:32:54",
+   "price_fetched_at": "2026-10-27T09:04:28",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-05-31",
    "revenue_growth": 0.19218726381480922,
@@ -6114,6 +6277,9 @@
    "pb": 3.7879621581399165,
    "ps": 1.2135880313968246,
    "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2026 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2022,
@@ -6279,7 +6445,7 @@
    "cik": 1045810,
    "price": 216.0,
    "shares_outstanding": 24147000000.0,
-   "price_fetched_at": "2026-10-26T23:32:47",
+   "price_fetched_at": "2026-10-27T09:04:24",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-01-25",
    "revenue_growth": 65.4735357900948,
@@ -6299,6 +6465,7 @@
    "pb": 33.15946672769926,
    "ps": 24.153933073382174,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2022,
@@ -6464,7 +6631,7 @@
    "cik": 1341439,
    "price": 126.05999755859375,
    "shares_outstanding": 3031501149.0,
-   "price_fetched_at": "2026-10-26T23:32:47",
+   "price_fetched_at": "2026-10-27T09:04:24",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-05-31",
    "revenue_growth": 17.348734298506944,
@@ -6484,6 +6651,7 @@
    "pb": 8.990096627501039,
    "ps": 5.673516151874551,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2022,
@@ -6649,7 +6817,7 @@
    "cik": 77476,
    "price": 135.4600067138672,
    "shares_outstanding": 1362741092.0,
-   "price_fetched_at": "2026-10-26T23:32:56",
+   "price_fetched_at": "2026-10-27T09:04:29",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-27",
    "revenue_growth": 2.254665011866658,
@@ -6669,6 +6837,7 @@
    "pb": 9.046207854140091,
    "ps": 1.9653651048345244,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -6834,7 +7003,7 @@
    "cik": 78003,
    "price": 29.790000915527344,
    "shares_outstanding": 5699673589.0,
-   "price_fetched_at": "2026-10-26T23:32:59",
+   "price_fetched_at": "2026-10-27T09:04:31",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": -1.6470995017838341,
@@ -6854,6 +7023,9 @@
    "pb": 1.9634728876742336,
    "ps": 2.7132629385978846,
    "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -7019,7 +7191,7 @@
    "cik": 80424,
    "price": 159.9199981689453,
    "shares_outstanding": 2317783143.0,
-   "price_fetched_at": "2026-10-26T23:32:56",
+   "price_fetched_at": "2026-10-27T09:04:29",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-06-30",
    "revenue_growth": 3.260405296378909,
@@ -7039,6 +7211,7 @@
    "pb": 6.824766179679481,
    "ps": 4.258891855691841,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2022,
@@ -7204,7 +7377,7 @@
    "cik": 829224,
    "price": 102.69000244140625,
    "shares_outstanding": 1140000000.0,
-   "price_fetched_at": "2026-10-26T23:32:55",
+   "price_fetched_at": "2026-10-27T09:04:28",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-09-28",
    "revenue_growth": 2.786915154162129,
@@ -7224,6 +7397,11 @@
    "pb": null,
    "ps": 3.148271930788264,
    "not_applicable": [],
+   "missing_reasons": {
+    "roe": "Average shareholders' equity is zero or negative",
+    "debt_to_equity": "Shareholders' equity is zero or negative",
+    "pb": "Shareholders' equity is zero or negative"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -7389,7 +7567,7 @@
    "cik": 731766,
    "price": 410.70001220703125,
    "shares_outstanding": 897594847.0,
-   "price_fetched_at": "2026-10-26T23:32:58",
+   "price_fetched_at": "2026-10-27T09:04:31",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 11.814039242726306,
@@ -7409,6 +7587,7 @@
    "pb": 3.683107349584058,
    "ps": 0.8236581665311973,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -7574,7 +7753,7 @@
    "cik": 100885,
    "price": 296.9700012207031,
    "shares_outstanding": 594075498.0,
-   "price_fetched_at": "2026-10-26T23:33:09",
+   "price_fetched_at": "2026-10-27T09:04:35",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 1.0721649484536082,
@@ -7594,6 +7773,7 @@
    "pb": 9.553398027088852,
    "ps": 7.197984551866577,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -7759,7 +7939,7 @@
    "cik": 1403161,
    "price": 404.1600036621094,
    "shares_outstanding": 1877355259.0,
-   "price_fetched_at": "2026-10-26T23:33:07",
+   "price_fetched_at": "2026-10-27T09:04:34",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-09-30",
    "revenue_growth": 11.339976618604911,
@@ -7782,6 +7962,12 @@
     "current_ratio",
     "debt_to_equity"
    ],
+   "missing_reasons": {
+    "eps_growth": "Diluted EPS not reported in the FY2025 10-K",
+    "debt_to_equity": "Not meaningful for banks and insurers (Financials sector)",
+    "current_ratio": "Not meaningful for banks and insurers (Financials sector)",
+    "pe": "Diluted EPS not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -7947,7 +8133,7 @@
    "cik": 732712,
    "price": 43.099998474121094,
    "shares_outstanding": 4154775202.0,
-   "price_fetched_at": "2026-10-26T23:32:52",
+   "price_fetched_at": "2026-10-27T09:04:26",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 2.5247054633943673,
@@ -7967,6 +8153,7 @@
    "pb": 1.6934850707532194,
    "ps": 1.2958210365835414,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2021,
@@ -8132,7 +8319,7 @@
    "cik": 72971,
    "price": 82.6500015258789,
    "shares_outstanding": 3001638935.0,
-   "price_fetched_at": "2026-10-26T23:33:02",
+   "price_fetched_at": "2026-10-27T09:04:34",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": 1.704821619519782,
@@ -8155,6 +8342,13 @@
     "current_ratio",
     "debt_to_equity"
    ],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K",
+    "debt_to_equity": "Not meaningful for banks and insurers (Financials sector)",
+    "current_ratio": "Not meaningful for banks and insurers (Financials sector)",
+    "fcf": "Capital expenditure not reported in the FY2025 10-K",
+    "fcf_margin": "Capital expenditure not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
@@ -8320,7 +8514,7 @@
    "cik": 104169,
    "price": 120.29000091552734,
    "shares_outstanding": 7933746241.0,
-   "price_fetched_at": "2026-10-26T23:32:57",
+   "price_fetched_at": "2026-10-27T09:04:30",
    "latest_fiscal_year": 2026,
    "latest_fiscal_year_end": "2026-01-31",
    "revenue_growth": 4.725214211766779,
@@ -8340,6 +8534,7 @@
    "pb": 9.580195574986716,
    "ps": 1.338193852728551,
    "not_applicable": [],
+   "missing_reasons": {},
    "history": [
     {
      "fiscal_year": 2022,
@@ -8505,7 +8700,7 @@
    "cik": 34088,
    "price": 184.5399932861328,
    "shares_outstanding": 4111911960.0,
-   "price_fetched_at": "2026-10-26T23:33:10",
+   "price_fetched_at": "2026-10-27T09:04:36",
    "latest_fiscal_year": 2025,
    "latest_fiscal_year_end": "2025-12-31",
    "revenue_growth": -4.962169429466367,
@@ -8525,6 +8720,9 @@
    "pb": 2.9254169673443022,
    "ps": 2.2839416487324424,
    "not_applicable": [],
+   "missing_reasons": {
+    "operating_margin": "Operating income not reported in the FY2025 10-K"
+   },
    "history": [
     {
      "fiscal_year": 2021,
