@@ -9,7 +9,8 @@ import json
 import sqlite3
 
 from pipeline.extract import FIELDS
-from pipeline.metrics import METRIC_DEFINITIONS, METRIC_KEYS, fcf
+from pipeline.analysis import pros_and_cons
+from pipeline.metrics import METRIC_DEFINITIONS, METRIC_KEYS, fcf, yearly_ratios
 from pipeline.sec_client import BACKEND_DIR
 
 DB_PATH = BACKEND_DIR / "data" / "stocklens.db"
@@ -122,30 +123,42 @@ def load_companies(conn):
 
 
 def load_company_detail(conn, ticker):
-    """Return one company with its yearly history, or None if the ticker is unknown.
+    """Return one company with its yearly history and analysis, or None if the ticker is unknown.
 
     history is a list (oldest year first) of
-    {"fiscal_year", "end_date", <each raw field>, "fcf", "tags": {field: tag}}.
+    {"fiscal_year", "end_date", <each raw field>, "fcf", "tags": {field: tag},
+     "ratios": {key: value}, "ratio_missing_reasons": {key: reason}}.
+    analysis is {"pros": [{"id", "text"}], "cons": [...]}.
     """
     row = conn.execute("SELECT * FROM companies WHERE ticker = ?", (ticker.upper(),)).fetchone()
     if row is None:
         return None
     company = company_row_to_dict(row)
 
-    history_by_year = {}
-    for f in conn.execute(
-        "SELECT * FROM financials WHERE ticker = ? ORDER BY fiscal_year", (company["ticker"],)
-    ):
-        year = history_by_year.setdefault(
-            f["fiscal_year"], {"fiscal_year": f["fiscal_year"], "end_date": f["end_date"], "tags": {}}
-        )
-        year[f["field"]] = f["value"]
-        year["tags"][f["field"]] = f["tag"]
+    # Rebuild the extract_company() shape, so the same metric functions can be reused per year.
+    years = {}
+    for f in conn.execute("SELECT * FROM financials WHERE ticker = ?", (company["ticker"],)):
+        year = years.setdefault(f["fiscal_year"], {"end_date": f["end_date"], "fields": {}})
+        year["fields"][f["field"]] = None if f["value"] is None else {"value": f["value"], "tag": f["tag"]}
 
-    history = list(history_by_year.values())
-    for year in history:
-        year["fcf"] = fcf(year.get("operating_cash_flow"), year.get("capex"))
+    is_financial = company["sector"] == "Financials"
+    ratios_by_year = yearly_ratios(years, is_financial)
+
+    history = []
+    for fiscal_year in sorted(years):
+        cells = years[fiscal_year]["fields"]
+        item = {"fiscal_year": fiscal_year, "end_date": years[fiscal_year]["end_date"]}
+        for field in FIELDS:
+            item[field] = None if cells.get(field) is None else cells[field]["value"]
+        item["fcf"] = fcf(item["operating_cash_flow"], item["capex"])
+        item["tags"] = {field: None if cells.get(field) is None else cells[field]["tag"] for field in FIELDS}
+        item["ratios"] = ratios_by_year[fiscal_year]["ratios"]
+        item["ratio_missing_reasons"] = ratios_by_year[fiscal_year]["missing_reasons"]
+        history.append(item)
     company["history"] = history
+
+    latest_equity = history[-1]["equity"] if history else None
+    company["analysis"] = pros_and_cons(company, company["not_applicable"], latest_equity)
     return company
 
 

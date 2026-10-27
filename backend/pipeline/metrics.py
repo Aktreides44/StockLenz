@@ -242,6 +242,27 @@ def missing_reason(key, years, price, shares_outstanding, is_financial):
     return "Cannot be calculated: the denominator is zero"
 
 
+YEARLY_RATIO_KEYS = ["net_margin", "operating_margin", "roe", "roa", "debt_to_equity", "current_ratio", "fcf_margin"]
+
+
+def yearly_ratios(years, is_financial):
+    """Ratios for every fiscal year (not only the latest), for the Ratios table on the company page.
+
+    Returns {year: {"ratios": {key: value}, "missing_reasons": {key: reason}}}.
+    Each year is computed as if it were the latest year, using only that year and earlier ones.
+    """
+    result = {}
+    for year in years:
+        years_so_far = {y: data for y, data in years.items() if y <= year}
+        values = compute_all(years_so_far, price=None, shares_outstanding=None, is_financial=is_financial)
+        ratios = {key: values[key] for key in YEARLY_RATIO_KEYS}
+        result[year] = {
+            "ratios": ratios,
+            "missing_reasons": explain_missing(ratios, years_so_far, None, None, is_financial),
+        }
+    return result
+
+
 def explain_missing(values, years, price, shares_outstanding, is_financial):
     """Return {metric_key: reason} for every metric in `values` that is None."""
     return {

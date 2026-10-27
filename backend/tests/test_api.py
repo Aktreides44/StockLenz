@@ -83,6 +83,19 @@ def test_company_detail_has_history(client):
     assert detail["history"][1]["revenue"] == 120
     assert detail["history"][1]["fcf"] == 20
     assert detail["history"][1]["tags"]["revenue"] == "TestTag"
+    # Yearly ratios: 2025 net margin = 15 / 120
+    assert detail["history"][1]["ratios"]["net_margin"] == pytest.approx(12.5)
+    assert detail["history"][1]["ratios"]["operating_margin"] is None
+    assert "Operating income" in detail["history"][1]["ratio_missing_reasons"]["operating_margin"]
+    # Rule-based analysis: FCF 20 is positive, revenue grew
+    assert {"id": "positive_fcf", "text": "Positive free cash flow of $0M"} in detail["analysis"]["pros"]
+    assert detail["analysis"]["cons"] == []
+
+
+def test_detail_analysis_skips_not_applicable(client):
+    bank = client.get("/companies/BNK").json()
+    all_ids = [item["id"] for item in bank["analysis"]["pros"] + bank["analysis"]["cons"]]
+    assert "low_debt" not in all_ids and "high_debt" not in all_ids
 
 
 def test_unknown_ticker_is_404(client):
