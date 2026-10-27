@@ -27,6 +27,17 @@ void main() {
     expect(formatPrice(1234567.5), r'$1,234,567.50');
   });
 
+  test('formatMillions', () {
+    expect(formatMillions(391035000000), '391,035');
+    expect(formatMillions(-1234e6), '-1,234');
+    expect(formatMillions(400e3), '0');
+  });
+
+  test('dates', () {
+    expect(formatDate('2026-10-27T09:04:12'), '27 Oct 2026');
+    expect(formatMonthYear('2025-09-27'), 'Sep 2025');
+  });
+
   group('RangeFilter', () {
     test('empty filter accepts everything, including missing values', () {
       expect(const RangeFilter().accepts(null), isTrue);

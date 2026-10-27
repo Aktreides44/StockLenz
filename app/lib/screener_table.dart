@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'format.dart';
 import 'models.dart';
+import 'widgets.dart';
 
 const double rowHeight = 32;
 const double headerHeight = 48;
@@ -43,6 +44,7 @@ class ScreenerTable extends StatefulWidget {
     required this.sortKey,
     required this.sortAscending,
     required this.onSort,
+    this.onCompanyTap,
   });
 
   final List<Company> companies;
@@ -53,6 +55,9 @@ class ScreenerTable extends StatefulWidget {
   final String sortKey;
   final bool sortAscending;
   final void Function(String columnKey) onSort;
+
+  /// Called when a row is clicked (opens the company page).
+  final void Function(Company company)? onCompanyTap;
 
   @override
   State<ScreenerTable> createState() => _ScreenerTableState();
@@ -213,15 +218,20 @@ class _ScreenerTableState extends State<ScreenerTable> {
       background = colors.surface;
     }
 
+    final company = widget.companies[index];
     return MouseRegion(
+      cursor: widget.onCompanyTap == null ? MouseCursor.defer : SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hoveredRow = index),
       onExit: (_) => setState(() => _hoveredRow = null),
-      child: Container(
-        decoration: BoxDecoration(
-          color: background,
-          border: Border(bottom: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.4))),
+      child: GestureDetector(
+        onTap: widget.onCompanyTap == null ? null : () => widget.onCompanyTap!(company),
+        child: Container(
+          decoration: BoxDecoration(
+            color: background,
+            border: Border(bottom: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.4))),
+          ),
+          child: Row(children: [for (final column in columns) _cell(company, column)]),
         ),
-        child: Row(children: [for (final column in columns) _cell(widget.companies[index], column)]),
       ),
     );
   }
@@ -238,14 +248,14 @@ class _ScreenerTableState extends State<ScreenerTable> {
         ),
       'sector' => Text(company.sector, overflow: TextOverflow.ellipsis),
       'fy' => company.latestFiscalYear == null
-          ? _missing('No 10-K data')
+          ? const MissingValue('No 10-K data')
           : Tooltip(
               message: 'Fiscal year ended ${company.latestFiscalYearEnd}',
-              child: Text('${company.latestFiscalYear}', style: _numberStyle),
+              child: Text('${company.latestFiscalYear}', style: numberStyle),
             ),
       'price' => company.price == null
-          ? _missing('No current share price available')
-          : Text(formatPrice(company.price!), style: _numberStyle),
+          ? const MissingValue('No current share price available')
+          : Text(formatPrice(company.price!), style: numberStyle),
       _ => _metricCell(company, column.key),
     };
 
@@ -263,21 +273,8 @@ class _ScreenerTableState extends State<ScreenerTable> {
 
   Widget _metricCell(Company company, String metricKey) {
     final value = company.metrics[metricKey];
-    if (value == null) return _missing(company.missingReason(metricKey));
+    if (value == null) return MissingValue(company.missingReason(metricKey));
     final unit = widget.metricsByKey[metricKey]?.unit ?? 'x';
-    return Text(
-      formatMetric(value, unit),
-      style: _numberStyle.copyWith(color: value < 0 ? Theme.of(context).colorScheme.error : null),
-    );
+    return NumberText(formatMetric(value, unit), value: value);
   }
-
-  Widget _missing(String reason) {
-    return Tooltip(
-      message: reason,
-      child: Text(missingValue, style: TextStyle(color: Theme.of(context).colorScheme.outline)),
-    );
-  }
-
-  // Tabular figures give every digit the same width, so numbers line up in columns.
-  static const TextStyle _numberStyle = TextStyle(fontFeatures: [FontFeature.tabularFigures()]);
 }

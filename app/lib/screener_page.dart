@@ -1,6 +1,7 @@
 // Screen 1: the screener. Search, sector filter, min/max filters and a sortable table.
 import 'package:flutter/material.dart';
 
+import 'company_page.dart';
 import 'data_service.dart';
 import 'filters_panel.dart';
 import 'models.dart';
@@ -192,6 +193,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
                         sortKey: _sortKey,
                         sortAscending: _sortAscending,
                         onSort: _onSort,
+                        onCompanyTap: (company) => openCompanyPage(context, company.ticker, data),
                       ),
               ),
               if (_showFilters)

@@ -26,10 +26,34 @@ String formatMoney(double value) {
   return '$sign\$${amount.toStringAsFixed(0)}';
 }
 
+/// Put a comma before every group of 3 digits, counted from the right: "1234567" -> "1,234,567".
+String _withCommas(String digits) => digits.replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (_) => ',');
+
 /// Share price: $343.91, $1,279.14
 String formatPrice(double price) {
   final parts = price.toStringAsFixed(2).split('.');
-  // Put a comma before every group of 3 digits, counted from the right.
-  final whole = parts[0].replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (_) => ',');
-  return '\$$whole.${parts[1]}';
+  return '\$${_withCommas(parts[0])}.${parts[1]}';
+}
+
+/// A dollar amount in millions, for the financial statement tables: 391,035 or -1,234
+String formatMillions(double value) {
+  final millions = (value / 1e6).round();
+  final sign = millions < 0 ? '-' : '';
+  return '$sign${_withCommas(millions.abs().toString())}';
+}
+
+const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/// "2026-10-27T09:04:12" -> "27 Oct 2026"
+String formatDate(String isoDate) {
+  final date = DateTime.tryParse(isoDate);
+  if (date == null) return isoDate;
+  return '${date.day} ${_months[date.month - 1]} ${date.year}';
+}
+
+/// "2025-09-27" -> "Sep 2025" (column headers of the financial tables)
+String formatMonthYear(String isoDate) {
+  final date = DateTime.tryParse(isoDate);
+  if (date == null) return isoDate;
+  return '${_months[date.month - 1]} ${date.year}';
 }

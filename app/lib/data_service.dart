@@ -53,8 +53,32 @@ Future<ScreenerData> _loadFromApi() async {
   return _buildData(metricsJson, companiesJson, isOffline: false);
 }
 
+Map<String, dynamic>? _snapshotCache;
+
+/// The snapshot file is read once and then kept in memory.
+Future<Map<String, dynamic>> _snapshot() async {
+  return _snapshotCache ??= jsonDecode(await rootBundle.loadString(snapshotAsset)) as Map<String, dynamic>;
+}
+
+/// Load one company's page. If the screener is already offline, go straight to the snapshot
+/// instead of waiting for the API to time out again.
+Future<CompanyDetail> loadCompanyDetail(String ticker, List<MetricDefinition> metrics, {bool offline = false}) async {
+  if (!offline) {
+    try {
+      final json = await _getJson('/companies/$ticker') as Map<String, dynamic>;
+      return CompanyDetail.fromJson(json, metrics, isOffline: false);
+    } catch (_) {
+      // fall through to the snapshot
+    }
+  }
+  final details = (await _snapshot())['details'] as Map<String, dynamic>;
+  final json = details[ticker] as Map<String, dynamic>?;
+  if (json == null) throw Exception('$ticker is not in the offline snapshot');
+  return CompanyDetail.fromJson(json, metrics, isOffline: true);
+}
+
 Future<ScreenerData> _loadFromSnapshot() async {
-  final snapshot = jsonDecode(await rootBundle.loadString(snapshotAsset)) as Map<String, dynamic>;
+  final snapshot = await _snapshot();
   return _buildData(
     snapshot['metrics'] as List<dynamic>,
     snapshot['companies'] as List<dynamic>,
