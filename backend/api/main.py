@@ -1,17 +1,33 @@
 """StockLens API: read-only access to the SQLite database built by `python -m pipeline.refresh`.
 
-It never calls the SEC or Yahoo at request time; it only reads the database.
+It never calls the SEC or Yahoo at request time; it only reads the database. On the server the
+database file is downloaded from GitHub (see api/database_file.py).
 
 Start it from the backend folder:
     python -m uvicorn api.main:app --reload
 Then open http://127.0.0.1:8000/docs
 """
+from contextlib import asynccontextmanager
+
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.database_file import refresh_if_needed
 from pipeline import db
 
-app = FastAPI(title="StockLens API", description="Fundamental stock screener data (SEC 10-K + latest price)")
+
+@asynccontextmanager
+async def lifespan(app):
+    # Runs once when the server starts: on Render, fetch the newest database before the first request.
+    refresh_if_needed()
+    yield
+
+
+app = FastAPI(
+    title="StockLens API",
+    description="Fundamental stock screener data (SEC 10-K + latest price)",
+    lifespan=lifespan,
+)
 
 # Allow the app (or a browser page) on any origin to read the data. The API is read-only.
 app.add_middleware(
@@ -27,9 +43,14 @@ def get_db():
 
     Tests replace this function (app.dependency_overrides) to use a small test database.
     """
+    refresh_if_needed()  # does nothing locally, or when the server's copy is still fresh
     if not db.DB_PATH.exists():
-        raise HTTPException(status_code=503, detail="Database not found. Run `python -m pipeline.refresh` first.")
-    conn = db.connect()
+        raise HTTPException(
+            status_code=503,
+            detail="Database not found. Locally: run `python -m pipeline.refresh`. "
+            "On the server: the daily data workflow has not published a database yet.",
+        )
+    conn = db.connect(db.DB_PATH)
     try:
         yield conn
     finally:
@@ -51,6 +72,7 @@ def health():
     It always answers (status "ok"), even without a database, so "server down" and
     "data missing" can be told apart.
     """
+    refresh_if_needed()
     if not db.DB_PATH.exists():
         return {"status": "ok", "database": "missing", "companies": 0, "prices_as_of": None}
     conn = db.connect(db.DB_PATH)

@@ -19,3 +19,10 @@ SEC_USER_AGENT = os.getenv("SEC_USER_AGENT")
 
 # Where the SQLite database lives. Default: backend/data/stocklens.db
 DB_PATH = Path(os.getenv("STOCKLENS_DB_PATH", str(BACKEND_DIR / "data" / "stocklens.db")))
+
+# Server only: where to download the database from (set on Render; the daily GitHub Actions run
+# publishes it there). Empty = don't download, just use the file at DB_PATH (local development).
+DB_URL = os.getenv("STOCKLENS_DB_URL", "")
+
+# How old (in hours) the downloaded copy may get before the server fetches it again.
+DB_MAX_AGE_HOURS = float(os.getenv("STOCKLENS_DB_MAX_AGE_HOURS", "6"))

@@ -1,0 +1,64 @@
+# Builds a fresh database every weekday and publishes it, so the API on Render can download it.
+#
+# What happens, in order:
+#   1. tests run (if they fail, nothing is published)
+#   2. the pipeline downloads SEC data and prices and builds stocklens.db
+#   3. a sanity check makes sure the result is not broken
+#   4. stocklens.db is uploaded to the GitHub release "data-latest", replacing yesterday's file
+#
+# Needs the repository secret SEC_USER_AGENT (Settings -> Secrets and variables -> Actions).
+
+name: Refresh data
+
+on:
+  schedule:
+    # 22:30 UTC, Monday to Friday: after the US market closes (16:00 New York time).
+    - cron: "30 22 * * 1-5"
+  workflow_dispatch: # adds a "Run workflow" button on GitHub, to start it by hand
+
+permissions:
+  contents: write # needed to upload the file to the release
+
+concurrency:
+  group: refresh-data # never run two refreshes at the same time
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v5
+
+      - name: Install Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install packages
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest -q
+
+      - name: Build the database
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: python -m pipeline.refresh
+
+      - name: Check the database before publishing
+        run: python -m pipeline.check_database
+
+      - name: Publish it as the "data-latest" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view data-latest > /dev/null 2>&1; then
+            gh release create data-latest --latest=false --title "Daily data" \
+              --notes "Built automatically by the Refresh data workflow. Not a code release."
+          fi
+          gh release upload data-latest data/stocklens.db --clobber

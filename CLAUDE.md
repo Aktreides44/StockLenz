@@ -42,7 +42,11 @@ Until a phase changes it, the code still works the v1 way (yfinance, 40 companie
    - fetches the latest price (v1: yfinance; v2: Polygon)
    - computes indicators and writes everything to `backend/data/stocklens.db`
    - v1 only: also exports `app/assets/snapshot.json` (removed in v2 phase 2)
-2. `backend/api/` — FastAPI app reading only from SQLite (never calls SEC at request time):
+   - in v2 it runs in GitHub Actions (`.github/workflows/refresh-data.yml`, weekdays), is checked by
+     `python -m pipeline.check_database`, and the DB is uploaded to the GitHub release `data-latest`
+2. `backend/api/` — FastAPI app reading only from SQLite (never calls SEC at request time).
+   On Render it downloads the DB from `STOCKLENS_DB_URL` at startup and when its copy is > 6 h old
+   (`api/database_file.py`); locally that setting is empty and the pipeline's file is used.
    - `GET /companies` → list with all screener metrics
    - `GET /companies/{ticker}` → detail incl. yearly history
    - `GET /metrics` → metric definitions (key, label, formula, unit, higher_is_better)

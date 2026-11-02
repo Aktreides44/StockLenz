@@ -103,9 +103,29 @@ variable always wins over `.env`.
 |---|---|---|
 | `SEC_USER_AGENT` | the pipeline (every SEC request) | none: must be set |
 | `STOCKLENS_DB_PATH` | the pipeline (writes) and the API (reads) | `backend/data/stocklens.db` |
+| `STOCKLENS_DB_URL` | the API on a server: where to download the database | empty = don't download |
+| `STOCKLENS_DB_MAX_AGE_HOURS` | the API on a server: re-download when the copy is older | `6` |
 
 The API server itself only needs `backend/requirements-api.txt` (FastAPI, uvicorn, python-dotenv);
 `requirements.txt` adds what the pipeline and the tests need.
+
+## Hosting (v2)
+
+```
+GitHub Actions (weekdays 22:30 UTC)            GitHub release "data-latest"          Render
+tests → pipeline → check_database  ──upload──►  stocklens.db              ──download──►  API server
+```
+
+- **Daily data:** `.github/workflows/refresh-data.yml` runs the tests and the pipeline, checks the
+  result (`python -m pipeline.check_database`: at least 90% of the companies, 90% of them with a price),
+  and uploads `stocklens.db` to the release `data-latest`. If anything fails, nothing is published and
+  the previous database stays online. It can also be started by hand: GitHub → Actions → Refresh data →
+  Run workflow. Needs the repository secret `SEC_USER_AGENT`.
+- **API on Render** (free web service): root directory `backend`, build command
+  `pip install -r requirements-api.txt`, start command `uvicorn api.main:app --host 0.0.0.0 --port $PORT`,
+  health check path `/health`, environment variables `PYTHON_VERSION=3.13.7` and
+  `STOCKLENS_DB_URL=https://github.com/Aktreides44/StockLenz/releases/download/data-latest/stocklens.db`.
+  The free tier sleeps after ~15 minutes without visitors; the first request then takes 30–60 s.
 
 ### App
 

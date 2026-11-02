@@ -130,6 +130,23 @@ def test_health_without_database_still_answers(tmp_path, monkeypatch):
     assert response.json()["database"] == "missing"
 
 
+def test_check_database_before_publishing(tmp_path):
+    from pipeline.check_database import check
+
+    test_db = tmp_path / "test.db"
+    good = make_company("AAA", "Industrials", make_years({2025: {"revenue": 10}}))
+    no_price = dict(make_company("BBB", "Industrials", make_years({2025: {"revenue": 10}})), price=None)
+    db.write_database([good, no_price], path=test_db)
+    conn = db.connect(test_db)
+    try:
+        assert check(conn, expected_companies=2) == ["only 1 of 2 companies have a price"]
+        assert check(conn, expected_companies=40) == [
+            "only 2 of 40 companies in the database", "only 1 of 2 companies have a price",
+        ]
+    finally:
+        conn.close()
+
+
 def test_cors_header(client):
     response = client.get("/companies", headers={"Origin": "http://localhost:1234"})
     assert response.headers["access-control-allow-origin"] == "*"
