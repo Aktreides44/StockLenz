@@ -1,46 +1,53 @@
 # StockLens — project brief for Claude Code
 
 ## What this is
-StockLens is a university prototype (Medical Informatics, software engineering course): a
-fundamental stock screener inspired by Screener.in, for long-term investors. Not a trading app.
+StockLens is a university project (Medical Informatics, software engineering course): a
+fundamental stock screener inspired by Screener.in, for long-term investors. Not a trading app,
+and it shows facts and simple rules — never investment advice.
 
-**Hard deadline: Wednesday 28 Oct 2026.** Must deliver a working Windows desktop UI with real
-screener functionality. iOS is a later goal — keep code platform-neutral, but do not spend time on
-iOS builds now.
+**v1.0 is done and tagged** (`git checkout v1.0`): the Windows app demoed on 28 Oct 2026 — 40
+companies, SEC 10-K data, yfinance prices, offline snapshot fallback.
 
-## Scope for the Wednesday demo (MVP)
-In scope:
-- 30–50 large US companies (S&P 500 names across several sectors).
-- Screener table: search by ticker/name, sort by any column, simple filters (min/max per metric, sector).
-- Company detail page: key metrics as cards + 4–5 years of annual revenue / net income / FCF (simple bar or line chart).
-- ~12–15 core indicators (list below), each with a visible formula/definition.
-- "Missing data" shown as "—" with a tooltip, never as 0 and never invented.
+**Now building v2.** The scope, decisions and order of work are in [`docs/V2_PLAN.md`](docs/V2_PLAN.md).
+Work through its phases in order, in small steps. That plan replaces the old v1 "out of scope" list:
+build what the current phase says, and nothing from a later phase unless asked.
 
-Out of scope until after Wednesday (do NOT build unless asked):
-- Scoring engine, five-company evaluation snapshots, comparison page, iOS build,
-  user accounts, real-time prices, PEG/ROCE/EV-EBITDA.
+## v2 target (see the plan for why)
+- **Hosted API:** the FastAPI backend runs online on **Render** (free tier first); the app talks to it,
+  not to `127.0.0.1`. Settings (e.g. `SEC_USER_AGENT`) come from environment variables / Render secrets.
+- **No offline mode:** no `snapshot.json` in the app. If the API can't be reached, show
+  "Can't connect — Retry" (and "Waking up the server…" while Render's free tier starts).
+- **Platforms:** one Flutter codebase for **web, Android and Windows**; **iOS** later (built on a Mac).
+  Keep code platform-neutral (no `dart:io`-only features in shared code).
+- **Companies:** the **S&P 500** (~500), from a published constituents list.
+- **Prices:** **Polygon.io** (one daily request for all US closing prices), yfinance only as backup.
+  **Shares outstanding:** from the SEC (10-K/10-Q cover page), not Yahoo.
+- **Data refresh:** the pipeline runs once a day (GitHub Actions), not on the user's PC.
+
+Until a phase changes it, the code still works the v1 way (yfinance, 40 companies, snapshot,
+`explorer.exe` link opener). When a phase replaces something, update this file and the README.
 
 ## Stack
-- `backend/` — Python 3.11+, FastAPI, SQLite (via stdlib `sqlite3` or SQLModel), pytest.
-- `app/` — Flutter (Windows desktop target), `http` package, `fl_chart` for charts.
-- Data: SEC EDGAR XBRL "companyfacts" API for fundamentals; `yfinance` for latest price and
-  shares outstanding (unofficial source — acceptable for prototype, document it in README).
+- `backend/` — Python 3.11+, FastAPI, SQLite (stdlib `sqlite3`), pytest. Hosted on Render (v2).
+- `app/` — Flutter (web, Android, Windows; iOS later), `http` package, `fl_chart` for charts.
+- Data: SEC EDGAR XBRL "companyfacts" API for fundamentals (+ 10-Q for TTM in phase 4);
+  Polygon.io for prices (v2), `yfinance` as backup.
 
 ## Architecture
 1. `backend/pipeline/` — a script (`python -m pipeline.refresh`) that:
-   - loads tickers from `backend/data/universe.csv` (ticker, name, sector)
+   - loads tickers from `backend/data/universe.csv` (ticker, name, sector, optional cik override)
    - maps ticker → CIK using https://www.sec.gov/files/company_tickers.json
    - downloads `https://data.sec.gov/api/xbrl/companyfacts/CIK##########.json`
    - extracts ANNUAL (form 10-K, fp=FY) values for the fields below, deduplicated by fiscal year
-   - fetches latest price via yfinance
+   - fetches the latest price (v1: yfinance; v2: Polygon)
    - computes indicators and writes everything to `backend/data/stocklens.db`
-   - also exports `app/assets/snapshot.json` so the Flutter app can run offline if the API is down
+   - v1 only: also exports `app/assets/snapshot.json` (removed in v2 phase 2)
 2. `backend/api/` — FastAPI app reading only from SQLite (never calls SEC at request time):
    - `GET /companies` → list with all screener metrics
    - `GET /companies/{ticker}` → detail incl. yearly history
    - `GET /metrics` → metric definitions (key, label, formula, unit, higher_is_better)
-3. `app/` — Flutter calls `http://127.0.0.1:8000`; on failure falls back to `assets/snapshot.json`
-   and shows a small "offline snapshot" banner.
+3. `app/` — Flutter reads the API address from one config setting (local for development, the Render
+   URL for real use). v1 still calls `http://127.0.0.1:8000` with the snapshot fallback until phase 2.
 
 ## SEC rules (important)
 - Every request MUST send a `User-Agent` header like `StockLens student project <EMAIL_FROM_.env>`.
@@ -96,8 +103,13 @@ Banks/insurers: current_ratio and debt_to_equity are not meaningful — return n
 - Run `pytest` after every change to calculations. Do not mark a task done with failing tests.
 
 ## Working conventions
-- Work in small steps; after each step tell me exactly what command to run to see it working.
+- Work in small steps. Before each step explain what you build and why (in plain words — I'm new to
+  coding tools and to the stock market); after each step tell me exactly what command to run to see it working.
 - Commit to git after each working step with a clear message.
+- Git/GitHub: the repo is https://github.com/Aktreides44/StockLenz (remote `origin`, branch `main`).
+  Commits use my GitHub noreply email (set as this repo's `user.email`) — never my personal email.
+  Ask me before every push. Never commit `backend/.env`, `backend/data/raw/` or `*.db`.
+  Never rewrite history that has already been pushed.
 - Prefer simple, readable code over clever abstractions — this will be graded and explained by a student.
 - Write a `README.md` with: setup, how to run pipeline/API/app, data sources and their limitations,
   metric definitions.
