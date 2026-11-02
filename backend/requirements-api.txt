@@ -1,5 +1,6 @@
 # Only what the API server needs (used on Render). It just reads the SQLite database.
 # For the pipeline and the tests, install requirements.txt instead.
-fastapi
-uvicorn
-python-dotenv
+# Versions are pinned (==) so the server installs exactly what was tested locally.
+fastapi==0.162.0
+uvicorn==0.54.0
+python-dotenv==1.2.4
