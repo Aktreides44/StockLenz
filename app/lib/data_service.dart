@@ -5,10 +5,9 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 
+import 'config.dart';
 import 'models.dart';
 
-const String apiBaseUrl = 'http://127.0.0.1:8000';
-const Duration apiTimeout = Duration(seconds: 3);
 const String snapshotAsset = 'assets/snapshot.json';
 
 class ScreenerData {

@@ -129,11 +129,16 @@ tests → pipeline → check_database  ──upload──►  stocklens.db      
 
 ### App
 
-With the API running, in a second window:
-
 ```
 cd app
 flutter run -d windows
+```
+
+By default the app uses the hosted API on Render (`app/lib/config.dart`). To use the API running on
+your own PC instead (start it first, see above):
+
+```
+flutter run -d windows --dart-define=API_URL=http://127.0.0.1:8000
 ```
 
 If the API is not running, the app uses the bundled `assets/snapshot.json` and shows an

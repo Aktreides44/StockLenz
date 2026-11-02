@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'company_page.dart';
+import 'config.dart';
 import 'data_service.dart';
 import 'filters_panel.dart';
 import 'models.dart';

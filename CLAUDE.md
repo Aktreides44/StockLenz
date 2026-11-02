@@ -50,8 +50,9 @@ Until a phase changes it, the code still works the v1 way (yfinance, 40 companie
    - `GET /companies` → list with all screener metrics
    - `GET /companies/{ticker}` → detail incl. yearly history
    - `GET /metrics` → metric definitions (key, label, formula, unit, higher_is_better)
-3. `app/` — Flutter reads the API address from one config setting (local for development, the Render
-   URL for real use). v1 still calls `http://127.0.0.1:8000` with the snapshot fallback until phase 2.
+3. `app/` — Flutter reads the API address from `app/lib/config.dart`: the Render URL by default,
+   `--dart-define=API_URL=http://127.0.0.1:8000` for a local API. The snapshot fallback stays until
+   phase 2 step 2.
 
 ## SEC rules (important)
 - Every request MUST send a `User-Agent` header like `StockLens student project <EMAIL_FROM_.env>`.
