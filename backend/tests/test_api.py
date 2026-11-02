@@ -112,6 +112,24 @@ def test_metrics_definitions(client):
         assert "latest fiscal year" in metrics[key]["formula"]
 
 
+def test_health_with_database(tmp_path, monkeypatch):
+    test_db = tmp_path / "test.db"
+    db.write_database([make_company("AAA", "Industrials", make_years({2025: {"revenue": 10}}))], path=test_db)
+    monkeypatch.setattr(db, "DB_PATH", test_db)
+    response = TestClient(app).get("/health")
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "ok", "database": "ok", "companies": 1, "prices_as_of": "2026-10-26T12:00:00",
+    }
+
+
+def test_health_without_database_still_answers(tmp_path, monkeypatch):
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "does-not-exist.db")
+    response = TestClient(app).get("/health")
+    assert response.status_code == 200
+    assert response.json()["database"] == "missing"
+
+
 def test_cors_header(client):
     response = client.get("/companies", headers={"Origin": "http://localhost:1234"})
     assert response.headers["access-control-allow-origin"] == "*"

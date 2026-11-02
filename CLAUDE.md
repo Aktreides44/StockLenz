@@ -108,6 +108,7 @@ Banks/insurers: current_ratio and debt_to_equity are not meaningful — return n
 - Commit to git after each working step with a clear message.
 - Git/GitHub: the repo is https://github.com/Aktreides44/StockLenz (remote `origin`, branch `main`).
   Commits use my GitHub noreply email (set as this repo's `user.email`) — never my personal email.
+  No "Co-Authored-By: Claude" (or any Claude attribution) line in commit messages — I'm the only author.
   Ask me before every push. Never commit `backend/.env`, `backend/data/raw/` or `*.db`.
   Never rewrite history that has already been pushed.
 - Prefer simple, readable code over clever abstractions — this will be graded and explained by a student.

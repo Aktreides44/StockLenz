@@ -1,18 +1,17 @@
 """Download data from SEC EDGAR, with caching and polite rate limiting.
 
-SEC rules: every request must send a User-Agent that identifies us (read from
-backend/.env), and we must stay under 10 requests per second.
+SEC rules: every request must send a User-Agent that identifies us (the SEC_USER_AGENT
+setting, see config.py), and we must stay under 10 requests per second.
 Downloaded JSON is cached in backend/data/raw/ so reruns don't refetch it.
 """
 import json
-import os
 import time
-from pathlib import Path
 
 import requests
-from dotenv import load_dotenv
 
-BACKEND_DIR = Path(__file__).resolve().parent.parent
+import config
+from config import BACKEND_DIR
+
 RAW_DIR = BACKEND_DIR / "data" / "raw"
 
 TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
@@ -22,12 +21,11 @@ SECONDS_BETWEEN_REQUESTS = 0.2  # at most 5 requests/second, well under the SEC 
 
 
 def get_user_agent():
-    load_dotenv(BACKEND_DIR / ".env")
-    user_agent = os.getenv("SEC_USER_AGENT")
+    user_agent = config.SEC_USER_AGENT
     if not user_agent or "example.com" in user_agent:
         raise RuntimeError(
-            "SEC_USER_AGENT is not set. Copy backend/.env.example to backend/.env "
-            "and put your email address in it."
+            "SEC_USER_AGENT is not set. Locally: copy backend/.env.example to backend/.env "
+            "and put your email address in it. On a server: set it as an environment variable."
         )
     return user_agent
 

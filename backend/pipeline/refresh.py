@@ -16,7 +16,8 @@ import yfinance as yf
 from pipeline import db
 from pipeline.extract import extract_company
 from pipeline.metrics import METRIC_KEYS, NOT_APPLICABLE_FOR_FINANCIALS, compute_all, explain_missing
-from pipeline.sec_client import BACKEND_DIR, load_companyfacts, load_ticker_to_cik
+from config import BACKEND_DIR
+from pipeline.sec_client import load_companyfacts, load_ticker_to_cik
 
 UNIVERSE_CSV = BACKEND_DIR / "data" / "universe.csv"
 SNAPSHOT_JSON = BACKEND_DIR.parent / "app" / "assets" / "snapshot.json"

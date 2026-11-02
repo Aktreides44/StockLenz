@@ -91,6 +91,21 @@ Then open http://127.0.0.1:8000/docs. Endpoints:
 | `GET /companies` | All companies with every screener metric, the latest fiscal year and its end date |
 | `GET /companies/{ticker}` | One company: metrics, 5 years of history, yearly ratios, rule-based pros/cons |
 | `GET /metrics` | Metric definitions: label, formula, unit, whether higher is better |
+| `GET /health` | `{"status": "ok", "database": "ok" or "missing", "companies": 40, "prices_as_of": ...}` — answers even without a database |
+
+### Settings
+
+All settings live in `backend/config.py` and are read from **environment variables**. On your PC they
+come from `backend/.env`; on a server you set them in the hosting dashboard. A real environment
+variable always wins over `.env`.
+
+| Variable | Needed by | Default |
+|---|---|---|
+| `SEC_USER_AGENT` | the pipeline (every SEC request) | none: must be set |
+| `STOCKLENS_DB_PATH` | the pipeline (writes) and the API (reads) | `backend/data/stocklens.db` |
+
+The API server itself only needs `backend/requirements-api.txt` (FastAPI, uvicorn, python-dotenv);
+`requirements.txt` adds what the pipeline and the tests need.
 
 ### App
 

@@ -40,8 +40,27 @@ def get_db():
 def index():
     return {
         "name": "StockLens API",
-        "endpoints": ["/companies", "/companies/{ticker}", "/metrics", "/docs"],
+        "endpoints": ["/companies", "/companies/{ticker}", "/metrics", "/health", "/docs"],
     }
+
+
+@app.get("/health")
+def health():
+    """Is the server up, and does it have data? The hosting service calls this to check on us.
+
+    It always answers (status "ok"), even without a database, so "server down" and
+    "data missing" can be told apart.
+    """
+    if not db.DB_PATH.exists():
+        return {"status": "ok", "database": "missing", "companies": 0, "prices_as_of": None}
+    conn = db.connect(db.DB_PATH)
+    try:
+        companies, prices_as_of = conn.execute(
+            "SELECT COUNT(*), MAX(price_fetched_at) FROM companies"
+        ).fetchone()
+    finally:
+        conn.close()
+    return {"status": "ok", "database": "ok", "companies": companies, "prices_as_of": prices_as_of}
 
 
 @app.get("/companies")

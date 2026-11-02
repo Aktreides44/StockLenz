@@ -11,9 +11,7 @@ import sqlite3
 from pipeline.extract import FIELDS
 from pipeline.analysis import pros_and_cons
 from pipeline.metrics import METRIC_DEFINITIONS, METRIC_KEYS, fcf, yearly_ratios
-from pipeline.sec_client import BACKEND_DIR
-
-DB_PATH = BACKEND_DIR / "data" / "stocklens.db"
+from config import DB_PATH
 
 COMPANY_COLUMNS = [
     "ticker", "name", "sector", "cik", "price", "shares_outstanding", "price_fetched_at",

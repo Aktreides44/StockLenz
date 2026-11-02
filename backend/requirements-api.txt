@@ -1,0 +1,5 @@
+# Only what the API server needs (used on Render). It just reads the SQLite database.
+# For the pipeline and the tests, install requirements.txt instead.
+fastapi
+uvicorn
+python-dotenv
