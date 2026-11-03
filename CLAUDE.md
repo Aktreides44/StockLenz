@@ -24,9 +24,9 @@ build what the current phase says, and nothing from a later phase unless asked.
   **Shares outstanding:** from the SEC (10-K/10-Q cover page), not Yahoo.
 - **Data refresh:** the pipeline runs once a day (GitHub Actions), not on the user's PC.
 
-Until a phase changes it, the code still works the v1 way (yfinance, 40 companies,
-`explorer.exe` link opener). Done so far: hosted API (phase 1); API address in `config.dart` and
-offline snapshot removed (phase 2 steps 1–2). When a phase replaces something, update this file and the README.
+Until a phase changes it, the code still works the v1 way (yfinance, 40 companies).
+Done so far: hosted API (phase 1); API address in `config.dart`, offline snapshot removed and links
+opened with `url_launcher` (phase 2 steps 1–3). When a phase replaces something, update this file and the README.
 
 ## Stack
 - `backend/` — Python 3.11+, FastAPI, SQLite (stdlib `sqlite3`), pytest. Hosted on Render (v2).

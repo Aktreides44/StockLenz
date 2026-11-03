@@ -1,9 +1,9 @@
 // Small widgets and styles shared by the screener and the company page.
 import 'dart:async';
-import 'dart:io' show Platform, Process;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
+import 'package:url_launcher/url_launcher.dart';
 
 import 'format.dart';
 
@@ -45,21 +45,21 @@ class NumberText extends StatelessWidget {
   }
 }
 
-/// Open a web page in the default browser.
-///
-/// On Windows we ask Explorer to open it, which needs no extra plugin. On other platforms
-/// (later: iOS) we copy the link to the clipboard for now.
+/// Open a web page: a new tab on the web, the browser app on Android/iOS, the default browser on Windows.
+/// If that fails, the link is copied to the clipboard instead.
 Future<void> openInBrowser(BuildContext context, String url) async {
-  if (Platform.isWindows) {
-    await Process.run('explorer.exe', [url]);
-    return;
+  bool opened;
+  try {
+    opened = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  } catch (_) {
+    opened = false;
   }
+  if (opened) return;
   await Clipboard.setData(ClipboardData(text: url));
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Link copied: $url')));
   }
 }
-
 
 /// A spinner while data loads. If it takes longer than a few seconds, the server on
 /// Render's free tier is probably asleep, so we say that it is waking up.
