@@ -17,7 +17,8 @@ build what the current phase says, and nothing from a later phase unless asked.
   not to `127.0.0.1`. Settings (e.g. `SEC_USER_AGENT`) come from environment variables / Render secrets.
 - **No offline mode:** no `snapshot.json` in the app. If the API can't be reached, show
   "Can't connect — Retry" (and "Waking up the server…" while Render's free tier starts).
-- **Platforms:** one Flutter codebase for **web, Android and Windows**; **iOS** later (built on a Mac).
+- **Platforms:** one Flutter codebase for **web, Android and Windows** (all working). **iOS**: code ready,
+  build later — no Mac available; iPhone users use the web version.
   Keep code platform-neutral (no `dart:io`-only features in shared code).
 - **Companies:** the **S&P 500** (~500), from a published constituents list.
 - **Prices:** **Polygon.io** (one daily request for all US closing prices), yfinance only as backup.
@@ -26,8 +27,7 @@ build what the current phase says, and nothing from a later phase unless asked.
 
 Until a phase changes it, the code still works the v1 way (yfinance, 40 companies).
 Done so far: hosted API (phase 1); API address in `config.dart`, offline snapshot removed and links
-opened with `url_launcher`, web app on GitHub Pages via `.github/workflows/deploy-web.yml`
-(phase 2 steps 1–4). When a phase replaces something, update this file and the README.
+opened with `url_launcher`, web app on GitHub Pages via `.github/workflows/deploy-web.yml`, Android app (phase 2 done). When a phase replaces something, update this file and the README.
 
 ## Stack
 - `backend/` — Python 3.11+, FastAPI, SQLite (stdlib `sqlite3`), pytest. Hosted on Render (v2).

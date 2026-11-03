@@ -4,7 +4,7 @@ A fundamental stock screener for long-term investors, inspired by Screener.in.
 University prototype (Medical Informatics, software engineering course), version 1.0.
 
 StockLens downloads the annual reports (10-K) of 40 large US companies from the SEC, calculates
-16 indicators such as ROE, net margin and P/E, and shows them in a Flutter app (web and Windows; Android next):
+16 indicators such as ROE, net margin and P/E, and shows them in a Flutter app (web, Android and Windows):
 a sortable, filterable screener table and a detail page per company.
 
 > **StockLens is not investment advice.** It shows reported facts and simple, transparent rules.
@@ -24,7 +24,7 @@ Yahoo (price)  ───┘
 | `backend/pipeline/` | Downloads SEC data and prices, calculates the indicators, writes the SQLite database |
 | `backend/api/` | FastAPI app that only *reads* the database (it never calls the SEC while serving requests) |
 | `backend/tests/` | pytest tests: every formula, the extractor (on a saved Apple file), the rules and the API |
-| `app/` | Flutter app (web, Windows; Android next): screener + company page |
+| `app/` | Flutter app (web, Android, Windows): screener + company page |
 
 ## Setup
 
@@ -137,8 +137,16 @@ cd app
 flutter run -d windows
 ```
 
-Other platforms: `flutter run -d chrome` (web) or `flutter run -d windows`. Windows builds that use
-plugins (such as `url_launcher` for links) need Windows **Developer Mode** turned on.
+Other platforms: `flutter run -d chrome` (web), `flutter run -d windows`, or plain `flutter run` with an
+Android phone (USB debugging on) or emulator connected. Windows builds that use plugins (such as
+`url_launcher` for links) need Windows **Developer Mode** turned on.
+
+| Platform | How to get it | Notes |
+|---|---|---|
+| Web | https://aktreides44.github.io/StockLenz/ | Published automatically (see Hosting); also works on iPhones |
+| Android | `flutter build apk --release` → `app/build/app/outputs/flutter-apk/app-release.apk` | Copy to the phone and open it (allow "install unknown apps"). Signed with Flutter's debug key: fine for testing, not for the Play Store |
+| Windows | `flutter build windows` → `app/build/windows/x64/runner/Release/` | Needs Developer Mode on the build PC |
+| iOS | not built yet | The code is platform-neutral and ready; building needs a Mac with Xcode (`flutter create . --platforms ios`, then `flutter run`). Until then iPhone users use the web version |
 
 By default the app uses the hosted API on Render (`app/lib/config.dart`). To use the API running on
 your own PC instead (start it first, see above):
