@@ -1,4 +1,5 @@
-// The "Filters" side panel: a min and max box for every metric.
+// The "Filters" panel: a min and max box for every metric.
+// Wide screens show it on the right side; phones show it as a bottom sheet.
 import 'package:flutter/material.dart';
 
 import 'models.dart';
@@ -36,6 +37,7 @@ class FiltersPanel extends StatefulWidget {
     required this.onChanged,
     required this.onClearAll,
     required this.onClose,
+    this.asSheet = false,
   });
 
   final List<MetricDefinition> metrics;
@@ -43,6 +45,9 @@ class FiltersPanel extends StatefulWidget {
   final void Function(String metricKey, RangeFilter filter) onChanged;
   final VoidCallback onClearAll;
   final VoidCallback onClose;
+
+  /// True inside a bottom sheet (phones): full width, no border on the left.
+  final bool asSheet;
 
   @override
   State<FiltersPanel> createState() => _FiltersPanelState();
@@ -118,10 +123,10 @@ class _FiltersPanelState extends State<FiltersPanel> {
     }
 
     return Container(
-      width: 340,
+      width: widget.asSheet ? null : 340,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
-        border: Border(left: BorderSide(color: theme.colorScheme.outlineVariant)),
+        border: widget.asSheet ? null : Border(left: BorderSide(color: theme.colorScheme.outlineVariant)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
