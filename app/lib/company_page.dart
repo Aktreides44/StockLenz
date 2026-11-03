@@ -7,6 +7,7 @@ import 'company_chart.dart';
 import 'company_sections.dart';
 import 'data_service.dart';
 import 'models.dart';
+import 'widgets.dart';
 
 /// Open the page for [ticker]. [data] is the screener data (used for peers and metric labels).
 void openCompanyPage(BuildContext context, String ticker, ScreenerData data) {
@@ -27,7 +28,7 @@ class CompanyPage extends StatefulWidget {
   final ScreenerData screenerData;
 
   /// Where the details come from. Tests pass in fake data here.
-  final Future<CompanyDetail> Function(String ticker, List<MetricDefinition> metrics, {bool offline}) loadDetail;
+  final Future<CompanyDetail> Function(String ticker, List<MetricDefinition> metrics) loadDetail;
 
   @override
   State<CompanyPage> createState() => _CompanyPageState();
@@ -61,17 +62,14 @@ class _CompanyPageState extends State<CompanyPage> {
   }
 
   Future<void> _load() async {
+    setState(() => _error = null);
     try {
-      final detail = await widget.loadDetail(
-        widget.ticker,
-        widget.screenerData.metrics,
-        offline: widget.screenerData.isOffline,
-      );
+      final detail = await widget.loadDetail(widget.ticker, widget.screenerData.metrics);
       if (!mounted) return;
       setState(() => _detail = detail);
     } catch (error) {
       if (!mounted) return;
-      setState(() => _error = 'Could not load ${widget.ticker}: $error');
+      setState(() => _error = '$error');
     }
   }
 
@@ -111,13 +109,12 @@ class _CompanyPageState extends State<CompanyPage> {
         title: Text(detail == null ? widget.ticker : '${detail.company.name} (${detail.company.ticker})'),
       ),
       body: detail == null
-          ? Center(child: _error == null ? const CircularProgressIndicator() : Text(_error!))
+          ? (_error == null ? const LoadingMessage() : ConnectionError(message: _error!, onRetry: _load))
           : _buildPage(detail),
     );
   }
 
   Widget _buildPage(CompanyDetail detail) {
-    final colors = Theme.of(context).colorScheme;
     final metricsByKey = {for (final metric in widget.screenerData.metrics) metric.key: metric};
     final years = detail.history;
 
@@ -132,15 +129,6 @@ class _CompanyPageState extends State<CompanyPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionBar(sections: sections, active: _activeSection, onTap: _jumpTo),
-        if (detail.isOffline)
-          Container(
-            color: colors.tertiaryContainer,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            child: Text(
-              'Offline snapshot — the API is not reachable, showing saved data.',
-              style: TextStyle(color: colors.onTertiaryContainer),
-            ),
-          ),
         Expanded(
           child: SingleChildScrollView(
             key: _scrollViewKey,

@@ -1,4 +1,4 @@
-"""Refresh all data: SEC fundamentals + latest price -> metrics -> SQLite + snapshot.json.
+"""Refresh all data: SEC fundamentals + latest price -> metrics -> SQLite database.
 
 Run from the backend folder:
     python -m pipeline.refresh
@@ -7,7 +7,6 @@ SEC data is cached in backend/data/raw/. Delete that folder to download fresh 10
 Prices are fetched fresh from Yahoo Finance (via yfinance) on every run.
 """
 import csv
-import json
 import warnings
 from datetime import datetime
 
@@ -20,7 +19,6 @@ from config import BACKEND_DIR
 from pipeline.sec_client import load_companyfacts, load_ticker_to_cik
 
 UNIVERSE_CSV = BACKEND_DIR / "data" / "universe.csv"
-SNAPSHOT_JSON = BACKEND_DIR.parent / "app" / "assets" / "snapshot.json"
 
 # yfinance prints pandas deprecation warnings that are not our concern
 warnings.filterwarnings("ignore", module="yfinance")
@@ -75,21 +73,6 @@ def build_company(row, cik):
     return company
 
 
-def export_snapshot():
-    """Write everything the app needs into one JSON file, for offline use."""
-    conn = db.connect()
-    companies = db.load_companies(conn)
-    snapshot = {
-        "generated_at": datetime.now().isoformat(timespec="seconds"),
-        "metrics": db.load_metric_definitions(conn),
-        "companies": companies,
-        "details": {c["ticker"]: db.load_company_detail(conn, c["ticker"]) for c in companies},
-    }
-    conn.close()
-    SNAPSHOT_JSON.parent.mkdir(parents=True, exist_ok=True)
-    SNAPSHOT_JSON.write_text(json.dumps(snapshot, indent=1), encoding="utf-8")
-
-
 def print_coverage(companies):
     total = len(companies)
     print()
@@ -120,10 +103,8 @@ def main():
             companies.append(company)
 
     db.write_database(companies)
-    export_snapshot()
     print()
     print(f"Wrote {len(companies)} companies to {db.DB_PATH}")
-    print(f"Exported snapshot to {SNAPSHOT_JSON}")
     print_coverage(companies)
 
 

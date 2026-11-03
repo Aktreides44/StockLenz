@@ -1,4 +1,4 @@
-"""SQLite storage: the pipeline writes here, the API (and the snapshot export) read from here.
+"""SQLite storage: the pipeline writes here, the API reads from here.
 
 Tables:
 - companies: one row per company, with price info and every screener metric as a column
@@ -106,7 +106,7 @@ def write_database(companies, path=DB_PATH):
     conn.close()
 
 
-# --- Reading (used by the API and the snapshot export) ---
+# --- Reading (used by the API) ---
 
 def company_row_to_dict(row):
     company = {column: row[column] for column in COMPANY_COLUMNS}

@@ -1,4 +1,4 @@
-// Data classes for what the API (or the offline snapshot) returns.
+// Data classes for what the API returns.
 
 double? _toDouble(Object? value) => value == null ? null : (value as num).toDouble();
 
@@ -154,7 +154,6 @@ class CompanyDetail {
     required this.history,
     required this.pros,
     required this.cons,
-    required this.isOffline,
   });
 
   final Company company;
@@ -164,21 +163,16 @@ class CompanyDetail {
   final List<AnalysisPoint> pros;
   final List<AnalysisPoint> cons;
 
-  /// True when this came from the bundled snapshot instead of the API.
-  final bool isOffline;
-
   factory CompanyDetail.fromJson(
     Map<String, dynamic> json,
-    List<MetricDefinition> definitions, {
-    required bool isOffline,
-  }) {
+    List<MetricDefinition> definitions,
+  ) {
     final analysis = json['analysis'] as Map<String, dynamic>;
     return CompanyDetail(
       company: Company.fromJson(json, definitions),
       history: [for (final year in json['history'] as List<dynamic>) YearData.fromJson(year as Map<String, dynamic>)],
       pros: [for (final item in analysis['pros'] as List<dynamic>) AnalysisPoint.fromJson(item as Map<String, dynamic>)],
       cons: [for (final item in analysis['cons'] as List<dynamic>) AnalysisPoint.fromJson(item as Map<String, dynamic>)],
-      isOffline: isOffline,
     );
   }
 }

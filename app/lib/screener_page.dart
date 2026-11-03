@@ -2,11 +2,11 @@
 import 'package:flutter/material.dart';
 
 import 'company_page.dart';
-import 'config.dart';
 import 'data_service.dart';
 import 'filters_panel.dart';
 import 'models.dart';
 import 'screener_table.dart';
+import 'widgets.dart';
 
 class ScreenerPage extends StatefulWidget {
   const ScreenerPage({super.key, this.loadData = loadScreenerData, this.onToggleTheme});
@@ -57,9 +57,15 @@ class _ScreenerPageState extends State<ScreenerPage> {
     } catch (error) {
       if (!mounted) return;
       setState(() {
-        _error = 'Could not load data: $error';
+        _error = '$error';
         _loading = false;
       });
+      // A reload failed, but the data loaded earlier is still on screen: just say so.
+      if (_data != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$error Showing the data loaded earlier.')),
+        );
+      }
     }
   }
 
@@ -161,24 +167,14 @@ class _ScreenerPageState extends State<ScreenerPage> {
   Widget _buildBody() {
     final data = _data;
     if (data == null) {
-      if (_loading) return const Center(child: CircularProgressIndicator());
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(_error ?? 'No data'),
-            const SizedBox(height: 12),
-            FilledButton(onPressed: _load, child: const Text('Try again')),
-          ],
-        ),
-      );
+      if (_loading) return const LoadingMessage();
+      return ConnectionError(message: _error ?? 'No data', onRetry: _load);
     }
 
     final visible = _visibleCompanies(data.companies);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (data.isOffline) _OfflineBanner(snapshotDate: data.snapshotDate, onRetry: _load),
         _toolbar(data, visible.length),
         Expanded(
           child: Row(
@@ -266,45 +262,6 @@ class _ScreenerPageState extends State<ScreenerPage> {
             style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _OfflineBanner extends StatelessWidget {
-  const _OfflineBanner({required this.snapshotDate, required this.onRetry});
-
-  final String? snapshotDate;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    // "2026-10-27T10:12:00" -> "2026-10-27 10:12"
-    final date = snapshotDate == null || snapshotDate!.length < 16
-        ? 'unknown date'
-        : snapshotDate!.substring(0, 16).replaceFirst('T', ' ');
-    return Material(
-      color: colors.tertiaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: Row(
-          children: [
-            Icon(Icons.cloud_off, size: 18, color: colors.onTertiaryContainer),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Offline snapshot — the API at $apiBaseUrl is not reachable. Showing data saved on $date.',
-                style: TextStyle(color: colors.onTertiaryContainer),
-              ),
-            ),
-            TextButton(
-              onPressed: onRetry,
-              style: TextButton.styleFrom(foregroundColor: colors.onTertiaryContainer),
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
       ),
     );
   }

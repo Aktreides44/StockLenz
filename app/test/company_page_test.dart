@@ -46,7 +46,6 @@ YearData year(int fiscalYear, double revenue, double? netIncome) {
 
 final screenerData = ScreenerData(
   metrics: metrics,
-  isOffline: false,
   companies: [
     company('AAPL', 'Apple Inc.', 'Information Technology', 5e12),
     company('MSFT', 'Microsoft Corporation', 'Information Technology', 4e12),
@@ -60,8 +59,7 @@ CompanyDetail appleDetail() {
     history: [year(2024, 391035e6, 93736e6), year(2025, 416161e6, null)],
     pros: const [AnalysisPoint(id: 'high_roe', text: 'Strong return on equity: ROE of 171.4% (above 15%)')],
     cons: const [AnalysisPoint(id: 'high_pe', text: 'Expensive on earnings: P/E (FY) of 46.1 (above 40)')],
-    isOffline: false,
-  );
+    );
 }
 
 Future<void> pumpApplePage(WidgetTester tester) async {
@@ -72,7 +70,7 @@ Future<void> pumpApplePage(WidgetTester tester) async {
     home: CompanyPage(
       ticker: 'AAPL',
       screenerData: screenerData,
-      loadDetail: (ticker, metrics, {bool offline = false}) async => appleDetail(),
+      loadDetail: (ticker, metrics) async => appleDetail(),
     ),
   ));
   await tester.pumpAndSettle();
@@ -129,7 +127,7 @@ void main() {
       home: CompanyPage(
         ticker: 'AAPL',
         screenerData: screenerData,
-        loadDetail: (ticker, metrics, {bool offline = false}) async => appleDetail(),
+        loadDetail: (ticker, metrics) async => appleDetail(),
       ),
     ));
     await tester.pumpAndSettle();

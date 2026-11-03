@@ -18,7 +18,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  # Offline fallback data, exported by `python -m pipeline.refresh`
-  assets:
-    - assets/snapshot.json

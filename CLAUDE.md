@@ -24,8 +24,9 @@ build what the current phase says, and nothing from a later phase unless asked.
   **Shares outstanding:** from the SEC (10-K/10-Q cover page), not Yahoo.
 - **Data refresh:** the pipeline runs once a day (GitHub Actions), not on the user's PC.
 
-Until a phase changes it, the code still works the v1 way (yfinance, 40 companies, snapshot,
-`explorer.exe` link opener). When a phase replaces something, update this file and the README.
+Until a phase changes it, the code still works the v1 way (yfinance, 40 companies,
+`explorer.exe` link opener). Done so far: hosted API (phase 1); API address in `config.dart` and
+offline snapshot removed (phase 2 steps 1–2). When a phase replaces something, update this file and the README.
 
 ## Stack
 - `backend/` — Python 3.11+, FastAPI, SQLite (stdlib `sqlite3`), pytest. Hosted on Render (v2).
@@ -41,7 +42,6 @@ Until a phase changes it, the code still works the v1 way (yfinance, 40 companie
    - extracts ANNUAL (form 10-K, fp=FY) values for the fields below, deduplicated by fiscal year
    - fetches the latest price (v1: yfinance; v2: Polygon)
    - computes indicators and writes everything to `backend/data/stocklens.db`
-   - v1 only: also exports `app/assets/snapshot.json` (removed in v2 phase 2)
    - in v2 it runs in GitHub Actions (`.github/workflows/refresh-data.yml`, weekdays), is checked by
      `python -m pipeline.check_database`, and the DB is uploaded to the GitHub release `data-latest`
 2. `backend/api/` — FastAPI app reading only from SQLite (never calls SEC at request time).
@@ -51,8 +51,8 @@ Until a phase changes it, the code still works the v1 way (yfinance, 40 companie
    - `GET /companies/{ticker}` → detail incl. yearly history
    - `GET /metrics` → metric definitions (key, label, formula, unit, higher_is_better)
 3. `app/` — Flutter reads the API address from `app/lib/config.dart`: the Render URL by default,
-   `--dart-define=API_URL=http://127.0.0.1:8000` for a local API. The snapshot fallback stays until
-   phase 2 step 2.
+   `--dart-define=API_URL=http://127.0.0.1:8000` for a local API. No offline data: while loading
+   it shows "Waking up the server…" after 5 s, on failure "Can't connect" + Retry (`widgets.dart`).
 
 ## SEC rules (important)
 - Every request MUST send a `User-Agent` header like `StockLens student project <EMAIL_FROM_.env>`.

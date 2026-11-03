@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stocklens/data_service.dart';
@@ -27,11 +29,9 @@ Company company(String ticker, String name, String sector, {double? marketCap, d
   );
 }
 
-ScreenerData fakeData({bool offline = false}) {
+ScreenerData fakeData() {
   return ScreenerData(
     metrics: metrics,
-    isOffline: offline,
-    snapshotDate: '2026-10-27T10:12:00',
     companies: [
       company('AAPL', 'Apple Inc.', 'Information Technology', marketCap: 5e12, roe: 171.4),
       company('KO', 'The Coca-Cola Company', 'Consumer Staples', marketCap: 3e11, roe: 45.0),
@@ -94,14 +94,39 @@ void main() {
     expect(top('AAPL') < top('MCD'), isTrue); // missing still at the bottom
   });
 
-  testWidgets('offline snapshot shows a banner', (tester) async {
-    await pumpPage(tester, fakeData(offline: true));
-    expect(find.textContaining('Offline snapshot'), findsOneWidget);
-    expect(find.textContaining('2026-10-27 10:12'), findsOneWidget);
+  testWidgets("server can't be reached: shows Can't connect, Retry loads the data", (tester) async {
+    tester.view.physicalSize = const Size(1600, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    var calls = 0;
+    Future<ScreenerData> load() async {
+      calls++;
+      if (calls == 1) throw const ApiException('No connection.');
+      return fakeData();
+    }
+
+    await tester.pumpWidget(MaterialApp(home: ScreenerPage(loadData: load)));
+    await tester.pumpAndSettle();
+    expect(find.text("Can't connect"), findsOneWidget);
+    expect(find.text('No connection.'), findsOneWidget);
+
+    await tester.tap(find.text('Retry'));
+    await tester.pumpAndSettle();
+    expect(find.text("Can't connect"), findsNothing);
+    expect(find.text('AAPL'), findsOneWidget);
   });
 
-  testWidgets('no banner when the API answered', (tester) async {
-    await pumpPage(tester, fakeData());
-    expect(find.textContaining('Offline snapshot'), findsNothing);
+  testWidgets('slow server: "Waking up the server…" appears after a few seconds', (tester) async {
+    final answer = Completer<ScreenerData>();
+    await tester.pumpWidget(MaterialApp(home: ScreenerPage(loadData: () => answer.future)));
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('Waking up the server…'), findsNothing);
+
+    await tester.pump(const Duration(seconds: 6));
+    expect(find.text('Waking up the server…'), findsOneWidget);
+
+    answer.complete(fakeData());
+    await tester.pumpAndSettle();
+    expect(find.text('Waking up the server…'), findsNothing);
   });
 }

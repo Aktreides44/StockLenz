@@ -16,12 +16,12 @@ a sortable, filterable screener table and a detail page per company.
 ```
 SEC EDGAR (10-K) ─┐
                   ├─► pipeline (python -m pipeline.refresh) ─► backend/data/stocklens.db ─► FastAPI ─► Flutter app
-Yahoo (price)  ───┘                                       └─► app/assets/snapshot.json (offline fallback)
+Yahoo (price)  ───┘
 ```
 
 | Folder | What it is |
 |---|---|
-| `backend/pipeline/` | Downloads SEC data and prices, calculates the indicators, writes the SQLite database and the snapshot |
+| `backend/pipeline/` | Downloads SEC data and prices, calculates the indicators, writes the SQLite database |
 | `backend/api/` | FastAPI app that only *reads* the database (it never calls the SEC while serving requests) |
 | `backend/tests/` | pytest tests: every formula, the extractor (on a saved Apple file), the rules and the API |
 | `app/` | Flutter app (Windows desktop): screener + company page |
@@ -67,8 +67,7 @@ cd backend
 ```
 
 Downloads the SEC data for every company in `backend/data/universe.csv` (cached in `backend/data/raw/`,
-so reruns are fast), fetches the latest prices, and writes `backend/data/stocklens.db` and
-`app/assets/snapshot.json`. At the end it prints how many companies have a value for each metric.
+so reruns are fast), fetches the latest prices, and writes `backend/data/stocklens.db`. At the end it prints how many companies have a value for each metric.
 To download fresh 10-K data, delete `backend/data/raw/` first.
 
 To check the raw extracted numbers for a few companies:
@@ -141,8 +140,9 @@ your own PC instead (start it first, see above):
 flutter run -d windows --dart-define=API_URL=http://127.0.0.1:8000
 ```
 
-If the API is not running, the app uses the bundled `assets/snapshot.json` and shows an
-"Offline snapshot" banner.
+The app has no offline copy of the data. While it waits it shows a spinner, and after 5 seconds
+"Waking up the server…" (the free Render server sleeps when nobody uses it). If the API can't be
+reached it shows "Can't connect" with a Retry button.
 
 ### Tests
 
