@@ -1,0 +1,68 @@
+# Builds the Flutter app as a website and publishes it on GitHub Pages:
+#   https://aktreides44.github.io/StockLenz/
+#
+# Runs every time app code changes on main (and can be started by hand).
+# The website only contains the app; the data comes from the API on Render.
+#
+# One-time setup on GitHub: Settings -> Pages -> Source: "GitHub Actions".
+
+name: Deploy web app
+
+on:
+  push:
+    branches: [main]
+    paths: ["app/**", ".github/workflows/deploy-web.yml"]
+  workflow_dispatch: # adds a "Run workflow" button on GitHub
+
+permissions:
+  contents: read
+  pages: write # needed to publish to GitHub Pages
+  id-token: write # proves to GitHub Pages that this workflow is allowed to publish
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: true # a newer push replaces an older, unfinished deploy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v5
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.8 # the version used on the development PC
+
+      - name: Install packages
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      # The site lives under /StockLenz/ (the repository name), so links inside it must start there.
+      - name: Build the website
+        run: flutter build web --release --base-href /StockLenz/
+
+      - name: Hand the website to GitHub Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: app/build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -4,7 +4,7 @@ A fundamental stock screener for long-term investors, inspired by Screener.in.
 University prototype (Medical Informatics, software engineering course), version 1.0.
 
 StockLens downloads the annual reports (10-K) of 40 large US companies from the SEC, calculates
-16 indicators such as ROE, net margin and P/E, and shows them in a Windows desktop app:
+16 indicators such as ROE, net margin and P/E, and shows them in a Flutter app (web and Windows; Android next):
 a sortable, filterable screener table and a detail page per company.
 
 > **StockLens is not investment advice.** It shows reported facts and simple, transparent rules.
@@ -24,7 +24,7 @@ Yahoo (price)  ───┘
 | `backend/pipeline/` | Downloads SEC data and prices, calculates the indicators, writes the SQLite database |
 | `backend/api/` | FastAPI app that only *reads* the database (it never calls the SEC while serving requests) |
 | `backend/tests/` | pytest tests: every formula, the extractor (on a saved Apple file), the rules and the API |
-| `app/` | Flutter app (Windows desktop): screener + company page |
+| `app/` | Flutter app (web, Windows; Android next): screener + company page |
 
 ## Setup
 
@@ -125,6 +125,10 @@ tests → pipeline → check_database  ──upload──►  stocklens.db      
   health check path `/health`, environment variables `PYTHON_VERSION=3.13.7` and
   `STOCKLENS_DB_URL=https://github.com/Aktreides44/StockLenz/releases/download/data-latest/stocklens.db`.
   The free tier sleeps after ~15 minutes without visitors; the first request then takes 30–60 s.
+- **Web app on GitHub Pages:** https://aktreides44.github.io/StockLenz/ —
+  `.github/workflows/deploy-web.yml` runs the app tests, builds the website
+  (`flutter build web --base-href /StockLenz/`) and publishes it whenever app code changes on `main`.
+  One-time setup: GitHub → Settings → Pages → Source: "GitHub Actions".
 
 ### App
 
@@ -132,6 +136,9 @@ tests → pipeline → check_database  ──upload──►  stocklens.db      
 cd app
 flutter run -d windows
 ```
+
+Other platforms: `flutter run -d chrome` (web) or `flutter run -d windows`. Windows builds that use
+plugins (such as `url_launcher` for links) need Windows **Developer Mode** turned on.
 
 By default the app uses the hosted API on Render (`app/lib/config.dart`). To use the API running on
 your own PC instead (start it first, see above):
