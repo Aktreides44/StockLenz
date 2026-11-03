@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'format.dart';
 import 'models.dart';
+import 'theme.dart';
 
 class RevenueIncomeChart extends StatelessWidget {
   const RevenueIncomeChart({super.key, required this.history});
@@ -44,7 +45,7 @@ class RevenueIncomeChart extends StatelessWidget {
       );
     }
 
-    final labelStyle = TextStyle(fontSize: 11, color: colors.onSurfaceVariant);
+    final labelStyle = TextStyle(fontSize: FontSizes.tiny, color: colors.onSurfaceVariant);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,13 +53,13 @@ class RevenueIncomeChart extends StatelessWidget {
         Row(
           children: [
             _LegendItem(color: revenueColor, label: 'Revenue'),
-            const SizedBox(width: 16),
+            const SizedBox(width: Space.lg),
             _LegendItem(color: incomeColor, label: 'Net income'),
             const Spacer(),
             Text('USD billions', style: labelStyle),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: Space.lg),
         SizedBox(
           height: 260,
           child: BarChart(
@@ -84,7 +85,7 @@ class RevenueIncomeChart extends StatelessWidget {
                     showTitles: true,
                     reservedSize: 28,
                     getTitlesWidget: (value, meta) => Padding(
-                      padding: const EdgeInsets.only(top: 6),
+                      padding: const EdgeInsets.only(top: Space.sm),
                       child: Text('FY${years[value.toInt()].fiscalYear}', style: labelStyle),
                     ),
                   ),
@@ -116,7 +117,7 @@ class RevenueIncomeChart extends StatelessWidget {
                     final value = year.values[field];
                     return BarTooltipItem(
                       'FY${year.fiscalYear} $label\n${value == null ? '— not reported' : formatMoney(value)}',
-                      TextStyle(color: colors.onInverseSurface, fontSize: 12),
+                      TextStyle(color: colors.onInverseSurface, fontSize: FontSizes.small),
                     );
                   },
                 ),
@@ -141,8 +142,8 @@ class _LegendItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(width: 12, height: 12, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
-        const SizedBox(width: 6),
-        Text(label, style: const TextStyle(fontSize: 12)),
+        const SizedBox(width: Space.sm),
+        Text(label, style: const TextStyle(fontSize: FontSizes.small)),
       ],
     );
   }

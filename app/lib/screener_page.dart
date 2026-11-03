@@ -6,6 +6,7 @@ import 'data_service.dart';
 import 'filters_panel.dart';
 import 'models.dart';
 import 'screener_table.dart';
+import 'theme.dart';
 import 'widgets.dart';
 
 class ScreenerPage extends StatefulWidget {
@@ -157,7 +158,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
               icon: const Icon(Icons.brightness_6),
               tooltip: 'Light / dark mode',
             ),
-          const SizedBox(width: 8),
+          const SizedBox(width: Space.sm),
         ],
       ),
       body: _buildBody(),
@@ -213,7 +214,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
     final sectors = data.companies.map((c) => c.sector).toSet().toList()..sort();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      padding: const EdgeInsets.fromLTRB(Space.lg, Space.md, Space.lg, Space.md),
       child: Wrap(
         spacing: 12,
         runSpacing: 8,
@@ -232,10 +233,10 @@ class _ScreenerPageState extends State<ScreenerPage> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: Space.md),
             decoration: BoxDecoration(
               border: Border.all(color: theme.colorScheme.outline),
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(Radii.small),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String?>(

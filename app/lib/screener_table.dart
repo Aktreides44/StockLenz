@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'format.dart';
 import 'models.dart';
+import 'theme.dart';
 import 'widgets.dart';
 
 const double rowHeight = 32;
@@ -176,7 +177,7 @@ class _ScreenerTableState extends State<ScreenerTable> {
     final arrow = isSorted
         ? Icon(widget.sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
             size: 14, color: theme.colorScheme.primary)
-        : const SizedBox(width: 14);
+        : const SizedBox(width: Space.md);
 
     Widget cell = InkWell(
       onTap: () => widget.onSort(column.key),
@@ -184,7 +185,7 @@ class _ScreenerTableState extends State<ScreenerTable> {
         width: column.width,
         height: headerHeight,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: Space.sm),
           child: Row(
             mainAxisAlignment: column.numeric ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: column.numeric ? [arrow, label] : [label, arrow],
@@ -262,10 +263,10 @@ class _ScreenerTableState extends State<ScreenerTable> {
     return SizedBox(
       width: column.width,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: Space.sm),
         child: Align(
           alignment: column.numeric ? Alignment.centerRight : Alignment.centerLeft,
-          child: DefaultTextStyle.merge(style: const TextStyle(fontSize: 13), child: content),
+          child: DefaultTextStyle.merge(style: const TextStyle(fontSize: FontSizes.body), child: content),
         ),
       ),
     );

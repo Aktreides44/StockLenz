@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'format.dart';
+import 'theme.dart';
 
 /// Tabular figures give every digit the same width, so numbers line up in columns.
 const TextStyle numberStyle = TextStyle(fontFeatures: [FontFeature.tabularFigures()]);
@@ -92,21 +93,24 @@ class _LoadingMessageState extends State<LoadingMessage> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const CircularProgressIndicator(),
-          if (_slow) ...[
-            const SizedBox(height: 16),
-            const Text('Waking up the server…'),
-            const SizedBox(height: 4),
-            Text(
-              'The free server sleeps when nobody uses it. This can take up to a minute.',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-              textAlign: TextAlign.center,
-            ),
+      child: Padding(
+        padding: const EdgeInsets.all(Space.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            if (_slow) ...[
+              const SizedBox(height: Space.lg),
+              const Text('Waking up the server…'),
+              const SizedBox(height: Space.xs),
+              Text(
+                'The free server sleeps when nobody uses it. This can take up to a minute.',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -124,16 +128,16 @@ class ConnectionError extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(Space.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.cloud_off, size: 48, color: colors.onSurfaceVariant),
-            const SizedBox(height: 12),
+            const SizedBox(height: Space.md),
             Text("Can't connect", style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 4),
+            const SizedBox(height: Space.xs),
             Text(message, textAlign: TextAlign.center, style: TextStyle(color: colors.onSurfaceVariant)),
-            const SizedBox(height: 16),
+            const SizedBox(height: Space.lg),
             FilledButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Retry')),
           ],
         ),

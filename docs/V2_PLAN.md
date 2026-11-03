@@ -1,6 +1,6 @@
 # StockLens v2 — plan
 
-Status: **agreed 2 Nov 2026**, not started. We work through the phases in order, in small steps.
+Status: **agreed 2 Nov 2026**. Phases 0–2 done (3 Nov 2026); phase 3 in progress. We work through the phases in order, in small steps.
 Before each step Claude explains what it builds and why; after each step you get the files to look at
 in VS Code and a command to try it yourself.
 
@@ -58,6 +58,8 @@ The app downloads finished numbers: about 1 MB for the whole screener, ~15 KB pe
 4. **Web:** `flutter build web`, published on GitHub Pages → a link anyone can open.
 5. **Android:** run on the emulator (Android Studio) or your own phone via USB; build an `.apk`.
 6. **iOS (later, on your friend's Mac):** install Xcode + Flutter, clone from GitHub, run in the iPhone Simulator.
+   *Status 3 Nov 2026:* no Mac or iPhone available → iOS stays "code ready, build later";
+   iPhone users use the web version.
 
 **You learn:** how one Flutter codebase becomes several apps; what an APK is; why iOS needs a Mac.
 **Done when:** the same app runs in a browser, on an Android phone and on Windows, all reading the hosted API.
@@ -66,6 +68,12 @@ The app downloads finished numbers: about 1 MB for the whole screener, ~15 KB pe
 1. One theme file with all colours, spacing and fonts (one font only, to stay light).
 2. **Phones:** screener becomes a list of cards with 3 key numbers; filters open as a bottom sheet.
    **Wide screens:** keep the dense table.
+   *Feedback from testing on a Samsung S24 (3 Nov 2026):*
+   - The frozen Ticker + Name columns (276 px) fill ~70% of a phone screen, so only one metric fits per
+     swipe. On phones: cards, or freeze only the ticker.
+   - After choosing a sector there was no obvious way back: the dropdown opens scrolled to the chosen
+     sector, so "All sectors" is off-screen at the top. Add a visible clear (×) button for the sector,
+     and make sure "All sectors" works on the phone. (The toolbar also overflows by ~53 px at phone width.)
 3. Search box in the top bar that jumps straight to a company.
 4. Company page tidied up for small screens.
 

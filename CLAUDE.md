@@ -120,5 +120,6 @@ Banks/insurers: current_ratio and debt_to_equity are not meaningful — return n
 - Prefer simple, readable code over clever abstractions — this will be graded and explained by a student.
 - Write a `README.md` with: setup, how to run pipeline/API/app, data sources and their limitations,
   metric definitions.
-- UI: clean, dark-mode-friendly Material 3, dense data table (like Screener.in), right-aligned numbers,
+- UI: colours, spacing (`Space.*`), text sizes (`FontSizes.*`), radii and the phone breakpoint (`isPhone`,
+  < 600 px) live in `app/lib/theme.dart` — use those, not loose numbers. Clean, dark-mode-friendly Material 3, dense data table (like Screener.in), right-aligned numbers,
   percentages to 1 decimal place, large numbers as $1.2B / $340M.

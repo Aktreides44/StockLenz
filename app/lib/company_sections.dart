@@ -3,14 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'format.dart';
 import 'models.dart';
+import 'theme.dart';
 import 'widgets.dart';
-
-/// Light grey page with white cards in light mode; dark cards on a darker page in dark mode.
-Color pageBackground(ColorScheme colors) =>
-    colors.brightness == Brightness.light ? const Color(0xFFF3F4F6) : colors.surface;
-
-Color cardBackground(ColorScheme colors) =>
-    colors.brightness == Brightness.light ? Colors.white : colors.surfaceContainer;
 
 const Map<String, String> fieldLabels = {
   'revenue': 'Revenue',
@@ -43,11 +37,11 @@ class SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(Space.lg),
       decoration: BoxDecoration(
         color: cardBackground(theme.colorScheme),
         border: Border.all(color: theme.colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(Radii.medium),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -58,7 +52,7 @@ class SectionCard extends StatelessWidget {
             children: [
               Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
               if (subtitle != null) ...[
-                const SizedBox(width: 10),
+                const SizedBox(width: Space.sm),
                 Flexible(
                   child: Text(subtitle!,
                       style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
@@ -66,7 +60,7 @@ class SectionCard extends StatelessWidget {
               ],
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: Space.md),
           child,
         ],
       ),
@@ -116,11 +110,11 @@ class SummarySection extends StatelessWidget {
     final muted = theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(Space.xl),
       decoration: BoxDecoration(
         color: cardBackground(theme.colorScheme),
         border: Border.all(color: theme.colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(Radii.medium),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -133,16 +127,16 @@ class SummarySection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(company.name, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: Space.sm),
                     Wrap(
                       spacing: 10,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: Space.sm, vertical: Space.xxs),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(Radii.small),
                           ),
                           child: Text(company.ticker,
                               style: TextStyle(
@@ -174,7 +168,7 @@ class SummarySection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: Space.lg),
           LayoutBuilder(builder: (context, constraints) {
             final columns = constraints.maxWidth > 720 ? 3 : (constraints.maxWidth > 460 ? 2 : 1);
             const gap = 32.0;
@@ -186,7 +180,7 @@ class SummarySection extends StatelessWidget {
               ],
             );
           }),
-          const SizedBox(height: 12),
+          const SizedBox(height: Space.md),
           Text(
             'Ratios use the FY${company.latestFiscalYear} 10-K (year ended ${company.latestFiscalYearEnd}) '
             'and the latest price. (FY) multiples are not trailing-12-month figures.',
@@ -219,11 +213,11 @@ class SummarySection extends StatelessWidget {
       decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.6)))),
       child: Row(
         children: [
-          Text(label, style: TextStyle(fontSize: 13, color: colors.onSurfaceVariant)),
-          const SizedBox(width: 4),
+          Text(label, style: TextStyle(fontSize: FontSizes.body, color: colors.onSurfaceVariant)),
+          const SizedBox(width: Space.xs),
           InfoIcon(formula),
           const Spacer(),
-          DefaultTextStyle.merge(style: const TextStyle(fontSize: 14), child: value),
+          DefaultTextStyle.merge(style: const TextStyle(fontSize: FontSizes.medium), child: value),
         ],
       ),
     );
@@ -252,19 +246,19 @@ class AnalysisSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           LayoutBuilder(builder: (context, constraints) {
-            if (constraints.maxWidth < 600) return Column(children: [pros, const SizedBox(height: 12), cons]);
+            if (constraints.maxWidth < 600) return Column(children: [pros, const SizedBox(height: Space.md), cons]);
             return IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [Expanded(child: pros), const SizedBox(width: 16), Expanded(child: cons)],
+                children: [Expanded(child: pros), const SizedBox(width: Space.lg), Expanded(child: cons)],
               ),
             );
           }),
-          const SizedBox(height: 12),
+          const SizedBox(height: Space.md),
           Row(
             children: [
               Icon(Icons.info_outline, size: 14, color: colors.outline),
-              const SizedBox(width: 6),
+              const SizedBox(width: Space.sm),
               Expanded(
                 child: Text(
                   'Generated automatically from simple threshold rules on the numbers on this page '
@@ -281,18 +275,18 @@ class AnalysisSection extends StatelessWidget {
 
   Widget _box(BuildContext context, String title, List<AnalysisPoint> items, Color accent, Color tint) {
     return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: tint.withValues(alpha: 0.35), borderRadius: BorderRadius.circular(6)),
+      padding: const EdgeInsets.all(Space.md),
+      decoration: BoxDecoration(color: tint.withValues(alpha: 0.35), borderRadius: BorderRadius.circular(Radii.medium)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: accent, fontSize: 15)),
-          const SizedBox(height: 8),
+          Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: accent, fontSize: FontSizes.title)),
+          const SizedBox(height: Space.sm),
           if (items.isEmpty)
             Text('No rule triggered.', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
           for (final item in items)
             Padding(
-              padding: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.only(bottom: Space.sm),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -301,7 +295,7 @@ class AnalysisSection extends StatelessWidget {
                     child: Tooltip(
                       message: 'Rule: ${item.id}',
                       waitDuration: const Duration(milliseconds: 600),
-                      child: Text(item.text, style: const TextStyle(fontSize: 13)),
+                      child: Text(item.text, style: const TextStyle(fontSize: FontSizes.body)),
                     ),
                   ),
                 ],
@@ -347,18 +341,18 @@ class PeersSection extends StatelessWidget {
     }
 
     String label(String key) => key == 'price' ? 'Price' : (metricsByKey[key]?.label ?? key);
-    const headerStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 12);
+    const headerStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: FontSizes.small);
 
     return SectionCard(
       title: 'Peers',
       subtitle: 'Other StockLens companies in ${company.sector}. Click one to open it.',
       child: DefaultTextStyle.merge(
-        style: const TextStyle(fontSize: 13),
+        style: const TextStyle(fontSize: FontSizes.body),
         child: Column(
           children: [
             Container(
               height: 34,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: Space.sm),
               decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.outlineVariant))),
               child: Row(
                 children: [
@@ -379,7 +373,7 @@ class PeersSection extends StatelessWidget {
                 onTap: () => onOpen(peer.ticker),
                 child: Container(
                   height: 34,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: Space.sm),
                   decoration: BoxDecoration(
                     border: Border(bottom: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.4))),
                   ),
@@ -452,7 +446,7 @@ class YearTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    const cellPadding = EdgeInsets.symmetric(horizontal: 8, vertical: 7);
+    const cellPadding = EdgeInsets.symmetric(horizontal: Space.sm, vertical: Space.sm);
 
     final table = Table(
       columnWidths: const {0: FixedColumnWidth(labelWidth)},
@@ -472,7 +466,7 @@ class YearTable extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text('FY${year.fiscalYear}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text(formatMonthYear(year.endDate), style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant)),
+                      Text(formatMonthYear(year.endDate), style: TextStyle(fontSize: FontSizes.tiny, color: colors.onSurfaceVariant)),
                     ],
                   ),
                 ),
@@ -494,7 +488,7 @@ class YearTable extends StatelessWidget {
                       child: Text(rows[i].label,
                           style: TextStyle(fontWeight: rows[i].bold ? FontWeight.bold : FontWeight.normal)),
                     ),
-                    if (rows[i].labelTooltip != null) ...[const SizedBox(width: 4), InfoIcon(rows[i].labelTooltip!)],
+                    if (rows[i].labelTooltip != null) ...[const SizedBox(width: Space.xs), InfoIcon(rows[i].labelTooltip!)],
                   ],
                 ),
               ),
@@ -516,7 +510,7 @@ class YearTable extends StatelessWidget {
 
     final minWidth = labelWidth + yearWidth * years.length;
     return DefaultTextStyle.merge(
-      style: const TextStyle(fontSize: 13),
+      style: const TextStyle(fontSize: FontSizes.body),
       child: LayoutBuilder(
         builder: (context, constraints) => constraints.maxWidth >= minWidth
             ? table
@@ -617,7 +611,7 @@ class StatementSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           YearTable(years: years, rows: rows),
-          if (footer != null) ...[const SizedBox(height: 16), footer!],
+          if (footer != null) ...[const SizedBox(height: Space.lg), footer!],
         ],
       ),
     );
@@ -647,24 +641,24 @@ class ProfitAndLossSummary extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Container(
       width: 250,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(Space.md),
       decoration: BoxDecoration(
         border: Border.all(color: colors.outlineVariant),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(Radii.medium),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Flexible(child: Text(label, style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant))),
-              const SizedBox(width: 4),
+              Flexible(child: Text(label, style: TextStyle(fontSize: FontSizes.small, color: colors.onSurfaceVariant))),
+              const SizedBox(width: Space.xs),
               InfoIcon(metricsByKey[key]?.formula ?? ''),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: Space.xs),
           DefaultTextStyle.merge(
-            style: const TextStyle(fontSize: 18),
+            style: const TextStyle(fontSize: FontSizes.large),
             child: _metricValue(company, key, metricsByKey),
           ),
         ],

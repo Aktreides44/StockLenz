@@ -7,6 +7,7 @@ import 'company_chart.dart';
 import 'company_sections.dart';
 import 'data_service.dart';
 import 'models.dart';
+import 'theme.dart';
 import 'widgets.dart';
 
 /// Open the page for [ticker]. [data] is the screener data (used for peers and metric labels).
@@ -121,7 +122,7 @@ class _CompanyPageState extends State<CompanyPage> {
     Widget section(String name, Widget child) {
       return KeyedSubtree(
         key: _sectionKeys[name],
-        child: Padding(padding: const EdgeInsets.only(bottom: 16), child: child),
+        child: Padding(padding: const EdgeInsets.only(bottom: Space.lg), child: child),
       );
     }
 
@@ -133,7 +134,7 @@ class _CompanyPageState extends State<CompanyPage> {
           child: SingleChildScrollView(
             key: _scrollViewKey,
             controller: _scroll,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(Space.lg),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1100),
@@ -213,14 +214,14 @@ class _SectionBar extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 1132),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: Space.sm),
             child: Row(
               children: [
                 for (final section in sections)
                   InkWell(
                     onTap: () => onTap(section),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: Space.md),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         border: Border(
@@ -230,7 +231,7 @@ class _SectionBar extends StatelessWidget {
                       child: Text(
                         section,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: FontSizes.body,
                           fontWeight: section == active ? FontWeight.w600 : FontWeight.normal,
                           color: section == active ? colors.primary : colors.onSurfaceVariant,
                         ),

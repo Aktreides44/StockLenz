@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'models.dart';
+import 'theme.dart';
 
 /// A min/max range for one metric. Either end may be empty (null).
 class RangeFilter {
@@ -109,7 +110,7 @@ class _FiltersPanelState extends State<FiltersPanel> {
       if (metric.group != currentGroup) {
         currentGroup = metric.group;
         rows.add(Padding(
-          padding: const EdgeInsets.only(top: 12, bottom: 4),
+          padding: const EdgeInsets.only(top: Space.md, bottom: Space.xs),
           child: Text(metric.group, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)),
         ));
       }
@@ -126,7 +127,7 @@ class _FiltersPanelState extends State<FiltersPanel> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+            padding: const EdgeInsets.fromLTRB(Space.lg, Space.sm, Space.sm, 0),
             child: Row(
               children: [
                 Text('Filters', style: theme.textTheme.titleMedium),
@@ -137,14 +138,14 @@ class _FiltersPanelState extends State<FiltersPanel> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: Space.lg),
             child: Text(
               'Companies with a missing value (—) are hidden when that metric has a filter.',
               style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
           ),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 0, 16, 16), children: rows),
+            child: ListView(padding: const EdgeInsets.fromLTRB(Space.lg, 0, Space.lg, Space.lg), children: rows),
           ),
         ],
       ),
@@ -153,17 +154,17 @@ class _FiltersPanelState extends State<FiltersPanel> {
 
   Widget _filterRow(MetricDefinition metric) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: Space.xs),
       child: Row(
         children: [
           Expanded(
             child: Tooltip(
               message: metric.formula,
-              child: Text('${metric.label} (${inputUnitLabel(metric.unit)})', style: const TextStyle(fontSize: 13)),
+              child: Text('${metric.label} (${inputUnitLabel(metric.unit)})', style: const TextStyle(fontSize: FontSizes.body)),
             ),
           ),
           _numberBox(_minControllers[metric.key]!, 'min', metric),
-          const SizedBox(width: 6),
+          const SizedBox(width: Space.sm),
           _numberBox(_maxControllers[metric.key]!, 'max', metric),
         ],
       ),
@@ -177,12 +178,12 @@ class _FiltersPanelState extends State<FiltersPanel> {
         controller: controller,
         onChanged: (_) => _update(metric),
         textAlign: TextAlign.right,
-        style: const TextStyle(fontSize: 13),
+        style: const TextStyle(fontSize: FontSizes.body),
         keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
         decoration: InputDecoration(
           hintText: hint,
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(horizontal: Space.sm, vertical: Space.sm),
           border: const OutlineInputBorder(),
         ),
       ),
