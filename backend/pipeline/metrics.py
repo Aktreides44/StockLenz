@@ -186,7 +186,7 @@ FIELD_LABELS = {
 }
 
 # The inputs each metric needs: (raw field, how many years before the latest year).
-# "price" and "shares" come from Yahoo Finance instead of the 10-K.
+# "price" comes from Yahoo Finance; "shares" from the SEC filings (pipeline/shares.py), Yahoo as backup.
 METRIC_INPUTS = {
     "revenue_growth": [("revenue", 0), ("revenue", 1)],
     "revenue_cagr_3y": [("revenue", 0), ("revenue", 3)],

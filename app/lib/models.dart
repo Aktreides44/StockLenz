@@ -43,6 +43,8 @@ class Company {
     this.cik,
     required this.price,
     this.priceFetchedAt,
+    this.sharesSource,
+    this.sharesAsOf,
     required this.latestFiscalYear,
     required this.latestFiscalYearEnd,
     required this.metrics,
@@ -60,6 +62,12 @@ class Company {
 
   /// When the price was downloaded, e.g. "2026-10-27T09:04:12".
   final String? priceFetchedAt;
+
+  /// Where the share count for the market cap comes from, e.g. "SEC cover page (10-Q)".
+  final String? sharesSource;
+
+  /// The date that share count refers to, e.g. "2026-07-17" (null for the Yahoo backup).
+  final String? sharesAsOf;
   final int? latestFiscalYear;
   final String? latestFiscalYearEnd;
 
@@ -81,6 +89,8 @@ class Company {
       cik: json['cik'] as int?,
       price: _toDouble(json['price']),
       priceFetchedAt: json['price_fetched_at'] as String?,
+      sharesSource: json['shares_source'] as String?,
+      sharesAsOf: json['shares_as_of'] as String?,
       latestFiscalYear: json['latest_fiscal_year'] as int?,
       latestFiscalYearEnd: json['latest_fiscal_year_end'] as String?,
       metrics: {for (final definition in definitions) definition.key: _toDouble(json[definition.key])},

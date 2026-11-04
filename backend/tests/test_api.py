@@ -14,6 +14,7 @@ def make_company(ticker, sector, years):
     company = {
         "ticker": ticker, "name": f"{ticker} Inc.", "sector": sector, "cik": 1,
         "price": 100.0, "shares_outstanding": 10, "price_fetched_at": "2026-10-26T12:00:00",
+        "shares_source": "SEC cover page (10-Q)", "shares_as_of": "2026-07-17",
         "latest_fiscal_year": latest, "latest_fiscal_year_end": years[latest]["end_date"],
         "not_applicable": ["current_ratio", "debt_to_equity"] if is_financial else [],
         "years": years,
@@ -63,6 +64,8 @@ def test_companies_list(client):
     assert aaa["revenue_growth"] == pytest.approx(20.0)
     assert aaa["pe"] == pytest.approx(25.0)
     assert aaa["operating_margin"] is None  # missing stays null in JSON, never 0
+    assert aaa["shares_source"] == "SEC cover page (10-Q)"
+    assert aaa["shares_as_of"] == "2026-07-17"
     assert aaa["missing_reasons"]["operating_margin"] == "Operating income not reported in the FY2025 10-K"
     assert "revenue_growth" not in aaa["missing_reasons"]
 

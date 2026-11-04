@@ -198,7 +198,8 @@ flutter test
 | Source | Used for | Limitations |
 |---|---|---|
 | **SEC EDGAR XBRL "companyfacts" API** (official, free) | All financial statement numbers | Annual 10-K figures only, so ratios are based on the **latest fiscal year**, not the last 12 months. Companies tag the same item differently; we try a fixed list of tags per field (see `backend/pipeline/extract.py`) and record which tag was used. If none is found the value is shown as "—", never as 0. |
-| **Yahoo Finance via `yfinance`** (unofficial) | Latest share price and shares outstanding | Not an official API: it can change or break without notice, and prices may be delayed. Acceptable for a prototype; v2 replaces it. |
+| **SEC filings (10-K / 10-Q)** | Shares outstanding | First fresh one of: cover page (`dei:EntityCommonStockSharesOutstanding`), balance sheet (`CommonStockSharesOutstanding`), average shares in the period (`WeightedAverageNumberOfSharesOutstandingBasic`). "Fresh" = at most a year older than the latest 10-K year end. Companies with several share classes have no cover-page number in companyfacts, so they use the later sources. Yahoo is the backup when none qualifies (e.g. Visa). The source is stored per company and shown next to the market cap. |
+| **Yahoo Finance via `yfinance`** (unofficial) | Latest share price; shares only as a backup | Not an official API: it can change or break without notice, and prices may be delayed. Polygon replaces it for prices (phase 4). |
 
 Things worth knowing about the data:
 
@@ -236,7 +237,7 @@ number gives "—" (never 0). Percentages are shown with one decimal place.
 | Current ratio | Current assets / Current liabilities | Not applicable for Financials |
 | Free cash flow | Operating cash flow − Capital expenditure | |
 | FCF margin | Free cash flow / Revenue × 100 | |
-| Market cap | Price × Shares outstanding | Shares across all share classes |
+| Market cap | Price × Shares outstanding | Shares from the SEC filings (all share classes together). With several classes, the price of the listed class is used for all shares: fine when the classes trade at about the same price (Alphabet, Meta), wrong for Berkshire Hathaway (one A share ≈ 1,500 B shares). Eli Lilly's cover page counts ~50M more shares than Yahoo (probably shares held in an employee benefit trust); we use the SEC number. |
 | P/E (FY) | Price / Diluted EPS of the latest fiscal year | Not trailing-12-month; empty if EPS ≤ 0 |
 | P/B (FY) | Market cap / Shareholders' equity at the latest fiscal year end | Empty if equity ≤ 0 |
 | P/S (FY) | Market cap / Revenue of the latest fiscal year | Not trailing-12-month |

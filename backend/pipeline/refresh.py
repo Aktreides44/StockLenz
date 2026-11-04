@@ -17,6 +17,7 @@ from pipeline.extract import extract_company
 from pipeline.metrics import METRIC_KEYS, NOT_APPLICABLE_FOR_FINANCIALS, compute_all, explain_missing
 from config import BACKEND_DIR
 from pipeline.sec_client import load_companyfacts, load_ticker_to_cik, sec_ticker
+from pipeline.shares import extract_shares
 
 UNIVERSE_CSV = BACKEND_DIR / "data" / "universe.csv"
 
@@ -46,14 +47,26 @@ def fetch_price_and_shares(ticker):
 
 def build_company(row, cik):
     ticker = row["ticker"]
-    years = extract_company(load_companyfacts(cik))
+    companyfacts = load_companyfacts(cik)
+    years = extract_company(companyfacts)
     if not years:
         print(f"    WARNING: no annual 10-K data found for {ticker}, skipping")
         return None
 
-    price, shares = fetch_price_and_shares(ticker)
-    is_financial = row["sector"] == "Financials"
     latest_year = max(years)
+    price, yahoo_shares = fetch_price_and_shares(ticker)
+
+    # Shares outstanding: from the SEC filings if possible, Yahoo only as a backup.
+    sec_shares = extract_shares(companyfacts, years[latest_year]["end_date"])
+    if sec_shares is not None:
+        shares, shares_source, shares_as_of = sec_shares["value"], sec_shares["source"], sec_shares["as_of"]
+    elif yahoo_shares is not None:
+        shares, shares_source, shares_as_of = yahoo_shares, "Yahoo Finance (backup)", None
+        print(f"    NOTE: no recent SEC share count for {ticker}, using Yahoo's")
+    else:
+        shares, shares_source, shares_as_of = None, None, None
+
+    is_financial = row["sector"] == "Financials"
 
     company = {
         "ticker": ticker,
@@ -62,6 +75,8 @@ def build_company(row, cik):
         "cik": cik,
         "price": price,
         "shares_outstanding": shares,
+        "shares_source": shares_source,
+        "shares_as_of": shares_as_of,
         "price_fetched_at": datetime.now().isoformat(timespec="seconds") if price is not None else None,
         "latest_fiscal_year": latest_year,
         "latest_fiscal_year_end": years[latest_year]["end_date"],

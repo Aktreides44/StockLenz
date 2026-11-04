@@ -25,6 +25,8 @@ Company company(String ticker, String name, String sector, double marketCap) {
     cik: 320193,
     price: 343.91,
     priceFetchedAt: '2026-10-27T09:04:12',
+    sharesSource: 'SEC cover page (10-Q)',
+    sharesAsOf: '2026-07-17',
     latestFiscalYear: 2025,
     latestFiscalYearEnd: '2025-09-27',
     metrics: {'market_cap': marketCap, 'roe': 171.4, 'net_margin': 26.9, 'operating_margin': null, 'pe': 46.1},
@@ -140,5 +142,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Calculated from each year\'s 10-K figures. Hover or press and hold a dash to see why it is missing.'),
         findsOneWidget);
+  });
+
+  testWidgets('the market cap info says where the share count comes from', (tester) async {
+    await pumpApplePage(tester);
+    expect(find.byTooltip('Price × Shares\nShares: SEC cover page (10-Q), 17 Jul 2026'), findsOneWidget);
   });
 }

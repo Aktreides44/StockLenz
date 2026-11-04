@@ -208,7 +208,14 @@ class SummarySection extends StatelessWidget {
           : NumberText(formatPrice(company.price!), value: company.price!, bold: true);
     } else {
       label = metricsByKey[key]?.label ?? key;
-      formula = metricsByKey[key]?.formula ?? '';
+      final definition = metricsByKey[key]?.formula ?? '';
+      // Market cap: also say where the number of shares comes from.
+      if (key == 'market_cap' && company.sharesSource != null) {
+        final asOf = company.sharesAsOf == null ? '' : ', ${formatDate(company.sharesAsOf!)}';
+        formula = '$definition\nShares: ${company.sharesSource}$asOf';
+      } else {
+        formula = definition;
+      }
       value = _metricValue(company, key, metricsByKey);
     }
 
