@@ -3,6 +3,8 @@
 # What happens, in order:
 #   1. tests run (if they fail, nothing is published)
 #   2. the pipeline downloads SEC data and prices and builds stocklens.db
+#      (the raw SEC files are kept between runs in the Actions cache; only companies with
+#       new 10-K/10-Q filings are downloaded again, see backend/pipeline/sec_updates.py)
 #   3. a sanity check makes sure the result is not broken
 #   4. stocklens.db is uploaded to the GitHub release "data-latest", replacing yesterday's file
 #
@@ -42,6 +44,16 @@ jobs:
 
       - name: Install packages
         run: pip install -r requirements.txt
+
+      # Restores the SEC files saved by the last run, and saves them again when this run succeeds.
+      # Every run saves a new cache entry (the key contains the run id); restore-keys picks the newest.
+      # GitHub deletes entries unused for 7 days and the oldest ones above 10 GB.
+      - name: Restore the saved SEC files
+        uses: actions/cache@v4
+        with:
+          path: backend/data/raw
+          key: sec-raw-${{ github.run_id }}
+          restore-keys: sec-raw-
 
       - name: Run tests
         run: python -m pytest -q

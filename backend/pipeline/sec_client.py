@@ -6,6 +6,7 @@ Downloaded JSON is cached in backend/data/raw/ so reruns don't refetch it.
 """
 import json
 import time
+from datetime import date
 
 import requests
 
@@ -13,6 +14,7 @@ import config
 from config import BACKEND_DIR
 
 RAW_DIR = BACKEND_DIR / "data" / "raw"
+MANIFEST = RAW_DIR / "downloaded.json"  # when each saved file was downloaded (used by sec_updates.py)
 
 TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json"
@@ -30,11 +32,29 @@ def get_user_agent():
     return user_agent
 
 
-def download_json(url):
+def download(url):
     response = requests.get(url, headers={"User-Agent": get_user_agent()}, timeout=30)
     time.sleep(SECONDS_BETWEEN_REQUESTS)
     response.raise_for_status()
-    return response.json()
+    return response
+
+
+def download_json(url):
+    return download(url).json()
+
+
+def download_text(url):
+    return download(url).text
+
+
+def load_manifest():
+    """{"CIK0000320193.json": "2026-11-04", ...}: when each saved file was downloaded."""
+    return json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.exists() else {}
+
+
+def save_manifest(manifest):
+    MANIFEST.parent.mkdir(parents=True, exist_ok=True)
+    MANIFEST.write_text(json.dumps(manifest, indent=1, sort_keys=True), encoding="utf-8")
 
 
 def get_cached_json(url, cache_file):
@@ -43,6 +63,10 @@ def get_cached_json(url, cache_file):
         data = download_json(url)
         cache_file.parent.mkdir(parents=True, exist_ok=True)
         cache_file.write_text(json.dumps(data), encoding="utf-8")
+        # Remember when it was downloaded, so sec_updates.py can tell when it is out of date.
+        manifest = load_manifest()
+        manifest[cache_file.name] = date.today().isoformat()
+        save_manifest(manifest)
     return json.loads(cache_file.read_text(encoding="utf-8"))
 
 

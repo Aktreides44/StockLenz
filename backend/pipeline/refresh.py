@@ -3,7 +3,8 @@
 Run from the backend folder:
     python -m pipeline.refresh
 
-SEC data is cached in backend/data/raw/. Delete that folder to download fresh 10-K data.
+SEC data is cached in backend/data/raw/; only files of companies with new filings are downloaded
+again (see sec_updates.py). Delete that folder to download everything fresh.
 Prices: the latest closing prices from Polygon (one request for all companies, see prices.py);
 Yahoo Finance only for tickers Polygon has no price for.
 """
@@ -16,6 +17,7 @@ from pipeline.metrics import METRIC_KEYS, NOT_APPLICABLE_FOR_FINANCIALS, compute
 from config import BACKEND_DIR
 from pipeline.prices import latest_closes, yahoo_price_and_shares
 from pipeline.sec_client import load_companyfacts, load_ticker_to_cik, sec_ticker
+from pipeline.sec_updates import remove_outdated_files
 from pipeline.shares import extract_shares
 
 UNIVERSE_CSV = BACKEND_DIR / "data" / "universe.csv"
@@ -101,6 +103,7 @@ def print_coverage(companies):
 
 def main():
     universe = load_universe()
+    remove_outdated_files()  # so only companies with new 10-K/10-Q filings are downloaded again
     ticker_to_cik = load_ticker_to_cik()
     polygon_closes, polygon_day = latest_closes()  # one request for all companies
 

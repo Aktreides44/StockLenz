@@ -88,9 +88,13 @@ cd backend
 .\.venv\Scripts\python.exe -m pipeline.refresh
 ```
 
-Downloads the SEC data for every company in `backend/data/universe.csv` (cached in `backend/data/raw/`,
-so reruns are fast), fetches the latest prices, and writes `backend/data/stocklens.db`. At the end it prints how many companies have a value for each metric.
-To download fresh 10-K data, delete `backend/data/raw/` first.
+Downloads the SEC data for every company in `backend/data/universe.csv` (saved in `backend/data/raw/`),
+fetches the latest prices, and writes `backend/data/stocklens.db`. At the end it prints how many companies have a value for each metric.
+Only what changed is downloaded again: `raw/downloaded.json` records when each file was saved, and
+before each run the pipeline reads the SEC's daily filing index for the days since then and deletes the
+saved files of companies that filed a new 10-K or 10-Q (`pipeline/sec_updates.py`). Files older than 30
+days are refreshed anyway. On GitHub the `raw/` folder is kept between runs with the Actions cache.
+To download everything fresh, delete `backend/data/raw/`.
 
 To check the raw extracted numbers for a few companies:
 
