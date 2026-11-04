@@ -156,3 +156,16 @@ def test_check_database_before_publishing(tmp_path):
 def test_cors_header(client):
     response = client.get("/companies", headers={"Origin": "http://localhost:1234"})
     assert response.headers["access-control-allow-origin"] == "*"
+
+
+def test_an_older_database_without_new_columns_still_works(tmp_path):
+    """Right after a code update the server may still have yesterday's database, without the newest columns."""
+    test_db = tmp_path / "old.db"
+    db.write_database([make_company("AAA", "Industrials", make_years({2025: {"revenue": 10}}))], path=test_db)
+    conn = db.connect(test_db)
+    conn.execute("ALTER TABLE companies DROP COLUMN ttm_end")  # as if the database were built by older code
+    conn.commit()
+    company = db.load_companies(conn)[0]
+    conn.close()
+    assert company["ticker"] == "AAA"
+    assert company["ttm_end"] is None

@@ -118,7 +118,10 @@ def write_database(companies, path=DB_PATH):
 # --- Reading (used by the API) ---
 
 def company_row_to_dict(row):
-    company = {column: row[column] for column in COMPANY_COLUMNS}
+    # A column the database does not have yet counts as empty. This keeps the API working right after
+    # a code update, while the server still has yesterday's database (it is replaced within hours).
+    present = set(row.keys())
+    company = {column: row[column] if column in present else None for column in COMPANY_COLUMNS}
     company["not_applicable"] = row["not_applicable"].split(",") if row["not_applicable"] else []
     company["missing_reasons"] = json.loads(row["missing_reasons"]) if row["missing_reasons"] else {}
     return company
