@@ -128,7 +128,7 @@ Then open http://127.0.0.1:8000/docs. Endpoints:
 | `GET /companies` | All companies with every screener metric, the latest fiscal year and its end date |
 | `GET /companies/{ticker}` | One company: metrics, 5 years of history, yearly ratios, rule-based pros/cons |
 | `GET /metrics` | Metric definitions: label, formula, unit, whether higher is better |
-| `GET /health` | `{"status": "ok", "database": "ok" or "missing", "companies": 500, "prices_as_of": ...}` — answers even without a database |
+| `GET /health` | `{"status": "ok", "database": "ok" or "missing", "companies": 498, "prices_as_of": "2026-11-03"}` (the trading day most prices are from) — answers even without a database |
 
 ### Settings
 

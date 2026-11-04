@@ -77,9 +77,14 @@ def health():
         return {"status": "ok", "database": "missing", "companies": 0, "prices_as_of": None}
     conn = db.connect(db.DB_PATH)
     try:
-        companies, prices_as_of = conn.execute(
-            "SELECT COUNT(*), MAX(price_fetched_at) FROM companies"
+        companies = conn.execute("SELECT COUNT(*) FROM companies").fetchone()[0]
+        # The day most prices are from (the Polygon trading day). Not the newest time: a Yahoo
+        # backup price carries the time it was downloaded, which would look newer than it is.
+        most_common_day = conn.execute(
+            "SELECT substr(price_fetched_at, 1, 10) AS day, COUNT(*) AS n FROM companies"
+            " WHERE price_fetched_at IS NOT NULL GROUP BY day ORDER BY n DESC LIMIT 1"
         ).fetchone()
+        prices_as_of = most_common_day[0] if most_common_day else None
     finally:
         conn.close()
     return {"status": "ok", "database": "ok", "companies": companies, "prices_as_of": prices_as_of}

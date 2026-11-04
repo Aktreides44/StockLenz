@@ -117,13 +117,15 @@ def test_metrics_definitions(client):
 
 def test_health_with_database(tmp_path, monkeypatch):
     test_db = tmp_path / "test.db"
-    db.write_database([make_company("AAA", "Industrials", make_years({2025: {"revenue": 10}}))], path=test_db)
+    years = make_years({2025: {"revenue": 10}})
+    backup = dict(make_company("BBB", "Industrials", years), price_fetched_at="2026-10-27T09:00:00")  # Yahoo backup
+    db.write_database([make_company("AAA", "Industrials", years), make_company("CCC", "Industrials", years), backup],
+                      path=test_db)
     monkeypatch.setattr(db, "DB_PATH", test_db)
     response = TestClient(app).get("/health")
     assert response.status_code == 200
-    assert response.json() == {
-        "status": "ok", "database": "ok", "companies": 1, "prices_as_of": "2026-10-26T12:00:00",
-    }
+    # The day most prices are from, not the newer time of the one backup price.
+    assert response.json() == {"status": "ok", "database": "ok", "companies": 3, "prices_as_of": "2026-10-26"}
 
 
 def test_health_without_database_still_answers(tmp_path, monkeypatch):
