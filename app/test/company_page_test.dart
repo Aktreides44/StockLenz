@@ -15,6 +15,8 @@ const metrics = [
       formula: 'OpInc / Rev × 100', unit: '%', higherIsBetter: true),
   MetricDefinition(key: 'pe', label: 'P/E (FY)', group: 'Valuation', formula: 'Price / EPS of the latest fiscal year',
       unit: 'x', higherIsBetter: false),
+  MetricDefinition(key: 'pe_ttm', label: 'P/E (TTM)', group: 'Valuation', formula: 'Price / EPS of the last 12 months',
+      unit: 'x', higherIsBetter: false),
 ];
 
 Company company(String ticker, String name, String sector, double marketCap) {
@@ -30,7 +32,8 @@ Company company(String ticker, String name, String sector, double marketCap) {
     sharesAsOf: '2026-07-17',
     latestFiscalYear: 2025,
     latestFiscalYearEnd: '2025-09-27',
-    metrics: {'market_cap': marketCap, 'roe': 171.4, 'net_margin': 26.9, 'operating_margin': null, 'pe': 46.1},
+    ttmEnd: '2026-06-27',
+    metrics: {'market_cap': marketCap, 'roe': 171.4, 'net_margin': 26.9, 'operating_margin': null, 'pe': 46.1, 'pe_ttm': 39.4},
     missingReasons: const {'operating_margin': 'Operating income not reported in the FY2025 10-K'},
     notApplicable: const [],
   );
@@ -149,5 +152,12 @@ void main() {
     await pumpApplePage(tester);
     expect(find.byTooltip('Latest share price: Polygon close, 27 Oct 2026'), findsOneWidget);
     expect(find.byTooltip('Price × Shares\nShares: SEC cover page (10-Q), 17 Jul 2026'), findsOneWidget);
+  });
+
+  testWidgets('the (TTM) metrics say which 12 months they cover', (tester) async {
+    await pumpApplePage(tester);
+    expect(find.text('39.40'), findsOneWidget);
+    expect(find.byTooltip('Price / EPS of the last 12 months\nLast 12 months to 27 Jun 2026'), findsOneWidget);
+    expect(find.textContaining('(TTM) multiples cover the 12 months to 27 Jun 2026.'), findsOneWidget);
   });
 }

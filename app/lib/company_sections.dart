@@ -104,8 +104,8 @@ class SummarySection extends StatelessWidget {
   final Map<String, MetricDefinition> metricsByKey;
 
   static const _keyRatios = [
-    'market_cap', 'price', 'pe', 'pb', 'ps', 'roe',
-    'roa', 'net_margin', 'operating_margin', 'debt_to_equity', 'current_ratio', 'revenue_growth',
+    'market_cap', 'price', 'pe', 'pe_ttm', 'pb', 'ps', 'ps_ttm',
+    'roe', 'roa', 'net_margin', 'operating_margin', 'debt_to_equity', 'current_ratio', 'revenue_growth',
   ];
 
   @override
@@ -187,7 +187,8 @@ class SummarySection extends StatelessWidget {
           const SizedBox(height: Space.md),
           Text(
             'Ratios use the FY${company.latestFiscalYear} 10-K (year ended ${company.latestFiscalYearEnd}) '
-            'and the latest price. (FY) multiples are not trailing-12-month figures.',
+            'and the latest price. (FY) multiples are not trailing-12-month figures'
+            '${company.ttmEnd == null ? '.' : '; (TTM) multiples cover the 12 months to ${formatDate(company.ttmEnd!)}.'}',
             style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
         ],
@@ -216,6 +217,9 @@ class SummarySection extends StatelessWidget {
       if (key == 'market_cap' && company.sharesSource != null) {
         final asOf = company.sharesAsOf == null ? '' : ', ${formatDate(company.sharesAsOf!)}';
         formula = '$definition\nShares: ${company.sharesSource}$asOf';
+      } else if (key.endsWith('_ttm') && company.ttmEnd != null) {
+        // (TTM) metrics: say which 12 months they cover.
+        formula = '$definition\nLast 12 months to ${formatDate(company.ttmEnd!)}';
       } else {
         formula = definition;
       }

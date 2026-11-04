@@ -30,6 +30,7 @@ Phase 4 step 3 done: closing prices from Polygon grouped daily (`pipeline/prices
 Yahoo only for gaps.
 Phase 4 step 4 done: only changed SEC files are downloaded again (`pipeline/sec_updates.py`: daily filing index +
 `raw/downloaded.json`, 30-day safety net); `raw/` kept between Actions runs with `actions/cache`.
+Phase 4 step 6 done: TTM revenue/net income/EPS (`pipeline/ttm.py`), metrics P/E (TTM) and P/S (TTM), `ttm_end` shown in the app.
 Phase 4 step 5 done: coverage report `python -m pipeline.coverage` (published daily next to the DB); 3 fallback tags.
 Phase 4 step 1 done: S&P 500 in `universe.csv` from `python -m pipeline.update_universe` (Wikipedia, read once).
 Done so far: hosted API (phase 1); API address in `config.dart`, offline snapshot removed and links
@@ -107,6 +108,11 @@ Record which tag was used per field and fiscal year end date; store it in the DB
 | pb | MarketCap / Equity; null if equity ≤ 0 |
 | ps | MarketCap / Rev |
 | market_cap | Price × shares outstanding |
+| pe_ttm | Price / TTM diluted EPS; null if TTM EPS ≤ 0 |
+| ps_ttm | MarketCap / TTM revenue |
+
+TTM = latest 10-K value + latest 10-Q year-to-date − the same period a year earlier (`pipeline/ttm.py`);
+= the FY value when the 10-K is the latest report; null when the comparison period is missing.
 
 Any division with a missing or zero denominator → null. Never substitute 0.
 Banks/insurers: current_ratio and debt_to_equity are not meaningful — return null and set a

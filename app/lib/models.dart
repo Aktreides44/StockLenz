@@ -48,6 +48,7 @@ class Company {
     this.sharesAsOf,
     required this.latestFiscalYear,
     required this.latestFiscalYearEnd,
+    this.ttmEnd,
     required this.metrics,
     required this.missingReasons,
     required this.notApplicable,
@@ -76,6 +77,9 @@ class Company {
   final int? latestFiscalYear;
   final String? latestFiscalYearEnd;
 
+  /// Where the trailing 12 months of the (TTM) metrics end, e.g. "2026-06-27" (the latest 10-Q).
+  final String? ttmEnd;
+
   /// Metric key -> value. null means missing (shown as "—"), never 0.
   final Map<String, double?> metrics;
 
@@ -99,6 +103,7 @@ class Company {
       sharesAsOf: json['shares_as_of'] as String?,
       latestFiscalYear: json['latest_fiscal_year'] as int?,
       latestFiscalYearEnd: json['latest_fiscal_year_end'] as String?,
+      ttmEnd: json['ttm_end'] as String?,
       metrics: {for (final definition in definitions) definition.key: _toDouble(json[definition.key])},
       missingReasons: reasons.map((key, value) => MapEntry(key, value as String)),
       notApplicable: ((json['not_applicable'] as List<dynamic>?) ?? []).cast<String>(),

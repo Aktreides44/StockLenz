@@ -259,6 +259,15 @@ number gives "—" (never 0). Percentages are shown with one decimal place.
 | P/E (FY) | Price / Diluted EPS of the latest fiscal year | Not trailing-12-month; empty if EPS ≤ 0 |
 | P/B (FY) | Market cap / Shareholders' equity at the latest fiscal year end | Empty if equity ≤ 0 |
 | P/S (FY) | Market cap / Revenue of the latest fiscal year | Not trailing-12-month |
+| P/E (TTM) | Price / Diluted EPS of the last 12 months | Empty if TTM EPS ≤ 0 (a loss in the last 12 months) |
+| P/S (TTM) | Market cap / Revenue of the last 12 months | |
+
+**TTM (trailing twelve months)** = latest fiscal year (10-K) + this year's months so far (latest 10-Q,
+"year to date") − the same months a year earlier. Example, Apple: FY2025 revenue $416.16B + 9 months to
+27 Jun 2026 $364.36B − 9 months to 28 Jun 2025 $313.70B = $466.82B. If the 10-K is the latest report,
+TTM = the fiscal year. All three numbers come from one XBRL tag (or a tag that reports exactly the same
+fiscal-year value), and a TTM value is left empty rather than guessed when a comparison period is
+missing (`backend/pipeline/ttm.py`). The company page shows which 12 months the (TTM) values cover.
 
 ### Rule-based pros and cons
 
