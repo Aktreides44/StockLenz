@@ -34,3 +34,20 @@ def test_fiscal_year_label_early_january_belongs_to_previous_year():
     assert fiscal_year_label("2024-09-28") == 2024
     assert fiscal_year_label("2023-01-01") == 2022  # JNJ's 52/53-week year
     assert fiscal_year_label("2026-01-31") == 2026  # Walmart-style January year end
+
+
+def test_fallback_tags_fill_gaps():
+    """Companies that use the later tags in the FIELDS lists (CrowdStrike, Mastercard, Air Products, ...)."""
+    def entry(val):
+        return {"start": "2025-01-01", "end": "2025-12-31", "val": val, "form": "10-K", "fp": "FY", "filed": "2026-02-01"}
+
+    facts = {"facts": {"us-gaap": {
+        "RevenueFromContractWithCustomerIncludingAssessedTax": {"units": {"USD": [entry(4_812e6)]}},
+        "ProfitLoss": {"units": {"USD": [entry(1_500e6)]}},
+        "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations": {"units": {"USD": [entry(2_000e6)]}},
+    }}}
+    fields = extract_company(facts)[2025]["fields"]
+    assert fields["revenue"] == {"value": 4_812e6, "tag": "RevenueFromContractWithCustomerIncludingAssessedTax"}
+    assert fields["net_income"] == {"value": 1_500e6, "tag": "ProfitLoss"}
+    assert fields["operating_cash_flow"]["tag"] == "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"
+    assert fields["operating_income"] is None  # never filled with a different number such as pre-tax income

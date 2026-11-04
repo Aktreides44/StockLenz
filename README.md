@@ -96,6 +96,18 @@ saved files of companies that filed a new 10-K or 10-Q (`pipeline/sec_updates.py
 days are refreshed anyway. On GitHub the `raw/` folder is kept between runs with the Actions cache.
 To download everything fresh, delete `backend/data/raw/`.
 
+### Coverage report
+
+```
+cd backend
+.\.venv\Scripts\python.exe -m pipeline.coverage
+```
+
+Writes `backend/data/coverage.md`: per metric how many companies have a value, are "not applicable"
+(banks) or miss it, every missing value grouped by its reason with the tickers, which companies needed
+the Yahoo backup, and which companies of `universe.csv` are not in the database. The daily GitHub run
+publishes the latest one: https://github.com/Aktreides44/StockLenz/releases/download/data-latest/coverage.md
+
 To check the raw extracted numbers for a few companies:
 
 ```
@@ -243,7 +255,7 @@ number gives "—" (never 0). Percentages are shown with one decimal place.
 | Current ratio | Current assets / Current liabilities | Not applicable for Financials |
 | Free cash flow | Operating cash flow − Capital expenditure | |
 | FCF margin | Free cash flow / Revenue × 100 | |
-| Market cap | Price × Shares outstanding | Shares from the SEC filings (all share classes together). With several classes, the price of the listed class is used for all shares: fine when the classes trade at about the same price (Alphabet, Meta), wrong for Berkshire Hathaway (one A share ≈ 1,500 B shares). Eli Lilly's cover page counts ~50M more shares than Yahoo (probably shares held in an employee benefit trust); we use the SEC number. |
+| Market cap | Price × Shares outstanding | Shares from the SEC filings (all share classes together). With several classes, the price of the listed class is used for all shares: fine when the classes trade at about the same price (Alphabet, Meta), not for Berkshire Hathaway (one A share ≈ 1,500 B shares): its count comes from Yahoo, which counts in B-share equivalents, so its market cap is right; an SEC count would mix A and B shares. Eli Lilly's cover page counts ~50M more shares than Yahoo (probably shares held in an employee benefit trust); we use the SEC number. |
 | P/E (FY) | Price / Diluted EPS of the latest fiscal year | Not trailing-12-month; empty if EPS ≤ 0 |
 | P/B (FY) | Market cap / Shareholders' equity at the latest fiscal year end | Empty if equity ≤ 0 |
 | P/S (FY) | Market cap / Revenue of the latest fiscal year | Not trailing-12-month |

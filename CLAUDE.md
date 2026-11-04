@@ -30,6 +30,7 @@ Phase 4 step 3 done: closing prices from Polygon grouped daily (`pipeline/prices
 Yahoo only for gaps.
 Phase 4 step 4 done: only changed SEC files are downloaded again (`pipeline/sec_updates.py`: daily filing index +
 `raw/downloaded.json`, 30-day safety net); `raw/` kept between Actions runs with `actions/cache`.
+Phase 4 step 5 done: coverage report `python -m pipeline.coverage` (published daily next to the DB); 3 fallback tags.
 Phase 4 step 1 done: S&P 500 in `universe.csv` from `python -m pipeline.update_universe` (Wikipedia, read once).
 Done so far: hosted API (phase 1); API address in `config.dart`, offline snapshot removed and links
 opened with `url_launcher`, web app on GitHub Pages via `.github/workflows/deploy-web.yml`, Android app (phase 2 done); theme file and phone layout with cards, sort menu,
@@ -70,8 +71,9 @@ filter bottom sheet and a sector ✕ button, 🔍 company search in the top bar 
 
 ## XBRL field mapping (us-gaap tags; try in order, first one found wins)
 - Revenue: `Revenues`, `RevenueFromContractWithCustomerExcludingAssessedTax`, `SalesRevenueNet`,
-  `RevenuesNetOfInterestExpense` (banks), `RegulatedAndUnregulatedOperatingRevenue` (utilities)
-- Net income: `NetIncomeLoss`, `NetIncomeLossAvailableToCommonStockholdersBasic`
+  `RevenuesNetOfInterestExpense` (banks), `RegulatedAndUnregulatedOperatingRevenue` (utilities),
+  `RevenueFromContractWithCustomerIncludingAssessedTax`
+- Net income: `NetIncomeLoss`, `NetIncomeLossAvailableToCommonStockholdersBasic`, `ProfitLoss`
 - Operating income: `OperatingIncomeLoss`
 - Diluted EPS: `EarningsPerShareDiluted` (unit USD/shares)
 - Total assets: `Assets`
@@ -79,7 +81,8 @@ filter bottom sheet and a sector ✕ button, 🔍 company search in the top bar 
 - Equity: `StockholdersEquity`, `StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest`
 - Long-term debt: `LongTermDebtNoncurrent`, `LongTermDebt`, `LongTermDebtAndCapitalLeaseObligations`,
   `LongTermNotesPayable`
-- Operating cash flow: `NetCashProvidedByUsedInOperatingActivities`
+- Operating cash flow: `NetCashProvidedByUsedInOperatingActivities`, `NetCashProvidedByUsedInOperatingActivitiesContinuingOperations`
+- Never fill a field with a different number (e.g. pre-tax income for operating income): leave it null.
 - Capex: `PaymentsToAcquirePropertyPlantAndEquipment`, `PaymentsToAcquireProductiveAssets`,
   `PaymentsToAcquireOtherPropertyPlantAndEquipment`, `PaymentsToAcquireOtherProductiveAssets`
 - Dividends paid: `PaymentsOfDividends`, `PaymentsOfDividendsCommonStock`, `PaymentsOfOrdinaryDividends`

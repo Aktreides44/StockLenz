@@ -6,7 +6,8 @@
 #      (the raw SEC files are kept between runs in the Actions cache; only companies with
 #       new 10-K/10-Q filings are downloaded again, see backend/pipeline/sec_updates.py)
 #   3. a sanity check makes sure the result is not broken
-#   4. stocklens.db is uploaded to the GitHub release "data-latest", replacing yesterday's file
+#   4. a coverage report (which companies miss which numbers, and why) is written
+#   5. stocklens.db and coverage.md are uploaded to the GitHub release "data-latest", replacing yesterday's
 #
 # Needs the repository secrets SEC_USER_AGENT and POLYGON_API_KEY
 # (Settings -> Secrets and variables -> Actions).
@@ -67,6 +68,9 @@ jobs:
       - name: Check the database before publishing
         run: python -m pipeline.check_database
 
+      - name: Write the coverage report
+        run: python -m pipeline.coverage
+
       - name: Publish it as the "data-latest" release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -75,4 +79,4 @@ jobs:
             gh release create data-latest --latest=false --title "Daily data" \
               --notes "Built automatically by the Refresh data workflow. Not a code release."
           fi
-          gh release upload data-latest data/stocklens.db --clobber
+          gh release upload data-latest data/stocklens.db data/coverage.md --clobber

@@ -11,11 +11,14 @@ from datetime import date
 # For each raw field: the us-gaap tags to try (in order, first one found wins) and the unit.
 # Tags after the ones listed in CLAUDE.md were added because real companies use them (example in the comment).
 FIELDS = {
-    # RevenuesNetOfInterestExpense: banks' "total net revenue" (WFC, GS); RegulatedAndUnregulated...: utilities (NEE)
+    # RevenuesNetOfInterestExpense: banks' "total net revenue" (WFC, GS); RegulatedAndUnregulated...: utilities (NEE);
+    # ...IncludingAssessedTax (revenue incl. taxes passed on to customers): CRWD, CPRT, AKAM, BALL, CBOE, ARE
     "revenue": (["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet",
-                 "RevenuesNetOfInterestExpense", "RegulatedAndUnregulatedOperatingRevenue"], "USD"),
-    # NetIncomeLossAvailableToCommonStockholdersBasic: CAT from 2025
-    "net_income": (["NetIncomeLoss", "NetIncomeLossAvailableToCommonStockholdersBasic"], "USD"),
+                 "RevenuesNetOfInterestExpense", "RegulatedAndUnregulatedOperatingRevenue",
+                 "RevenueFromContractWithCustomerIncludingAssessedTax"], "USD"),
+    # NetIncomeLossAvailableToCommonStockholdersBasic: CAT from 2025;
+    # ProfitLoss (incl. the small share of minority owners): AVGO, MA, ITW, LYB, VRSN, VTRS, BE
+    "net_income": (["NetIncomeLoss", "NetIncomeLossAvailableToCommonStockholdersBasic", "ProfitLoss"], "USD"),
     "operating_income": (["OperatingIncomeLoss"], "USD"),
     "eps_diluted": (["EarningsPerShareDiluted"], "USD/shares"),
     "total_assets": (["Assets"], "USD"),
@@ -26,7 +29,9 @@ FIELDS = {
     # LongTermNotesPayable: ORCL
     "long_term_debt": (["LongTermDebtNoncurrent", "LongTermDebt", "LongTermDebtAndCapitalLeaseObligations",
                         "LongTermNotesPayable"], "USD"),
-    "operating_cash_flow": (["NetCashProvidedByUsedInOperatingActivities"], "USD"),
+    # ...ContinuingOperations (without sold or discontinued businesses): APD, BDX, DD, DLTR, DOV, DRI, GEHC, JCI
+    "operating_cash_flow": (["NetCashProvidedByUsedInOperatingActivities",
+                             "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"], "USD"),
     # PaymentsToAcquireProductiveAssets (PP&E incl. software): NVDA, AMZN, HD, PEP, V, LMT, CVX;
     # PaymentsToAcquireOtherPropertyPlantAndEquipment: LLY; PaymentsToAcquireOtherProductiveAssets: VZ
     "capex": (["PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets",
