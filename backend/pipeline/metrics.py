@@ -166,7 +166,16 @@ METRIC_DEFINITIONS = [
      "Current market cap / Shareholders' equity at the latest fiscal year end; empty if equity ≤ 0", "x", False),
     ("ps", "P/S (FY)", "Valuation",
      "Current market cap / Revenue of the latest fiscal year (not trailing 12 months)", "x", False),
+    ("pe_ttm", "P/E (TTM)", "Valuation",
+     "Current price / Diluted EPS of the last 12 months (latest 10-K + 10-Q year to date − the same months "
+     "a year earlier); empty if EPS ≤ 0", "x", False),
+    ("ps_ttm", "P/S (TTM)", "Valuation",
+     "Current market cap / Revenue of the last 12 months (latest 10-K + 10-Q year to date − the same months "
+     "a year earlier)", "x", False),
 ]
+
+# The TTM metrics use the trailing-twelve-month values from pipeline/ttm.py instead of the 10-K year.
+TTM_METRICS = {"pe_ttm": "eps_diluted", "ps_ttm": "revenue"}
 
 METRIC_KEYS = [definition[0] for definition in METRIC_DEFINITIONS]
 
@@ -208,10 +217,12 @@ METRIC_INPUTS = {
 }
 
 
-def missing_reason(key, years, price, shares_outstanding, is_financial):
+def missing_reason(key, years, price, shares_outstanding, is_financial, ttm=None):
     """Explain in plain words why metric `key` has no value. Shown as the tooltip on "—"."""
     if is_financial and key in NOT_APPLICABLE_FOR_FINANCIALS:
         return "Not meaningful for banks and insurers (Financials sector)"
+    if key in TTM_METRICS:
+        return ttm_missing_reason(key, ttm, price, shares_outstanding)
 
     latest = max(years)
     for field, years_back in METRIC_INPUTS[key]:
@@ -243,6 +254,20 @@ def missing_reason(key, years, price, shares_outstanding, is_financial):
     return "Cannot be calculated: the denominator is zero"
 
 
+def ttm_missing_reason(key, ttm, price, shares_outstanding):
+    if price is None:
+        return "No current share price available"
+    if key == "ps_ttm" and shares_outstanding is None:
+        return "Shares outstanding not available"
+    field = TTM_METRICS[key]
+    if ttm is None or ttm.get(field) is None:
+        return (f"No trailing-12-month {FIELD_LABELS[field]}: it needs the latest 10-K value and, "
+                "after a 10-Q, the same year-to-date period of both years")
+    if key == "pe_ttm":
+        return "TTM diluted EPS is zero or negative (a loss in the last 12 months)"
+    return "Cannot be calculated: the denominator is zero"
+
+
 YEARLY_RATIO_KEYS = ["net_margin", "operating_margin", "roe", "roa", "debt_to_equity", "current_ratio", "fcf_margin"]
 
 
@@ -264,20 +289,22 @@ def yearly_ratios(years, is_financial):
     return result
 
 
-def explain_missing(values, years, price, shares_outstanding, is_financial):
+def explain_missing(values, years, price, shares_outstanding, is_financial, ttm=None):
     """Return {metric_key: reason} for every metric in `values` that is None."""
     return {
-        key: missing_reason(key, years, price, shares_outstanding, is_financial)
+        key: missing_reason(key, years, price, shares_outstanding, is_financial, ttm)
         for key, value in values.items()
         if value is None
     }
 
 
-def compute_all(years, price, shares_outstanding, is_financial):
+def compute_all(years, price, shares_outstanding, is_financial, ttm=None):
     """Compute every metric for the latest fiscal year in `years` (the output of extract_company).
 
+    ttm: the trailing-twelve-month values from pipeline/ttm.py ({"revenue", "eps_diluted", ...}), or None.
     Returns {metric_key: value or None}.
     """
+    ttm = ttm or {}
     latest = max(years)
 
     def value(year, field):
@@ -312,4 +339,6 @@ def compute_all(years, price, shares_outstanding, is_financial):
         "pe": pe(price, now("eps_diluted")),
         "pb": pb(company_market_cap, now("equity")),
         "ps": ps(company_market_cap, now("revenue")),
+        "pe_ttm": pe(price, ttm.get("eps_diluted")),
+        "ps_ttm": ps(company_market_cap, ttm.get("revenue")),
     }

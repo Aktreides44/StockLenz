@@ -378,3 +378,42 @@ def test_compute_all_financials_flag():
     assert result["debt_to_equity"] is None
     assert result["market_cap"] is None
     assert result["pe"] is None
+
+
+# --- TTM valuation metrics (P/E and P/S on the last 12 months instead of the fiscal year) ---
+
+def ttm_years():
+    return make_years({2024: {"revenue": 400, "eps_diluted": 4.0}})
+
+
+def test_pe_and_ps_ttm_use_the_trailing_twelve_months():
+    # Price 100, 2 shares -> market cap 200. TTM EPS 5 -> P/E 20 (FY: 100 / 4 = 25). TTM revenue 500 -> P/S 0.4.
+    ttm = {"end": "2025-06-30", "revenue": 500, "net_income": 10, "eps_diluted": 5.0}
+    result = metrics.compute_all(ttm_years(), price=100.0, shares_outstanding=2, is_financial=False, ttm=ttm)
+    assert result["pe"] == approx(25.0)
+    assert result["pe_ttm"] == approx(20.0)
+    assert result["ps"] == approx(0.5)
+    assert result["ps_ttm"] == approx(0.4)
+
+
+def test_ttm_metrics_with_zero_negative_and_missing_inputs():
+    years = ttm_years()
+    for eps in (0.0, -1.5):  # a loss in the last 12 months: no P/E, never a negative one
+        ttm = {"end": "2025-06-30", "revenue": 500, "net_income": -3, "eps_diluted": eps}
+        values = metrics.compute_all(years, price=100.0, shares_outstanding=2, is_financial=False, ttm=ttm)
+        assert values["pe_ttm"] is None
+        reasons = metrics.explain_missing(values, years, 100.0, 2, False, ttm)
+        assert reasons["pe_ttm"] == "TTM diluted EPS is zero or negative (a loss in the last 12 months)"
+
+    zero_revenue = {"end": "2025-06-30", "revenue": 0, "net_income": 1, "eps_diluted": 1.0}
+    assert metrics.compute_all(years, 100.0, 2, False, zero_revenue)["ps_ttm"] is None
+
+    values = metrics.compute_all(years, price=100.0, shares_outstanding=2, is_financial=False, ttm=None)
+    assert values["pe_ttm"] is None and values["ps_ttm"] is None  # no TTM at all: empty, never 0
+    reasons = metrics.explain_missing(values, years, 100.0, 2, False, None)
+    assert reasons["pe_ttm"].startswith("No trailing-12-month Diluted EPS")
+    assert reasons["ps_ttm"].startswith("No trailing-12-month Revenue")
+
+    no_price = metrics.compute_all(years, price=None, shares_outstanding=2, is_financial=False,
+                                   ttm={"end": "2025-06-30", "revenue": 500, "net_income": 1, "eps_diluted": 5.0})
+    assert metrics.explain_missing(no_price, years, None, 2, False)["pe_ttm"] == "No current share price available"

@@ -17,6 +17,7 @@ COMPANY_COLUMNS = [
     "ticker", "name", "sector", "cik", "price", "price_source", "price_fetched_at",
     "shares_outstanding", "shares_source", "shares_as_of",
     "latest_fiscal_year", "latest_fiscal_year_end",
+    "ttm_end", "revenue_ttm", "net_income_ttm", "eps_ttm",
 ] + METRIC_KEYS
 
 
@@ -47,6 +48,10 @@ CREATE TABLE companies (
     price_fetched_at TEXT, -- Polygon: the trading day of the close; Yahoo: when it was downloaded
     latest_fiscal_year INTEGER,
     latest_fiscal_year_end TEXT,
+    ttm_end TEXT,          -- where the trailing 12 months end (latest 10-Q, or the fiscal year end)
+    revenue_ttm REAL,      -- trailing-twelve-month values (pipeline/ttm.py); NULL if not calculable
+    net_income_ttm REAL,
+    eps_ttm REAL,
     not_applicable TEXT,  -- comma-separated metric keys, e.g. "current_ratio,debt_to_equity"
     missing_reasons TEXT, -- JSON object mapping metric key to why it has no value
 {metric_columns}

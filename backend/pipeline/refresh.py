@@ -19,6 +19,7 @@ from pipeline.prices import latest_closes, yahoo_price_and_shares
 from pipeline.sec_client import load_companyfacts, load_ticker_to_cik, sec_ticker
 from pipeline.sec_updates import remove_outdated_files
 from pipeline.shares import extract_shares
+from pipeline.ttm import extract_ttm
 
 UNIVERSE_CSV = BACKEND_DIR / "data" / "universe.csv"
 
@@ -67,6 +68,7 @@ def build_company(row, cik, polygon_closes, polygon_day):
 
     latest_year = max(years)
     sec_shares = extract_shares(companyfacts, years[latest_year]["end_date"])
+    ttm = extract_ttm(companyfacts, years)  # the last 12 months, from the 10-K and the 10-Qs since
     market = choose_price_and_shares(ticker, polygon_closes, polygon_day, sec_shares)
     price, shares = market["price"], market["shares_outstanding"]
 
@@ -80,12 +82,16 @@ def build_company(row, cik, polygon_closes, polygon_day):
         **market,  # price, price_source, price_fetched_at, shares_outstanding, shares_source, shares_as_of
         "latest_fiscal_year": latest_year,
         "latest_fiscal_year_end": years[latest_year]["end_date"],
+        "ttm_end": ttm["end"],
+        "revenue_ttm": ttm["revenue"],
+        "net_income_ttm": ttm["net_income"],
+        "eps_ttm": ttm["eps_diluted"],
         "not_applicable": NOT_APPLICABLE_FOR_FINANCIALS if is_financial else [],
         "years": years,
     }
-    values = compute_all(years, price, shares, is_financial)
+    values = compute_all(years, price, shares, is_financial, ttm)
     company.update(values)
-    company["missing_reasons"] = explain_missing(values, years, price, shares, is_financial)
+    company["missing_reasons"] = explain_missing(values, years, price, shares, is_financial, ttm)
     return company
 
 
