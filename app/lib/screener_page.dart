@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import 'company_page.dart';
+import 'company_search.dart';
 import 'data_service.dart';
 import 'filters_panel.dart';
 import 'models.dart';
@@ -154,6 +155,12 @@ class _ScreenerPageState extends State<ScreenerPage> {
       appBar: AppBar(
         title: const Text('StockLens'),
         actions: [
+          // Jump straight to a company (only once the list of companies has loaded).
+          if (_data != null)
+            CompanySearchButton(
+              companies: _data!.companies,
+              onSelected: (company) => openCompanyPage(context, company.ticker, _data!),
+            ),
           IconButton(onPressed: _loading ? null : _load, icon: const Icon(Icons.refresh), tooltip: 'Reload data'),
           if (widget.onToggleTheme != null)
             IconButton(
@@ -281,7 +288,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
     return TextField(
       onChanged: (text) => setState(() => _search = text),
       decoration: const InputDecoration(
-        hintText: 'Search ticker or name',
+        hintText: 'Filter list by ticker or name',
         prefixIcon: Icon(Icons.search),
         isDense: true,
         border: OutlineInputBorder(),

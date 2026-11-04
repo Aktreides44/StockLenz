@@ -28,7 +28,8 @@ build what the current phase says, and nothing from a later phase unless asked.
 Until a phase changes it, the code still works the v1 way (yfinance, 40 companies).
 Done so far: hosted API (phase 1); API address in `config.dart`, offline snapshot removed and links
 opened with `url_launcher`, web app on GitHub Pages via `.github/workflows/deploy-web.yml`, Android app (phase 2 done); theme file and phone layout with cards, sort menu,
-filter bottom sheet and a sector ✕ button (phase 3 steps 1–2). When a phase replaces something, update this file and the README.
+filter bottom sheet and a sector ✕ button, 🔍 company search in the top bar (`company_search.dart`)
+(phase 3 steps 1–3). When a phase replaces something, update this file and the README.
 
 ## Stack
 - `backend/` — Python 3.11+, FastAPI, SQLite (stdlib `sqlite3`), pytest. Hosted on Render (v2).
