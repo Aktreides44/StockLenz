@@ -46,6 +46,12 @@ def get_cached_json(url, cache_file):
     return json.loads(cache_file.read_text(encoding="utf-8"))
 
 
+def sec_ticker(ticker):
+    """universe.csv writes share classes with a dot (BRK.B, like Wikipedia and Polygon);
+    the SEC and Yahoo use a dash (BRK-B)."""
+    return ticker.replace(".", "-")
+
+
 def load_ticker_to_cik():
     """Return a dict like {"AAPL": 320193, ...} from the SEC's official ticker list."""
     data = get_cached_json(TICKERS_URL, RAW_DIR / "company_tickers.json")

@@ -2,6 +2,8 @@ fastapi
 uvicorn
 requests
 yfinance
+pandas
+lxml  # pandas.read_html reads the S&P 500 table from Wikipedia
 python-dotenv
 pytest
 httpx2

@@ -16,7 +16,7 @@ from pipeline import db
 from pipeline.extract import extract_company
 from pipeline.metrics import METRIC_KEYS, NOT_APPLICABLE_FOR_FINANCIALS, compute_all, explain_missing
 from config import BACKEND_DIR
-from pipeline.sec_client import load_companyfacts, load_ticker_to_cik
+from pipeline.sec_client import load_companyfacts, load_ticker_to_cik, sec_ticker
 
 UNIVERSE_CSV = BACKEND_DIR / "data" / "universe.csv"
 
@@ -25,8 +25,9 @@ warnings.filterwarnings("ignore", module="yfinance")
 
 
 def load_universe():
+    """The companies to process. Lines starting with "#" are comments (the date the list was read)."""
     with open(UNIVERSE_CSV, newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+        return list(csv.DictReader(line for line in f if not line.startswith("#")))
 
 
 def fetch_price_and_shares(ticker):
@@ -36,7 +37,7 @@ def fetch_price_and_shares(ticker):
     unlike info["sharesOutstanding"], which only counts one class.
     """
     try:
-        info = yf.Ticker(ticker).fast_info
+        info = yf.Ticker(sec_ticker(ticker)).fast_info  # Yahoo also writes BRK-B
         return info["last_price"], info["shares"]
     except Exception as error:  # network problems, unknown ticker, Yahoo changes, ...
         print(f"    WARNING: no price for {ticker}: {error}")
@@ -94,7 +95,7 @@ def main():
         ticker = row["ticker"]
         print(f"[{number}/{len(universe)}] {ticker}")
         # The optional "cik" column in universe.csv overrides the SEC ticker list
-        cik = int(row["cik"]) if row.get("cik") else ticker_to_cik.get(ticker)
+        cik = int(row["cik"]) if row.get("cik") else ticker_to_cik.get(sec_ticker(ticker))
         if cik is None:
             print(f"    WARNING: {ticker} not found in the SEC ticker list, skipping")
             continue

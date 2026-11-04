@@ -3,7 +3,7 @@
 A fundamental stock screener for long-term investors, inspired by Screener.in.
 University prototype (Medical Informatics, software engineering course), version 1.0.
 
-StockLens downloads the annual reports (10-K) of 40 large US companies from the SEC, calculates
+StockLens downloads the annual reports (10-K) of the S&P 500 companies (the ~500 largest US companies) from the SEC, calculates
 16 indicators such as ROE, net margin and P/E, and shows them in a Flutter app (web, Android and Windows):
 a sortable, filterable screener and a detail page per company. On wide screens the screener is a dense
 table; on phones (narrower than 600 px) it becomes a list of cards with market cap, P/E (FY) and ROE,
@@ -64,6 +64,23 @@ flutter pub get
 
 ## How to run
 
+### Company list: the S&P 500
+
+`backend/data/universe.csv` holds the companies (ticker, name, sector, optional CIK override). It is made
+from Wikipedia's "List of S&P 500 companies" and saved in git, so the daily pipeline never depends on
+Wikipedia and git history shows when the list changed. Run this by hand when the index changes:
+
+```
+cd backend
+.\.venv\Scripts\python.exe -m pipeline.update_universe
+```
+
+It keeps one ticker per company (Alphabet: GOOGL, not also GOOG), checks every ticker and CIK against
+the SEC's official ticker list, keeps manual CIK overrides (e.g. Exxon Mobil), writes the date into the
+first line of the file, and prints what changed and which CIKs need a manual look.
+Tickers are written like Wikipedia and Polygon (`BRK.B`); the code converts them to `BRK-B` for the SEC
+and Yahoo.
+
 ### Pipeline: build the database
 
 ```
@@ -95,7 +112,7 @@ Then open http://127.0.0.1:8000/docs. Endpoints:
 | `GET /companies` | All companies with every screener metric, the latest fiscal year and its end date |
 | `GET /companies/{ticker}` | One company: metrics, 5 years of history, yearly ratios, rule-based pros/cons |
 | `GET /metrics` | Metric definitions: label, formula, unit, whether higher is better |
-| `GET /health` | `{"status": "ok", "database": "ok" or "missing", "companies": 40, "prices_as_of": ...}` — answers even without a database |
+| `GET /health` | `{"status": "ok", "database": "ok" or "missing", "companies": 500, "prices_as_of": ...}` — answers even without a database |
 
 ### Settings
 

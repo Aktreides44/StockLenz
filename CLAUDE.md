@@ -25,7 +25,8 @@ build what the current phase says, and nothing from a later phase unless asked.
   **Shares outstanding:** from the SEC (10-K/10-Q cover page), not Yahoo.
 - **Data refresh:** the pipeline runs once a day (GitHub Actions), not on the user's PC.
 
-Until a phase changes it, the code still works the v1 way (yfinance, 40 companies).
+Until a phase changes it, the code still uses yfinance for prices and shares (phase 4 steps 2–3 replace it).
+Phase 4 step 1 done: S&P 500 in `universe.csv` from `python -m pipeline.update_universe` (Wikipedia, read once).
 Done so far: hosted API (phase 1); API address in `config.dart`, offline snapshot removed and links
 opened with `url_launcher`, web app on GitHub Pages via `.github/workflows/deploy-web.yml`, Android app (phase 2 done); theme file and phone layout with cards, sort menu,
 filter bottom sheet and a sector ✕ button, 🔍 company search in the top bar (`company_search.dart`), company page for phones
@@ -39,7 +40,8 @@ filter bottom sheet and a sector ✕ button, 🔍 company search in the top bar 
 
 ## Architecture
 1. `backend/pipeline/` — a script (`python -m pipeline.refresh`) that:
-   - loads tickers from `backend/data/universe.csv` (ticker, name, sector, optional cik override)
+   - loads tickers from `backend/data/universe.csv` (ticker, name, sector, optional cik override; `#` lines are
+     comments). Tickers use dots (`BRK.B`); `sec_ticker()` converts to `BRK-B` for the SEC and Yahoo.
    - maps ticker → CIK using https://www.sec.gov/files/company_tickers.json
    - downloads `https://data.sec.gov/api/xbrl/companyfacts/CIK##########.json`
    - extracts ANNUAL (form 10-K, fp=FY) values for the fields below, deduplicated by fiscal year
