@@ -1,6 +1,6 @@
 # StockLens v2 — plan
 
-Status: **agreed 2 Nov 2026**. Phases 0–2 done (3 Nov 2026); phase 3 in progress. We work through the phases in order, in small steps.
+Status: **agreed 2 Nov 2026**. Phases 0–3 done (4 Nov 2026); phase 4 next. We work through the phases in order, in small steps.
 Before each step Claude explains what it builds and why; after each step you get the files to look at
 in VS Code and a command to try it yourself.
 

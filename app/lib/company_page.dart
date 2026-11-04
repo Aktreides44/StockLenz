@@ -134,7 +134,7 @@ class _CompanyPageState extends State<CompanyPage> {
           child: SingleChildScrollView(
             key: _scrollViewKey,
             controller: _scroll,
-            padding: const EdgeInsets.all(Space.lg),
+            padding: EdgeInsets.all(isPhone(context) ? Space.sm : Space.lg), // phones: more room for numbers
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1100),
@@ -175,7 +175,7 @@ class _CompanyPageState extends State<CompanyPage> {
                       'Ratios',
                       StatementSection(
                         title: 'Ratios',
-                        subtitle: "Calculated from each year's 10-K figures. Hover a dash to see why it is missing.",
+                        subtitle: "Calculated from each year's 10-K figures. Hover or press and hold a dash to see why it is missing.",
                         years: years,
                         rows: ratioRows(metricsByKey),
                       ),
@@ -193,7 +193,7 @@ class _CompanyPageState extends State<CompanyPage> {
 
 /// The sticky bar with links to each section. It sits above the scrolling area,
 /// so it always stays visible.
-class _SectionBar extends StatelessWidget {
+class _SectionBar extends StatefulWidget {
   const _SectionBar({required this.sections, required this.active, required this.onTap});
 
   final List<String> sections;
@@ -201,7 +201,32 @@ class _SectionBar extends StatelessWidget {
   final void Function(String section) onTap;
 
   @override
+  State<_SectionBar> createState() => _SectionBarState();
+}
+
+class _SectionBarState extends State<_SectionBar> {
+  late final Map<String, GlobalKey> _tabKeys = {for (final section in widget.sections) section: GlobalKey()};
+
+  @override
+  void didUpdateWidget(_SectionBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // On a phone the bar is wider than the screen: when the active section changes,
+    // slide the bar so that its tab is visible (after this frame is drawn).
+    if (oldWidget.active != widget.active) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final tabContext = _tabKeys[widget.active]?.currentContext;
+        if (tabContext != null && tabContext.mounted) {
+          Scrollable.ensureVisible(tabContext, alignment: 0.5, duration: const Duration(milliseconds: 200));
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final sections = widget.sections;
+    final active = widget.active;
+    final onTap = widget.onTap;
     final colors = Theme.of(context).colorScheme;
     return Container(
       height: 42,
@@ -219,6 +244,7 @@ class _SectionBar extends StatelessWidget {
               children: [
                 for (final section in sections)
                   InkWell(
+                    key: _tabKeys[section],
                     onTap: () => onTap(section),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: Space.md),

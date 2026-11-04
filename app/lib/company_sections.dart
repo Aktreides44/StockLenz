@@ -36,8 +36,13 @@ class SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final phone = isPhone(context);
+    final titleText = Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600));
+    final subtitleText = subtitle == null
+        ? null
+        : Text(subtitle!, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant));
     return Container(
-      padding: const EdgeInsets.all(Space.lg),
+      padding: EdgeInsets.all(phone ? Space.md : Space.lg),
       decoration: BoxDecoration(
         color: cardBackground(theme.colorScheme),
         border: Border.all(color: theme.colorScheme.outlineVariant),
@@ -46,20 +51,19 @@ class SectionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-              if (subtitle != null) ...[
-                const SizedBox(width: Space.sm),
-                Flexible(
-                  child: Text(subtitle!,
-                      style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-                ),
+          // Wide screens: title and explanation on one line. Phones: the explanation goes below.
+          if (phone) ...[
+            titleText,
+            if (subtitleText != null) ...[const SizedBox(height: Space.xxs), subtitleText],
+          ] else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                titleText,
+                if (subtitleText != null) ...[const SizedBox(width: Space.sm), Flexible(child: subtitleText)],
               ],
-            ],
-          ),
+            ),
           const SizedBox(height: Space.md),
           child,
         ],
@@ -110,7 +114,7 @@ class SummarySection extends StatelessWidget {
     final muted = theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant);
 
     return Container(
-      padding: const EdgeInsets.all(Space.xl),
+      padding: EdgeInsets.all(isPhone(context) ? Space.md : Space.xl),
       decoration: BoxDecoration(
         color: cardBackground(theme.colorScheme),
         border: Border.all(color: theme.colorScheme.outlineVariant),
@@ -327,9 +331,13 @@ class PeersSection extends StatelessWidget {
 
   static const _columns = ['price', 'market_cap', 'pe', 'roe', 'net_margin', 'revenue_growth'];
 
+  /// Phones have room for fewer columns: the same three numbers as the screener cards.
+  static const _phoneColumns = ['market_cap', 'pe', 'roe'];
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final columns = isPhone(context) ? _phoneColumns : _columns;
     final peers = allCompanies.where((c) => c.sector == company.sector && c.ticker != company.ticker).toList()
       ..sort((a, b) => (b.metrics['market_cap'] ?? -1).compareTo(a.metrics['market_cap'] ?? -1));
 
@@ -345,7 +353,7 @@ class PeersSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Peers',
-      subtitle: 'Other StockLens companies in ${company.sector}. Click one to open it.',
+      subtitle: 'Other StockLens companies in ${company.sector}. Tap one to open it.',
       child: DefaultTextStyle.merge(
         style: const TextStyle(fontSize: FontSizes.body),
         child: Column(
@@ -357,7 +365,7 @@ class PeersSection extends StatelessWidget {
               child: Row(
                 children: [
                   const Expanded(flex: 3, child: Text('Name', style: headerStyle)),
-                  for (final key in _columns)
+                  for (final key in columns)
                     Expanded(
                       flex: 2,
                       child: Tooltip(
@@ -392,7 +400,7 @@ class PeersSection extends StatelessWidget {
                           ],
                         ),
                       ),
-                      for (final key in _columns)
+                      for (final key in columns)
                         Expanded(
                           flex: 2,
                           child: Align(alignment: Alignment.centerRight, child: _peerCell(peer, key)),
@@ -443,78 +451,164 @@ class YearTable extends StatelessWidget {
   static const double labelWidth = 220;
   static const double yearWidth = 110;
 
+  // Sizes when the table does not fit (phones). Every row gets the same fixed height,
+  // so the fixed labels on the left line up with the scrolling numbers on the right.
+  static const double narrowLabelWidth = 136;
+  static const double narrowYearWidth = 96;
+  static const double narrowHeaderHeight = 44;
+  static const double narrowRowHeight = 40;
+
+  static const cellPadding = EdgeInsets.symmetric(horizontal: Space.sm, vertical: Space.sm);
+
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    const cellPadding = EdgeInsets.symmetric(horizontal: Space.sm, vertical: Space.sm);
+    final minWidth = labelWidth + yearWidth * years.length;
+    return DefaultTextStyle.merge(
+      style: const TextStyle(fontSize: FontSizes.body),
+      child: LayoutBuilder(
+        builder: (context, constraints) =>
+            constraints.maxWidth >= minWidth ? _fullTable(context) : _tableWithFixedLabels(context),
+      ),
+    );
+  }
 
-    final table = Table(
+  /// Wide screens: one table, all years visible.
+  Widget _fullTable(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Table(
       columnWidths: const {0: FixedColumnWidth(labelWidth)},
       defaultColumnWidth: const FlexColumnWidth(),
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       children: [
         TableRow(
-          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.outlineVariant))),
+          decoration: _headerDecoration(colors),
           children: [
             const SizedBox.shrink(),
-            for (final year in years)
-              Tooltip(
-                message: 'Fiscal year ended ${year.endDate}',
-                child: Padding(
-                  padding: cellPadding,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text('FY${year.fiscalYear}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text(formatMonthYear(year.endDate), style: TextStyle(fontSize: FontSizes.tiny, color: colors.onSurfaceVariant)),
-                    ],
-                  ),
-                ),
-              ),
+            for (final year in years) Padding(padding: cellPadding, child: _yearHeader(context, year)),
           ],
         ),
         for (var i = 0; i < rows.length; i++)
           TableRow(
-            decoration: BoxDecoration(
-              color: i.isOdd ? colors.surfaceContainerHighest.withValues(alpha: 0.25) : null,
-              border: Border(bottom: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.4))),
-            ),
+            decoration: _rowDecoration(colors, i),
             children: [
-              Padding(
-                padding: cellPadding,
-                child: Row(
-                  children: [
-                    Flexible(
-                      child: Text(rows[i].label,
-                          style: TextStyle(fontWeight: rows[i].bold ? FontWeight.bold : FontWeight.normal)),
-                    ),
-                    if (rows[i].labelTooltip != null) ...[const SizedBox(width: Space.xs), InfoIcon(rows[i].labelTooltip!)],
-                  ],
-                ),
-              ),
-              for (final year in years)
-                Padding(
-                  padding: cellPadding,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: DefaultTextStyle.merge(
-                      style: TextStyle(fontWeight: rows[i].bold ? FontWeight.bold : FontWeight.normal),
-                      child: rows[i].cell(year),
-                    ),
-                  ),
-                ),
+              Padding(padding: cellPadding, child: _label(rows[i])),
+              for (final year in years) Padding(padding: cellPadding, child: _value(rows[i], year)),
             ],
           ),
       ],
     );
+  }
 
-    final minWidth = labelWidth + yearWidth * years.length;
-    return DefaultTextStyle.merge(
-      style: const TextStyle(fontSize: FontSizes.body),
-      child: LayoutBuilder(
-        builder: (context, constraints) => constraints.maxWidth >= minWidth
-            ? table
-            : SingleChildScrollView(scrollDirection: Axis.horizontal, child: SizedBox(width: minWidth, child: table)),
+  /// Narrow screens: the labels stay on the left while the years scroll sideways.
+  /// `reverse: true` starts the scrolling part at its right end, so the newest year is visible first.
+  Widget _tableWithFixedLabels(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    const sidePadding = EdgeInsets.symmetric(horizontal: Space.sm);
+
+    final labels = Container(
+      width: narrowLabelWidth,
+      decoration: BoxDecoration(border: Border(right: BorderSide(color: colors.outlineVariant))),
+      child: Column(
+        children: [
+          Container(height: narrowHeaderHeight, decoration: _headerDecoration(colors)),
+          for (var i = 0; i < rows.length; i++)
+            Container(
+              height: narrowRowHeight,
+              padding: sidePadding,
+              alignment: Alignment.centerLeft,
+              decoration: _rowDecoration(colors, i),
+              child: _label(rows[i], maxLines: 2),
+            ),
+        ],
+      ),
+    );
+
+    final numbers = Column(
+      children: [
+        Container(
+          height: narrowHeaderHeight,
+          decoration: _headerDecoration(colors),
+          child: Row(
+            children: [
+              for (final year in years)
+                SizedBox(width: narrowYearWidth, child: Padding(padding: sidePadding, child: _yearHeader(context, year))),
+            ],
+          ),
+        ),
+        for (var i = 0; i < rows.length; i++)
+          Container(
+            height: narrowRowHeight,
+            decoration: _rowDecoration(colors, i),
+            child: Row(
+              children: [
+                for (final year in years)
+                  SizedBox(width: narrowYearWidth, child: Padding(padding: sidePadding, child: _value(rows[i], year))),
+              ],
+            ),
+          ),
+      ],
+    );
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        labels,
+        Expanded(child: SingleChildScrollView(scrollDirection: Axis.horizontal, reverse: true, child: numbers)),
+      ],
+    );
+  }
+
+  BoxDecoration _headerDecoration(ColorScheme colors) =>
+      BoxDecoration(border: Border(bottom: BorderSide(color: colors.outlineVariant)));
+
+  /// Every other row is slightly tinted, which makes long rows easier to follow.
+  BoxDecoration _rowDecoration(ColorScheme colors, int index) => BoxDecoration(
+        color: index.isOdd ? colors.surfaceContainerHighest.withValues(alpha: 0.25) : null,
+        border: Border(bottom: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.4))),
+      );
+
+  /// "FY2025" with the month the fiscal year ended under it.
+  Widget _yearHeader(BuildContext context, YearData year) {
+    return Tooltip(
+      message: 'Fiscal year ended ${year.endDate}',
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // maxLines: 1 keeps each line on one line, so the heading always fits its height.
+          Text('FY${year.fiscalYear}', maxLines: 1, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            formatMonthYear(year.endDate),
+            maxLines: 1,
+            style: TextStyle(fontSize: FontSizes.tiny, color: Theme.of(context).colorScheme.onSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _label(YearTableRow row, {int? maxLines}) {
+    return Row(
+      children: [
+        Flexible(
+          child: Text(
+            row.label,
+            maxLines: maxLines,
+            overflow: maxLines == null ? null : TextOverflow.ellipsis,
+            style: TextStyle(fontWeight: row.bold ? FontWeight.bold : FontWeight.normal),
+          ),
+        ),
+        if (row.labelTooltip != null) ...[const SizedBox(width: Space.xs), InfoIcon(row.labelTooltip!)],
+      ],
+    );
+  }
+
+  Widget _value(YearTableRow row, YearData year) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: DefaultTextStyle.merge(
+        style: TextStyle(fontWeight: row.bold ? FontWeight.bold : FontWeight.normal),
+        child: row.cell(year),
       ),
     );
   }
@@ -592,7 +686,8 @@ class StatementSection extends StatelessWidget {
     required this.title,
     required this.years,
     required this.rows,
-    this.subtitle = 'Figures in USD millions · source: SEC 10-K filings (XBRL). Hover a number to see its tag.',
+    this.subtitle = 'Figures in USD millions · source: SEC 10-K filings (XBRL). '
+        'Hover or press and hold a number to see its tag.',
     this.footer,
   });
 

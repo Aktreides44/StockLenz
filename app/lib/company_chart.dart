@@ -50,12 +50,14 @@ class RevenueIncomeChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        // A Wrap instead of a Row: on a narrow phone "USD billions" moves to the next line.
+        Wrap(
+          spacing: Space.lg,
+          runSpacing: Space.xs,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             _LegendItem(color: revenueColor, label: 'Revenue'),
-            const SizedBox(width: Space.lg),
             _LegendItem(color: incomeColor, label: 'Net income'),
-            const Spacer(),
             Text('USD billions', style: labelStyle),
           ],
         ),

@@ -138,7 +138,7 @@ void main() {
     await pumpApplePage(tester);
     await tester.tap(find.text('Ratios').first);
     await tester.pumpAndSettle();
-    expect(find.text('Calculated from each year\'s 10-K figures. Hover a dash to see why it is missing.'),
+    expect(find.text('Calculated from each year\'s 10-K figures. Hover or press and hold a dash to see why it is missing.'),
         findsOneWidget);
   });
 }
