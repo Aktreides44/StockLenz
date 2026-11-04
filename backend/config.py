@@ -17,6 +17,9 @@ load_dotenv(BACKEND_DIR / ".env")
 # Example: "StockLens student project you@example.com"
 SEC_USER_AGENT = os.getenv("SEC_USER_AGENT")
 
+# Polygon.io (Massive) API key for the daily closing prices. Empty = use Yahoo Finance for all prices.
+POLYGON_API_KEY = os.getenv("POLYGON_API_KEY", "")
+
 # Where the SQLite database lives. Default: backend/data/stocklens.db
 DB_PATH = Path(os.getenv("STOCKLENS_DB_PATH", str(BACKEND_DIR / "data" / "stocklens.db")))
 

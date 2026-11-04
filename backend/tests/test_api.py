@@ -14,7 +14,7 @@ def make_company(ticker, sector, years):
     company = {
         "ticker": ticker, "name": f"{ticker} Inc.", "sector": sector, "cik": 1,
         "price": 100.0, "shares_outstanding": 10, "price_fetched_at": "2026-10-26T12:00:00",
-        "shares_source": "SEC cover page (10-Q)", "shares_as_of": "2026-07-17",
+        "shares_source": "SEC cover page (10-Q)", "shares_as_of": "2026-07-17", "price_source": "Polygon close",
         "latest_fiscal_year": latest, "latest_fiscal_year_end": years[latest]["end_date"],
         "not_applicable": ["current_ratio", "debt_to_equity"] if is_financial else [],
         "years": years,

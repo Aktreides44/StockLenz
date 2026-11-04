@@ -202,7 +202,10 @@ class SummarySection extends StatelessWidget {
     final Widget value;
     if (key == 'price') {
       label = 'Price';
-      formula = 'Latest share price from Yahoo Finance';
+      formula = company.priceSource == null
+          ? 'Latest share price'
+          : 'Latest share price: ${company.priceSource}'
+              '${company.priceFetchedAt == null ? '' : ', ${formatDate(company.priceFetchedAt!)}'}';
       value = company.price == null
           ? const MissingValue('No current share price available')
           : NumberText(formatPrice(company.price!), value: company.price!, bold: true);
@@ -376,7 +379,7 @@ class PeersSection extends StatelessWidget {
                     Expanded(
                       flex: 2,
                       child: Tooltip(
-                        message: metricsByKey[key]?.formula ?? 'Latest share price from Yahoo Finance',
+                        message: metricsByKey[key]?.formula ?? 'Latest closing price (Polygon; Yahoo Finance as backup)',
                         child: Text(label(key), textAlign: TextAlign.right, style: headerStyle),
                       ),
                     ),

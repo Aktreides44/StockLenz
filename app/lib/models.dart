@@ -43,6 +43,7 @@ class Company {
     this.cik,
     required this.price,
     this.priceFetchedAt,
+    this.priceSource,
     this.sharesSource,
     this.sharesAsOf,
     required this.latestFiscalYear,
@@ -60,8 +61,12 @@ class Company {
   final int? cik;
   final double? price;
 
-  /// When the price was downloaded, e.g. "2026-10-27T09:04:12".
+  /// The day of the price: the trading day for a Polygon close ("2026-11-03"),
+  /// the download time for the Yahoo backup ("2026-11-04T09:04:12").
   final String? priceFetchedAt;
+
+  /// Where the price comes from: "Polygon close" or "Yahoo Finance (backup)".
+  final String? priceSource;
 
   /// Where the share count for the market cap comes from, e.g. "SEC cover page (10-Q)".
   final String? sharesSource;
@@ -89,6 +94,7 @@ class Company {
       cik: json['cik'] as int?,
       price: _toDouble(json['price']),
       priceFetchedAt: json['price_fetched_at'] as String?,
+      priceSource: json['price_source'] as String?,
       sharesSource: json['shares_source'] as String?,
       sharesAsOf: json['shares_as_of'] as String?,
       latestFiscalYear: json['latest_fiscal_year'] as int?,

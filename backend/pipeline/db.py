@@ -14,8 +14,8 @@ from pipeline.metrics import METRIC_DEFINITIONS, METRIC_KEYS, fcf, yearly_ratios
 from config import DB_PATH
 
 COMPANY_COLUMNS = [
-    "ticker", "name", "sector", "cik", "price", "shares_outstanding", "shares_source", "shares_as_of",
-    "price_fetched_at",
+    "ticker", "name", "sector", "cik", "price", "price_source", "price_fetched_at",
+    "shares_outstanding", "shares_source", "shares_as_of",
     "latest_fiscal_year", "latest_fiscal_year_end",
 ] + METRIC_KEYS
 
@@ -40,10 +40,11 @@ CREATE TABLE companies (
     sector TEXT NOT NULL,
     cik INTEGER NOT NULL,
     price REAL,
+    price_source TEXT,    -- "Polygon close" or "Yahoo Finance (backup)"
     shares_outstanding REAL,
     shares_source TEXT,   -- where the share count comes from, e.g. "SEC cover page (10-Q)"
     shares_as_of TEXT,    -- the date the share count refers to (None for Yahoo)
-    price_fetched_at TEXT,
+    price_fetched_at TEXT, -- Polygon: the trading day of the close; Yahoo: when it was downloaded
     latest_fiscal_year INTEGER,
     latest_fiscal_year_end TEXT,
     not_applicable TEXT,  -- comma-separated metric keys, e.g. "current_ratio,debt_to_equity"

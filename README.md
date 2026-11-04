@@ -123,6 +123,7 @@ variable always wins over `.env`.
 | Variable | Needed by | Default |
 |---|---|---|
 | `SEC_USER_AGENT` | the pipeline (every SEC request) | none: must be set |
+| `POLYGON_API_KEY` | the pipeline (closing prices) | empty = all prices from Yahoo |
 | `STOCKLENS_DB_PATH` | the pipeline (writes) and the API (reads) | `backend/data/stocklens.db` |
 | `STOCKLENS_DB_URL` | the API on a server: where to download the database | empty = don't download |
 | `STOCKLENS_DB_MAX_AGE_HOURS` | the API on a server: re-download when the copy is older | `6` |
@@ -141,7 +142,7 @@ tests → pipeline → check_database  ──upload──►  stocklens.db      
   result (`python -m pipeline.check_database`: at least 90% of the companies, 90% of them with a price),
   and uploads `stocklens.db` to the release `data-latest`. If anything fails, nothing is published and
   the previous database stays online. It can also be started by hand: GitHub → Actions → Refresh data →
-  Run workflow. Needs the repository secret `SEC_USER_AGENT`.
+  Run workflow. Needs the repository secrets `SEC_USER_AGENT` and `POLYGON_API_KEY`.
 - **API on Render** (free web service): root directory `backend`, build command
   `pip install -r requirements-api.txt`, start command `uvicorn api.main:app --host 0.0.0.0 --port $PORT`,
   health check path `/health`, environment variables `PYTHON_VERSION=3.13.7` and
@@ -199,7 +200,8 @@ flutter test
 |---|---|---|
 | **SEC EDGAR XBRL "companyfacts" API** (official, free) | All financial statement numbers | Annual 10-K figures only, so ratios are based on the **latest fiscal year**, not the last 12 months. Companies tag the same item differently; we try a fixed list of tags per field (see `backend/pipeline/extract.py`) and record which tag was used. If none is found the value is shown as "—", never as 0. |
 | **SEC filings (10-K / 10-Q)** | Shares outstanding | First fresh one of: cover page (`dei:EntityCommonStockSharesOutstanding`), balance sheet (`CommonStockSharesOutstanding`), average shares in the period (`WeightedAverageNumberOfSharesOutstandingBasic`). "Fresh" = at most a year older than the latest 10-K year end. Companies with several share classes have no cover-page number in companyfacts, so they use the later sources. Yahoo is the backup when none qualifies (e.g. Visa). The source is stored per company and shown next to the market cap. |
-| **Yahoo Finance via `yfinance`** (unofficial) | Latest share price; shares only as a backup | Not an official API: it can change or break without notice, and prices may be delayed. Polygon replaces it for prices (phase 4). |
+| **Polygon.io (Massive)** "grouped daily" | Closing prices | One request returns the closes of all US stocks (~12,600) for one trading day. The free plan has no prices for the current day, so the pipeline uses the latest earlier trading day (stepping back over weekends/holidays). Needs `POLYGON_API_KEY`. |
+| **Yahoo Finance via `yfinance`** (unofficial) | Backup only: price when Polygon has none, shares when the SEC has none | Not an official API: it can change or break without notice. A normal run asks it only for the few gaps. |
 
 Things worth knowing about the data:
 

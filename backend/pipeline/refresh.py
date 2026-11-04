@@ -4,25 +4,21 @@ Run from the backend folder:
     python -m pipeline.refresh
 
 SEC data is cached in backend/data/raw/. Delete that folder to download fresh 10-K data.
-Prices are fetched fresh from Yahoo Finance (via yfinance) on every run.
+Prices: the latest closing prices from Polygon (one request for all companies, see prices.py);
+Yahoo Finance only for tickers Polygon has no price for.
 """
 import csv
-import warnings
 from datetime import datetime
-
-import yfinance as yf
 
 from pipeline import db
 from pipeline.extract import extract_company
 from pipeline.metrics import METRIC_KEYS, NOT_APPLICABLE_FOR_FINANCIALS, compute_all, explain_missing
 from config import BACKEND_DIR
+from pipeline.prices import latest_closes, yahoo_price_and_shares
 from pipeline.sec_client import load_companyfacts, load_ticker_to_cik, sec_ticker
 from pipeline.shares import extract_shares
 
 UNIVERSE_CSV = BACKEND_DIR / "data" / "universe.csv"
-
-# yfinance prints pandas deprecation warnings that are not our concern
-warnings.filterwarnings("ignore", module="yfinance")
 
 
 def load_universe():
@@ -31,21 +27,35 @@ def load_universe():
         return list(csv.DictReader(line for line in f if not line.startswith("#")))
 
 
-def fetch_price_and_shares(ticker):
-    """Return (latest price, shares outstanding) from Yahoo Finance, or (None, None) on failure.
+def choose_price_and_shares(ticker, polygon_closes, polygon_day, sec_shares, yahoo=yahoo_price_and_shares):
+    """Pick the price and the share count, and say where each comes from.
 
-    fast_info["shares"] counts all share classes (e.g. Alphabet's A, B and C shares),
-    unlike info["sharesOutstanding"], which only counts one class.
+    Price: Polygon's close if it has one, else Yahoo. Shares: the SEC filings (sec_shares), else Yahoo.
+    Yahoo is only asked when something is missing, so a normal run makes almost no Yahoo requests.
+    Returns a dict with price, price_source, price_fetched_at, shares_outstanding, shares_source, shares_as_of.
     """
-    try:
-        info = yf.Ticker(sec_ticker(ticker)).fast_info  # Yahoo also writes BRK-B
-        return info["last_price"], info["shares"]
-    except Exception as error:  # network problems, unknown ticker, Yahoo changes, ...
-        print(f"    WARNING: no price for {ticker}: {error}")
-        return None, None
+    result = {"price": None, "price_source": None, "price_fetched_at": None,
+              "shares_outstanding": None, "shares_source": None, "shares_as_of": None}
+    if ticker in polygon_closes:
+        result.update(price=polygon_closes[ticker], price_source="Polygon close",
+                      price_fetched_at=polygon_day.isoformat())
+    if sec_shares is not None:
+        result.update(shares_outstanding=sec_shares["value"], shares_source=sec_shares["source"],
+                      shares_as_of=sec_shares["as_of"])
+
+    if result["price"] is None or result["shares_outstanding"] is None:
+        yahoo_price, yahoo_shares = yahoo(ticker)
+        if result["price"] is None and yahoo_price is not None:
+            print(f"    NOTE: no Polygon price for {ticker}, using Yahoo's")
+            result.update(price=yahoo_price, price_source="Yahoo Finance (backup)",
+                          price_fetched_at=datetime.now().isoformat(timespec="seconds"))
+        if result["shares_outstanding"] is None and yahoo_shares is not None:
+            print(f"    NOTE: no recent SEC share count for {ticker}, using Yahoo's")
+            result.update(shares_outstanding=yahoo_shares, shares_source="Yahoo Finance (backup)")
+    return result
 
 
-def build_company(row, cik):
+def build_company(row, cik, polygon_closes, polygon_day):
     ticker = row["ticker"]
     companyfacts = load_companyfacts(cik)
     years = extract_company(companyfacts)
@@ -54,17 +64,9 @@ def build_company(row, cik):
         return None
 
     latest_year = max(years)
-    price, yahoo_shares = fetch_price_and_shares(ticker)
-
-    # Shares outstanding: from the SEC filings if possible, Yahoo only as a backup.
     sec_shares = extract_shares(companyfacts, years[latest_year]["end_date"])
-    if sec_shares is not None:
-        shares, shares_source, shares_as_of = sec_shares["value"], sec_shares["source"], sec_shares["as_of"]
-    elif yahoo_shares is not None:
-        shares, shares_source, shares_as_of = yahoo_shares, "Yahoo Finance (backup)", None
-        print(f"    NOTE: no recent SEC share count for {ticker}, using Yahoo's")
-    else:
-        shares, shares_source, shares_as_of = None, None, None
+    market = choose_price_and_shares(ticker, polygon_closes, polygon_day, sec_shares)
+    price, shares = market["price"], market["shares_outstanding"]
 
     is_financial = row["sector"] == "Financials"
 
@@ -73,11 +75,7 @@ def build_company(row, cik):
         "name": row["name"],
         "sector": row["sector"],
         "cik": cik,
-        "price": price,
-        "shares_outstanding": shares,
-        "shares_source": shares_source,
-        "shares_as_of": shares_as_of,
-        "price_fetched_at": datetime.now().isoformat(timespec="seconds") if price is not None else None,
+        **market,  # price, price_source, price_fetched_at, shares_outstanding, shares_source, shares_as_of
         "latest_fiscal_year": latest_year,
         "latest_fiscal_year_end": years[latest_year]["end_date"],
         "not_applicable": NOT_APPLICABLE_FOR_FINANCIALS if is_financial else [],
@@ -104,6 +102,7 @@ def print_coverage(companies):
 def main():
     universe = load_universe()
     ticker_to_cik = load_ticker_to_cik()
+    polygon_closes, polygon_day = latest_closes()  # one request for all companies
 
     companies = []
     for number, row in enumerate(universe, start=1):
@@ -114,7 +113,7 @@ def main():
         if cik is None:
             print(f"    WARNING: {ticker} not found in the SEC ticker list, skipping")
             continue
-        company = build_company(row, cik)
+        company = build_company(row, cik, polygon_closes, polygon_day)
         if company is not None:
             companies.append(company)
 

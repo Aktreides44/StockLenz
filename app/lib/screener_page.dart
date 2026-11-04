@@ -141,7 +141,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
         tooltip: 'Latest fiscal year: all 10-K figures in this row come from it.\n'
             'Hover a year to see the fiscal year end date.',
       ),
-      const ScreenerColumn(key: 'price', label: 'Price', width: 90, tooltip: 'Latest share price (Yahoo Finance)'),
+      const ScreenerColumn(key: 'price', label: 'Price', width: 90, tooltip: 'Latest closing price (Polygon; Yahoo Finance as backup)'),
       for (final metric in ordered)
         ScreenerColumn(key: metric.key, label: metric.label, width: 104, tooltip: '${metric.label}\n${metric.formula}'),
     ];

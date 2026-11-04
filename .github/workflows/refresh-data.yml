@@ -6,7 +6,8 @@
 #   3. a sanity check makes sure the result is not broken
 #   4. stocklens.db is uploaded to the GitHub release "data-latest", replacing yesterday's file
 #
-# Needs the repository secret SEC_USER_AGENT (Settings -> Secrets and variables -> Actions).
+# Needs the repository secrets SEC_USER_AGENT and POLYGON_API_KEY
+# (Settings -> Secrets and variables -> Actions).
 
 name: Refresh data
 
@@ -48,6 +49,7 @@ jobs:
       - name: Build the database
         env:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         run: python -m pipeline.refresh
 
       - name: Check the database before publishing

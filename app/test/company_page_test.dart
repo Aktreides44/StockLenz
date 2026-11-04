@@ -25,6 +25,7 @@ Company company(String ticker, String name, String sector, double marketCap) {
     cik: 320193,
     price: 343.91,
     priceFetchedAt: '2026-10-27T09:04:12',
+    priceSource: 'Polygon close',
     sharesSource: 'SEC cover page (10-Q)',
     sharesAsOf: '2026-07-17',
     latestFiscalYear: 2025,
@@ -144,8 +145,9 @@ void main() {
         findsOneWidget);
   });
 
-  testWidgets('the market cap info says where the share count comes from', (tester) async {
+  testWidgets('the price and market cap info say where the numbers come from', (tester) async {
     await pumpApplePage(tester);
+    expect(find.byTooltip('Latest share price: Polygon close, 27 Oct 2026'), findsOneWidget);
     expect(find.byTooltip('Price × Shares\nShares: SEC cover page (10-Q), 17 Jul 2026'), findsOneWidget);
   });
 }

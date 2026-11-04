@@ -25,8 +25,9 @@ build what the current phase says, and nothing from a later phase unless asked.
   **Shares outstanding:** from the SEC (10-K/10-Q cover page), not Yahoo.
 - **Data refresh:** the pipeline runs once a day (GitHub Actions), not on the user's PC.
 
-Until a phase changes it, the code still uses yfinance for prices (phase 4 step 3 replaces it).
 Phase 4 step 2 done: shares outstanding from the SEC (`pipeline/shares.py`; source stored as `shares_source`), Yahoo as backup.
+Phase 4 step 3 done: closing prices from Polygon grouped daily (`pipeline/prices.py`, `POLYGON_API_KEY`; `price_source`),
+Yahoo only for gaps.
 Phase 4 step 1 done: S&P 500 in `universe.csv` from `python -m pipeline.update_universe` (Wikipedia, read once).
 Done so far: hosted API (phase 1); API address in `config.dart`, offline snapshot removed and links
 opened with `url_launcher`, web app on GitHub Pages via `.github/workflows/deploy-web.yml`, Android app (phase 2 done); theme file and phone layout with cards, sort menu,
