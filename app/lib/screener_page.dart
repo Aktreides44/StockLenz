@@ -10,6 +10,7 @@ import 'data_service.dart';
 import 'device_settings.dart';
 import 'filters_panel.dart';
 import 'models.dart';
+import 'presets.dart';
 import 'screener_cards.dart';
 import 'screener_table.dart';
 import 'theme.dart';
@@ -41,6 +42,12 @@ class _ScreenerPageState extends State<ScreenerPage> {
   /// Screener columns the user switched off (saved on the device, see device_settings.dart).
   Set<String> _hiddenColumns = {};
 
+  /// The user's own filter presets (saved on the device).
+  List<FilterPreset> _savedPresets = [];
+
+  /// Goes up by one when a preset is applied, so the filter panel is rebuilt with the new numbers in its boxes.
+  int _filtersVersion = 0;
+
   String _sortKey = 'market_cap';
   bool _sortAscending = false;
 
@@ -52,6 +59,9 @@ class _ScreenerPageState extends State<ScreenerPage> {
     _load();
     loadHiddenColumns().then((hidden) {
       if (mounted) setState(() => _hiddenColumns = hidden);
+    });
+    loadPresets().then((presets) {
+      if (mounted) setState(() => _savedPresets = presets);
     });
   }
 
@@ -242,6 +252,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
               ),
               if (_showFilters)
                 FiltersPanel(
+                  key: ValueKey(_filtersVersion),
                   metrics: data.metrics,
                   filters: _filters,
                   onChanged: (key, filter) => setState(() => _filters[key] = filter),
@@ -267,6 +278,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
           SizedBox(width: 280, child: _searchBox()),
           _sectorPicker(data, expand: false),
           _filtersButton(onPressed: () => setState(() => _showFilters = !_showFilters)),
+          _presetsMenu(data, iconOnly: false),
           _columnsButton(data),
           _countText('$visibleCount of ${data.companies.length} companies'),
         ],
@@ -274,7 +286,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
     );
   }
 
-  /// Phones: search, sector and "Filters / Sort / count" each get their own line.
+  /// Phones: search, "sector + presets" and "Filters / Sort / count" each get their own line.
   Widget _phoneToolbar(ScreenerData data, int visibleCount, List<ScreenerColumn> columns) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(Space.md, Space.md, Space.md, Space.sm),
@@ -283,7 +295,13 @@ class _ScreenerPageState extends State<ScreenerPage> {
         children: [
           _searchBox(),
           const SizedBox(height: Space.sm),
-          _sectorPicker(data, expand: true),
+          Row(
+            children: [
+              Expanded(child: _sectorPicker(data, expand: true)),
+              const SizedBox(width: Space.sm),
+              _presetsMenu(data, iconOnly: true),
+            ],
+          ),
           const SizedBox(height: Space.sm),
           Row(
             children: [
@@ -389,6 +407,62 @@ class _ScreenerPageState extends State<ScreenerPage> {
       }
     });
     saveHiddenColumns(hidden);
+  }
+
+  Widget _presetsMenu(ScreenerData data, {required bool iconOnly}) {
+    final hasFilters = _sector != null || _activeFilterCount > 0;
+    return PresetsMenu(
+      saved: _savedPresets,
+      labels: {for (final metric in data.metrics) metric.key: metric.label},
+      onApply: (preset) => _applyPreset(preset, data),
+      onSaveCurrent: hasFilters ? _saveCurrentAsPreset : null,
+      onDelete: _deletePreset,
+      iconOnly: iconOnly,
+    );
+  }
+
+  /// Replace the current sector and filters with the preset's.
+  /// Metrics or sectors the data doesn't have (any more) are left out.
+  void _applyPreset(FilterPreset preset, ScreenerData data) {
+    final metricKeys = {for (final metric in data.metrics) metric.key};
+    final sectors = {for (final company in data.companies) company.sector};
+    setState(() {
+      _filters
+        ..clear()
+        ..addAll({
+          for (final entry in preset.filters.entries)
+            if (metricKeys.contains(entry.key)) entry.key: entry.value,
+        });
+      _sector = sectors.contains(preset.sector) ? preset.sector : null;
+      _filtersVersion++;
+    });
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('Preset "${preset.name}" applied')));
+  }
+
+  Future<void> _saveCurrentAsPreset() async {
+    final name = await askPresetName(context);
+    if (name == null || !mounted) return;
+    final preset = FilterPreset(
+      name: name,
+      sector: _sector,
+      filters: {
+        for (final entry in _filters.entries)
+          if (!entry.value.isEmpty) entry.key: entry.value,
+      },
+    );
+    // A preset with the same name is replaced.
+    setState(() => _savedPresets = [..._savedPresets.where((p) => p.name != name), preset]);
+    savePresets(_savedPresets);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('Saved preset "$name"')));
+  }
+
+  void _deletePreset(FilterPreset preset) {
+    setState(() => _savedPresets = [..._savedPresets.where((p) => p.name != preset.name)]);
+    savePresets(_savedPresets);
   }
 
   Widget _countText(String text) {

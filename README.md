@@ -10,7 +10,12 @@ table; on phones (narrower than 600 px) it becomes a list of cards with market c
 a "Sort" menu and the filters in a bottom sheet. The 🔍 in the top bar jumps straight to a company
 (ticker or name); the field above the list only filters the list. On wide screens, **Columns** chooses
 which columns the table shows; the choice is saved on the device (`shared_preferences`; the hidden
-columns are stored, so metrics added later show up by themselves). On phones the company page uses
+columns are stored, so metrics added later show up by themselves). **Presets** (the bookmarks icon
+next to the sector on phones) fills in a named set of filters with one tap: four examples come with the
+app — *Profitable & low debt* (net margin ≥ 0 %, debt/equity ≤ 0.5), *High return on equity* (ROE ≥ 15 %),
+*Growing revenue* (3-year revenue CAGR ≥ 10 %) and *Low P/E* (P/E TTM 0–15) — and "Save current
+filters…" stores your own (sector + filters, as JSON on the device). These are common rules of thumb
+for screening, not recommendations. On phones the company page uses
 smaller margins, shows 3 peer columns, and its yearly tables keep the row labels fixed while the years
 scroll sideways, starting at the newest year.
 
