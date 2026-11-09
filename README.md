@@ -8,7 +8,9 @@ StockLens downloads the annual reports (10-K) of the S&P 500 companies (the ~500
 a sortable, filterable screener and a detail page per company. On wide screens the screener is a dense
 table; on phones (narrower than 600 px) it becomes a list of cards with market cap, P/E (FY) and ROE,
 a "Sort" menu and the filters in a bottom sheet. The 🔍 in the top bar jumps straight to a company
-(ticker or name); the field above the list only filters the list. On phones the company page uses
+(ticker or name); the field above the list only filters the list. On wide screens, **Columns** chooses
+which columns the table shows; the choice is saved on the device (`shared_preferences`; the hidden
+columns are stored, so metrics added later show up by themselves). On phones the company page uses
 smaller margins, shows 3 peer columns, and its yearly tables keep the row labels fixed while the years
 scroll sideways, starting at the newest year.
 

@@ -3,9 +3,11 @@
 // a "Sort" menu and the filters in a bottom sheet.
 import 'package:flutter/material.dart';
 
+import 'columns_dialog.dart';
 import 'company_page.dart';
 import 'company_search.dart';
 import 'data_service.dart';
+import 'device_settings.dart';
 import 'filters_panel.dart';
 import 'models.dart';
 import 'screener_cards.dart';
@@ -36,6 +38,9 @@ class _ScreenerPageState extends State<ScreenerPage> {
   final Map<String, RangeFilter> _filters = {};
   bool _showFilters = false;
 
+  /// Screener columns the user switched off (saved on the device, see device_settings.dart).
+  Set<String> _hiddenColumns = {};
+
   String _sortKey = 'market_cap';
   bool _sortAscending = false;
 
@@ -45,6 +50,9 @@ class _ScreenerPageState extends State<ScreenerPage> {
   void initState() {
     super.initState();
     _load();
+    loadHiddenColumns().then((hidden) {
+      if (mounted) setState(() => _hiddenColumns = hidden);
+    });
   }
 
   Future<void> _load() async {
@@ -217,7 +225,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
                     ? const Center(child: Text('No companies match the search and filters.'))
                     : ScreenerTable(
                         companies: visible,
-                        columns: columns,
+                        columns: [for (final column in columns) if (!_hiddenColumns.contains(column.key)) column],
                         metricsByKey: metricsByKey,
                         sortKey: _sortKey,
                         sortAscending: _sortAscending,
@@ -252,6 +260,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
           SizedBox(width: 280, child: _searchBox()),
           _sectorPicker(data, expand: false),
           _filtersButton(onPressed: () => setState(() => _showFilters = !_showFilters)),
+          _columnsButton(data),
           _countText('$visibleCount of ${data.companies.length} companies'),
         ],
       ),
@@ -342,6 +351,37 @@ class _ScreenerPageState extends State<ScreenerPage> {
       label: Text('$_activeFilterCount'),
       child: OutlinedButton.icon(onPressed: onPressed, icon: const Icon(Icons.filter_list), label: const Text('Filters')),
     );
+  }
+
+  /// Wide screens only: choose which columns the table shows. The badge counts the hidden ones.
+  Widget _columnsButton(ScreenerData data) {
+    return Badge(
+      isLabelVisible: _hiddenColumns.isNotEmpty,
+      label: Text('${_hiddenColumns.length} hidden'),
+      child: OutlinedButton.icon(
+        onPressed: () => showColumnsDialog(
+          context,
+          columns: _scrollingColumns(data.metrics),
+          metrics: data.metrics,
+          hidden: _hiddenColumns,
+          onChanged: _setHiddenColumns,
+        ),
+        icon: const Icon(Icons.view_column_outlined),
+        label: const Text('Columns'),
+      ),
+    );
+  }
+
+  void _setHiddenColumns(Set<String> hidden) {
+    setState(() {
+      _hiddenColumns = hidden;
+      // Don't keep sorting by a column that can't be seen any more.
+      if (hidden.contains(_sortKey)) {
+        _sortKey = 'market_cap';
+        _sortAscending = false;
+      }
+    });
+    saveHiddenColumns(hidden);
   }
 
   Widget _countText(String text) {
