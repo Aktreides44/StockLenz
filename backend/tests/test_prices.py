@@ -26,16 +26,32 @@ def test_parse_grouped_daily():
     assert parse_grouped_daily({"resultsCount": 0}) == {}  # weekend or holiday
 
 
-def test_steps_back_over_the_weekend(key):
+def full_day(**extra):
+    """A grouped daily answer of a real trading day: thousands of closes."""
+    results = [{"T": f"T{i}", "c": 10.0} for i in range(prices.MIN_TRADING_DAY_PRICES)]
+    return {"results": results + [{"T": t, "c": c} for t, c in extra.items()]}
+
+
+def test_skips_the_weekend_without_asking(key):
     asked, waits = [], []
 
     def fake_download(day):
         asked.append(day)
-        return {"results": [{"T": "AAPL", "c": 338.32}]} if day == FRIDAY else {"resultsCount": 0}
+        return full_day(AAPL=338.32)
 
     closes, day = latest_closes(today=SUNDAY, download=fake_download, wait=waits.append)
-    assert (closes, day) == ({"AAPL": 338.32}, FRIDAY)
-    assert asked == [date(2026, 10, 31), FRIDAY]  # Saturday first (nothing), then Friday
+    assert day == FRIDAY and closes["AAPL"] == 338.32
+    assert asked == [FRIDAY]  # Sunday's run: no request for Saturday
+    assert waits == []
+
+
+def test_a_day_with_only_a_few_weekend_trades_is_not_a_trading_day(key):
+    # Monday's run: Friday was a holiday with a few hundred off-exchange trades -> go back to Thursday.
+    thursday = date(2026, 10, 29)
+    answers = {FRIDAY: {"results": [{"T": "AAPL", "c": 1.0}] * 271}, thursday: full_day(AAPL=330.0)}
+    waits = []
+    closes, day = latest_closes(today=date(2026, 11, 2), download=lambda d: answers[d], wait=waits.append)
+    assert (day, closes["AAPL"]) == (thursday, 330.0)
     assert waits == [prices.SECONDS_BETWEEN_REQUESTS]  # waited once, between the two requests
 
 

@@ -21,7 +21,7 @@ from datetime import date, datetime, timedelta, timezone
 import requests
 
 import config
-from pipeline.prices import download_grouped_daily, parse_grouped_daily
+from pipeline.prices import download_grouped_daily, is_trading_day, parse_grouped_daily
 
 HISTORY_DAYS = 366  # how far back the chart goes (calendar days)
 SPLITS_URL = "https://api.polygon.io/v3/reference/splits"
@@ -33,13 +33,15 @@ SECONDS_BETWEEN_REQUESTS = 12
 def load_history(conn):
     """Read the price history from an existing database: ({ticker: {day: close}}, set of fetched days).
 
-    An older database without these tables simply gives an empty history.
+    An older database without these tables simply gives an empty history. Weekend days are dropped:
+    a few weekend trades once slipped in as a "trading day" (7 Nov 2026).
     """
     history, fetched_days = {}, set()
     tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
     if "prices" in tables:
         for ticker, day, close in conn.execute("SELECT ticker, day, close FROM prices"):
-            history.setdefault(ticker, {})[day] = close
+            if date.fromisoformat(day).weekday() < 5:
+                history.setdefault(ticker, {})[day] = close
     if "price_days" in tables:
         fetched_days = {row[0] for row in conn.execute("SELECT day FROM price_days")}
     return history, fetched_days
@@ -72,7 +74,8 @@ def backfill(history, fetched_days, tickers, today, budget, download=download_gr
         except Exception as error:  # e.g. 403 for a day the plan doesn't cover: try again next run
             print(f"    Price history: no data for {day} ({error})")
             continue
-        add_closes(history, closes, day, tickers)  # an empty answer (holiday) adds nothing
+        if is_trading_day(day, closes):  # a holiday (no or only a few prices) adds nothing
+            add_closes(history, closes, day, tickers)
         fetched_days.add(day.isoformat())
         asked += 1
     return asked

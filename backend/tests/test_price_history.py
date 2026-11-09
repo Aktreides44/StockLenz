@@ -2,7 +2,7 @@
 from datetime import date
 
 import config
-from pipeline import db
+from pipeline import db, prices
 from pipeline.price_history import (
     backfill, load_history, missing_days, parse_ticker_range, readjust_splits, trim, update_history,
 )
@@ -23,16 +23,22 @@ def test_missing_days_skips_weekends_and_known_days_newest_first():
     assert date(2026, 11, 8) not in days  # Sunday
 
 
+def full_day(**closes):
+    """A grouped daily answer of a real trading day: thousands of closes (other tickers) plus `closes`."""
+    results = [{"T": f"T{i}", "c": 10.0} for i in range(prices.MIN_TRADING_DAY_PRICES)]
+    return {"results": results + [{"T": t, "c": c} for t, c in closes.items()]}
+
+
 def test_backfill_keeps_to_the_budget_and_remembers_holidays():
     answers = {
-        date(2026, 11, 6): {"results": [{"T": "AAPL", "c": 331.9}, {"T": "OTHER", "c": 1.0}]},
-        date(2026, 11, 5): {"resultsCount": 0},  # a holiday: nothing traded
+        date(2026, 11, 6): full_day(AAPL=331.9),
+        date(2026, 11, 5): {"results": [{"T": "AAPL", "c": 1.0}]},  # a holiday: only a stray trade
     }
 
     def download(day):
         if day == date(2026, 11, 4):
             raise RuntimeError("Polygon answered 500")
-        return answers.get(day, {"results": [{"T": "NVDA", "c": 200.0}]})
+        return answers.get(day, full_day(NVDA=200.0))
 
     history, fetched = {}, set()
     asked = backfill(history, fetched, TICKERS, MONDAY, budget=3, download=download, wait=no_wait)
@@ -46,6 +52,15 @@ def test_history_carries_over_from_the_previous_database(tmp_path):
     db.write_database([], path=path, price_history={"AAPL": {"2026-11-05": 330.0}}, price_days={"2026-11-05"})
     conn = db.connect(path)
     assert load_history(conn) == ({"AAPL": {"2026-11-05": 330.0}}, {"2026-11-05"})
+    conn.close()
+
+
+def test_weekend_days_are_dropped_when_loading(tmp_path):
+    # 7 Nov 2026 was a Saturday that once slipped in with a few weekend trades.
+    path = tmp_path / "old.db"
+    db.write_database([], path=path, price_history={"AAPL": {"2026-11-06": 331.9, "2026-11-07": 340.0}})
+    conn = db.connect(path)
+    assert load_history(conn)[0] == {"AAPL": {"2026-11-06": 331.9}}
     conn.close()
 
 

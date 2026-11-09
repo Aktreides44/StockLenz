@@ -21,6 +21,16 @@ GROUPED_DAILY_URL = "https://api.polygon.io/v2/aggs/grouped/locale/us/market/sto
 MAX_DAYS_BACK = 5  # enough to get past a long weekend
 SECONDS_BETWEEN_REQUESTS = 12  # free plan: 5 requests per minute
 
+# A real trading day has ~11,000-12,600 closes. On weekends Polygon sometimes lists a few hundred
+# off-exchange trades (271 on Saturday 7 Nov 2026); such a day must not count as a trading day.
+MIN_TRADING_DAY_PRICES = 1000
+
+
+def is_trading_day(day, closes):
+    """Weekdays with a full list of closes only."""
+    return day.weekday() < 5 and len(closes) >= MIN_TRADING_DAY_PRICES
+
+
 # yfinance prints pandas deprecation warnings that are not our concern
 warnings.filterwarnings("ignore", module="yfinance")
 
@@ -53,19 +63,23 @@ def latest_closes(today=None, download=download_grouped_daily, wait=time.sleep):
         print("WARNING: POLYGON_API_KEY is not set, all prices come from Yahoo Finance")
         return {}, None
     today = today or date.today()
+    requests_made = 0
     for days_back in range(1, MAX_DAYS_BACK + 1):  # the free plan has no prices for today yet
         day = today - timedelta(days=days_back)
-        if days_back > 1:
+        if day.weekday() >= 5:  # Saturday, Sunday: no trading, no request
+            continue
+        if requests_made > 0:
             wait(SECONDS_BETWEEN_REQUESTS)
+        requests_made += 1
         try:
             closes = parse_grouped_daily(download(day))
         except Exception as error:  # network problem, 403 for a day the plan doesn't cover, ...
             print(f"    Polygon: no data for {day} ({error})")
             continue
-        if closes:
+        if is_trading_day(day, closes):
             print(f"Polygon: {len(closes)} closing prices for {day}")
             return closes, day
-        print(f"    Polygon: no trading on {day}")
+        print(f"    Polygon: no trading on {day} ({len(closes)} prices)")
     print(f"WARNING: Polygon had no prices in the last {MAX_DAYS_BACK} days, all prices come from Yahoo Finance")
     return {}, None
 
