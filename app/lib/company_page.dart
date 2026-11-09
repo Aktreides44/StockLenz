@@ -7,6 +7,7 @@ import 'company_chart.dart';
 import 'company_sections.dart';
 import 'data_service.dart';
 import 'models.dart';
+import 'price_chart.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
@@ -37,7 +38,7 @@ class CompanyPage extends StatefulWidget {
 
 class _CompanyPageState extends State<CompanyPage> {
   static const sections = [
-    'Summary', 'Chart', 'Analysis', 'Peers', 'Profit & Loss', 'Balance Sheet', 'Cash Flow', 'Ratios',
+    'Summary', 'Price', 'Chart', 'Analysis', 'Peers', 'Profit & Loss', 'Balance Sheet', 'Cash Flow', 'Ratios',
   ];
 
   // Each section gets a key, so we can find where it is and scroll to it.
@@ -142,6 +143,14 @@ class _CompanyPageState extends State<CompanyPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     section('Summary', SummarySection(company: detail.company, metricsByKey: metricsByKey)),
+                    section(
+                      'Price',
+                      SectionCard(
+                        title: 'Share price',
+                        subtitle: 'Daily closing prices (Polygon), adjusted for stock splits',
+                        child: PriceChart(history: detail.priceHistory),
+                      ),
+                    ),
                     section(
                       'Chart',
                       SectionCard(

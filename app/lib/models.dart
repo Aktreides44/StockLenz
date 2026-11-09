@@ -168,6 +168,21 @@ class AnalysisPoint {
   }
 }
 
+/// One day of the price chart.
+class PricePoint {
+  const PricePoint({required this.day, required this.close});
+
+  /// Trading day, e.g. "2026-11-06".
+  final String day;
+
+  /// Closing price that day (adjusted for stock splits).
+  final double close;
+
+  factory PricePoint.fromJson(Map<String, dynamic> json) {
+    return PricePoint(day: json['day'] as String, close: (json['close'] as num).toDouble());
+  }
+}
+
 /// Everything on the company page.
 class CompanyDetail {
   const CompanyDetail({
@@ -175,6 +190,7 @@ class CompanyDetail {
     required this.history,
     required this.pros,
     required this.cons,
+    this.priceHistory = const [],
   });
 
   final Company company;
@@ -183,6 +199,9 @@ class CompanyDetail {
   final List<YearData> history;
   final List<AnalysisPoint> pros;
   final List<AnalysisPoint> cons;
+
+  /// Daily closing prices of the last year, oldest first (empty if the server has none yet).
+  final List<PricePoint> priceHistory;
 
   factory CompanyDetail.fromJson(
     Map<String, dynamic> json,
@@ -194,6 +213,10 @@ class CompanyDetail {
       history: [for (final year in json['history'] as List<dynamic>) YearData.fromJson(year as Map<String, dynamic>)],
       pros: [for (final item in analysis['pros'] as List<dynamic>) AnalysisPoint.fromJson(item as Map<String, dynamic>)],
       cons: [for (final item in analysis['cons'] as List<dynamic>) AnalysisPoint.fromJson(item as Map<String, dynamic>)],
+      priceHistory: [
+        for (final point in (json['price_history'] as List<dynamic>?) ?? [])
+          PricePoint.fromJson(point as Map<String, dynamic>),
+      ],
     );
   }
 }
