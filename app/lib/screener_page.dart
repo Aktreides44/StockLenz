@@ -161,7 +161,14 @@ class _ScreenerPageState extends State<ScreenerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('StockLens'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(logoAsset, height: 28, excludeFromSemantics: true),
+            const SizedBox(width: Space.sm),
+            const Text('StockLens'),
+          ],
+        ),
         actions: [
           // Jump straight to a company (only once the list of companies has loaded).
           if (_data != null)

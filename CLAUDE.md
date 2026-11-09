@@ -33,6 +33,9 @@ Phase 4 step 4 done: only changed SEC files are downloaded again (`pipeline/sec_
 Phase 4 step 7 done: price chart — daily closes kept in the `prices` table (`pipeline/price_history.py`: carried over from
 yesterday's published DB, backfill `PRICE_BACKFILL_DAYS`, re-adjust after splits), `price_history` in the detail API, `price_chart.dart`.
 Phase 4 done.
+Phase 6 done (logo): icons + splash from `docs/logo_icon.png` / `docs/logo_foreground.png` (`flutter_launcher_icons`,
+`flutter_native_splash`, settings in `app/pubspec.yaml`), logo in the top bar (`app/assets/logo.png`), accent = logo green
+(`logoGreen`/`logoNavy` in `theme.dart`).
 Phase 5 step 1 done: "Columns" picker (wide screens), hidden columns saved on the device (`device_settings.dart`,
 `shared_preferences`; also the place for presets and the watchlist).
 Phase 4 step 6 done: TTM revenue/net income/EPS (`pipeline/ttm.py`), metrics P/E (TTM) and P/S (TTM), `ttm_end` shown in the app.

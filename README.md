@@ -149,6 +149,21 @@ variable always wins over `.env`.
 The API server itself only needs `backend/requirements-api.txt` (FastAPI, uvicorn, python-dotenv);
 `requirements.txt` adds what the pipeline and the tests need.
 
+## Logo and app icons
+
+The logo lives in `docs/` (`logo_icon.png`: on white, 1024 px; `logo_foreground.png`: transparent, for
+Android's adaptive icon). The icons for Android, Windows and the web (favicon, `manifest.json`) and the
+splash screen (Android and web; Windows has none) are generated from it. After changing the logo, in `app/`:
+
+```
+dart run flutter_launcher_icons
+dart run flutter_native_splash:create
+```
+
+The settings are in `app/pubspec.yaml`. The top bar shows a 256 px copy, `app/assets/logo.png`. The
+app's accent colour is the logo's green (`theme.dart`, Material 3 "fidelity" scheme); negative numbers
+stay red.
+
 ## Hosting (v2)
 
 ```

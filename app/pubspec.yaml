@@ -17,6 +17,44 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.8
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/logo.png # the logo in the top bar (256 px copy of docs/logo_foreground.png)
+
+# App icons for every platform, generated from the logo in docs/ with:
+#   dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "../docs/logo_icon.png" # logo on white, 1024x1024
+  android: "ic_launcher"
+  # Android "adaptive icon": the phone cuts the shape (circle, rounded square, ...); the logo on a
+  # transparent background sits inside the safe zone, on white.
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "../docs/logo_foreground.png"
+  min_sdk_android: 21
+  ios: false # no iOS project yet (needs a Mac)
+  web:
+    generate: true
+    image_path: "../docs/logo_icon.png"
+    background_color: "#FFFFFF"
+    theme_color: "#1B2A3A" # the logo's navy
+  windows:
+    generate: true
+    image_path: "../docs/logo_icon.png"
+    icon_size: 256
+
+# The screen shown while the app starts (Android and web; Windows has none), generated with:
+#   dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: "../docs/logo_icon.png"
+  android_12: # Android 12+ shows the icon in a circle on its own splash screen
+    color: "#FFFFFF"
+    image: "../docs/logo_foreground.png"
+  android: true
+  web: true
+  ios: false

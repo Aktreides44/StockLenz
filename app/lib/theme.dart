@@ -5,12 +5,28 @@
 // so the app downloads no extra font files.
 import 'package:flutter/material.dart';
 
+/// The logo's colours (docs/logo_icon.png): the green arrow and the navy magnifying glass.
+const Color logoGreen = Color(0xFF2DB443);
+const Color logoNavy = Color(0xFF1B2A3A);
+
 /// The brand colour. Material 3 calculates all other colours (light and dark) from it.
-const Color seedColor = Color(0xFF26A69A);
+const Color seedColor = logoGreen;
+
+/// The small logo shown next to "StockLens" in the top bar.
+const String logoAsset = 'assets/logo.png';
 
 ThemeData buildTheme(Brightness brightness) {
+  final isLight = brightness == Brightness.light;
   return ThemeData(
-    colorScheme: ColorScheme.fromSeed(seedColor: seedColor, brightness: brightness),
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: brightness,
+      // "fidelity" keeps the accent close to the logo's green; the default would soften it a lot.
+      // Negative numbers keep using the scheme's red "error" colour, so they stay easy to tell apart.
+      dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+    ),
+    // The title and icons of the top bar in the logo's navy (light mode); dark mode keeps light text.
+    appBarTheme: isLight ? const AppBarTheme(foregroundColor: logoNavy) : null,
     visualDensity: VisualDensity.compact,
   );
 }
