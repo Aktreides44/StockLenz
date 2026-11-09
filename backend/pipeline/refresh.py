@@ -15,6 +15,7 @@ from pipeline import db
 from pipeline.extract import extract_company
 from pipeline.metrics import METRIC_KEYS, NOT_APPLICABLE_FOR_FINANCIALS, compute_all, explain_missing
 from config import BACKEND_DIR
+from pipeline.price_history import update_history
 from pipeline.prices import latest_closes, yahoo_price_and_shares
 from pipeline.sec_client import load_companyfacts, load_ticker_to_cik, sec_ticker
 from pipeline.sec_updates import remove_outdated_files
@@ -126,7 +127,13 @@ def main():
         if company is not None:
             companies.append(company)
 
-    db.write_database(companies)
+    # The price chart's history: yesterday's database (if there is one) + today's closes + backfill.
+    previous = db.connect(db.DB_PATH) if db.DB_PATH.exists() else None
+    price_history, price_days = update_history(previous, [c["ticker"] for c in companies], polygon_closes, polygon_day)
+    if previous is not None:
+        previous.close()
+
+    db.write_database(companies, price_history=price_history, price_days=price_days)
     print()
     print(f"Wrote {len(companies)} companies to {db.DB_PATH}")
     print_coverage(companies)

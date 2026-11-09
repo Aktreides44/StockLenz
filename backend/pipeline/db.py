@@ -4,6 +4,8 @@ Tables:
 - companies: one row per company, with price info and every screener metric as a column
 - financials: the raw SEC values, one row per (company, fiscal year, field), incl. the XBRL tag used
 - metric_definitions: label, formula and unit for each metric, shown in the app
+- prices: daily closing prices of the last year, for the price chart (pipeline/price_history.py)
+- price_days: the days the price history has already asked Polygon for (incl. holidays)
 """
 import json
 import sqlite3
@@ -34,6 +36,8 @@ def create_tables(conn):
 DROP TABLE IF EXISTS companies;
 DROP TABLE IF EXISTS financials;
 DROP TABLE IF EXISTS metric_definitions;
+DROP TABLE IF EXISTS prices;
+DROP TABLE IF EXISTS price_days;
 
 CREATE TABLE companies (
     ticker TEXT PRIMARY KEY,
@@ -67,6 +71,17 @@ CREATE TABLE financials (
     PRIMARY KEY (ticker, fiscal_year, field)
 );
 
+CREATE TABLE prices (
+    ticker TEXT NOT NULL,
+    day TEXT NOT NULL,     -- trading day, "YYYY-MM-DD"
+    close REAL NOT NULL,   -- closing price that day (split-adjusted)
+    PRIMARY KEY (ticker, day)
+) WITHOUT ROWID;
+
+CREATE TABLE price_days (
+    day TEXT PRIMARY KEY
+);
+
 CREATE TABLE metric_definitions (
     key TEXT PRIMARY KEY,
     label TEXT NOT NULL,
@@ -79,15 +94,21 @@ CREATE TABLE metric_definitions (
 """)
 
 
-def write_database(companies, path=DB_PATH):
+def write_database(companies, path=DB_PATH, price_history=None, price_days=None):
     """Replace the whole database with the given companies.
 
     Each company is a dict with the COMPANY_COLUMNS keys, plus "not_applicable" (list),
     "missing_reasons" (dict) and "years" (the output of extract_company).
+    price_history: {ticker: {day: close}} and price_days: set of days (from price_history.py), optional.
     """
     conn = connect(path)
     with conn:
         create_tables(conn)
+
+        for ticker, closes in (price_history or {}).items():
+            conn.executemany("INSERT INTO prices VALUES (?, ?, ?)",
+                             [(ticker, day, close) for day, close in closes.items()])
+        conn.executemany("INSERT INTO price_days VALUES (?)", [(day,) for day in sorted(price_days or [])])
 
         for order, (key, label, group, formula, unit, higher_is_better) in enumerate(METRIC_DEFINITIONS):
             conn.execute(
@@ -169,7 +190,17 @@ def load_company_detail(conn, ticker):
 
     latest_equity = history[-1]["equity"] if history else None
     company["analysis"] = pros_and_cons(company, company["not_applicable"], latest_equity)
+    company["price_history"] = load_price_history(conn, company["ticker"])
     return company
+
+
+def load_price_history(conn, ticker):
+    """[{"day": "2025-11-10", "close": 269.43}, ...], oldest first; [] if the database has none."""
+    tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
+    if "prices" not in tables:  # a database built before the price chart existed
+        return []
+    rows = conn.execute("SELECT day, close FROM prices WHERE ticker = ? ORDER BY day", (ticker,))
+    return [{"day": day, "close": close} for day, close in rows]
 
 
 def load_metric_definitions(conn):

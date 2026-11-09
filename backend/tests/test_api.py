@@ -96,6 +96,23 @@ def test_company_detail_has_history(client):
     assert detail["analysis"]["cons"] == []
 
 
+def test_detail_has_no_price_history_without_prices(client):
+    assert client.get("/companies/AAA").json()["price_history"] == []
+
+
+def test_detail_includes_the_price_history(tmp_path):
+    test_db = tmp_path / "prices.db"
+    company = make_company("AAA", "Industrials", make_years({2025: {"revenue": 10}}))
+    db.write_database([company], path=test_db,
+                      price_history={"AAA": {"2026-11-06": 101.0, "2026-11-05": 100.0}}, price_days={"2026-11-05"})
+    conn = db.connect(test_db)
+    try:
+        detail = db.load_company_detail(conn, "AAA")
+    finally:
+        conn.close()
+    assert detail["price_history"] == [{"day": "2026-11-05", "close": 100.0}, {"day": "2026-11-06", "close": 101.0}]
+
+
 def test_detail_analysis_skips_not_applicable(client):
     bank = client.get("/companies/BNK").json()
     all_ids = [item["id"] for item in bank["analysis"]["pros"] + bank["analysis"]["cons"]]

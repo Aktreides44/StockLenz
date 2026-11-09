@@ -20,6 +20,10 @@ SEC_USER_AGENT = os.getenv("SEC_USER_AGENT")
 # Polygon.io (Massive) API key for the daily closing prices. Empty = use Yahoo Finance for all prices.
 POLYGON_API_KEY = os.getenv("POLYGON_API_KEY", "")
 
+# Price chart: how many missing older days to fetch per run (12 s each on Polygon's free plan).
+# The daily run uses the default; for a quick start, run the workflow once by hand with e.g. 260.
+PRICE_BACKFILL_DAYS = int(os.getenv("PRICE_BACKFILL_DAYS", "25"))
+
 # Where the SQLite database lives. Default: backend/data/stocklens.db
 DB_PATH = Path(os.getenv("STOCKLENS_DB_PATH", str(BACKEND_DIR / "data" / "stocklens.db")))
 

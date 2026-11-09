@@ -19,6 +19,10 @@ on:
     # 22:30 UTC, Monday to Friday: after the US market closes (16:00 New York time).
     - cron: "30 22 * * 1-5"
   workflow_dispatch: # adds a "Run workflow" button on GitHub, to start it by hand
+    inputs:
+      backfill_days:
+        description: "Older price days to fetch for the price chart (12 s each; 260 fills a whole year)"
+        default: "25"
 
 permissions:
   contents: write # needed to upload the file to the release
@@ -29,7 +33,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 75 # a by-hand run with a big price backfill can take almost an hour
     defaults:
       run:
         working-directory: backend
@@ -59,10 +63,18 @@ jobs:
       - name: Run tests
         run: python -m pytest -q
 
+      # The price chart's history lives in the published database: start from yesterday's.
+      # (On the very first run there is none yet; the history then starts empty.)
+      - name: Get yesterday's database (for the price history)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download data-latest --pattern stocklens.db --dir data || echo "No earlier database"
+
       - name: Build the database
         env:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+          PRICE_BACKFILL_DAYS: ${{ inputs.backfill_days || '25' }} # scheduled runs: 25
         run: python -m pipeline.refresh
 
       - name: Check the database before publishing
