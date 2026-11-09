@@ -9,6 +9,7 @@ import 'data_service.dart';
 import 'models.dart';
 import 'price_chart.dart';
 import 'theme.dart';
+import 'watchlist.dart';
 import 'widgets.dart';
 
 /// Open the page for [ticker]. [data] is the screener data (used for peers and metric labels).
@@ -109,6 +110,7 @@ class _CompanyPageState extends State<CompanyPage> {
       appBar: AppBar(
         backgroundColor: cardBackground(colors),
         title: Text(detail == null ? widget.ticker : '${detail.company.name} (${detail.company.ticker})'),
+        actions: [WatchStar(ticker: widget.ticker), const SizedBox(width: Space.sm)],
       ),
       body: detail == null
           ? (_error == null ? const LoadingMessage() : ConnectionError(message: _error!, onRetry: _load))

@@ -60,3 +60,24 @@ Future<void> savePresets(List<FilterPreset> presets) async {
     // Not saved; the presets still work until the app is closed.
   }
 }
+
+const _watchlistKey = 'watchlist';
+
+/// The tickers on the user's watchlist.
+Future<Set<String>> loadWatchlist() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    return (prefs.getStringList(_watchlistKey) ?? []).toSet();
+  } catch (_) {
+    return {};
+  }
+}
+
+Future<void> saveWatchlist(Set<String> tickers) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_watchlistKey, tickers.toList()..sort());
+  } catch (_) {
+    // Not saved; the watchlist still works until the app is closed.
+  }
+}

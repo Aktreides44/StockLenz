@@ -14,6 +14,7 @@ import 'presets.dart';
 import 'screener_cards.dart';
 import 'screener_table.dart';
 import 'theme.dart';
+import 'watchlist.dart';
 import 'widgets.dart';
 
 class ScreenerPage extends StatefulWidget {
@@ -39,6 +40,9 @@ class _ScreenerPageState extends State<ScreenerPage> {
   final Map<String, RangeFilter> _filters = {};
   bool _showFilters = false;
 
+  /// True: show only the companies on the watchlist.
+  bool _watchlistOnly = false;
+
   /// Screener columns the user switched off (saved on the device, see device_settings.dart).
   Set<String> _hiddenColumns = {};
 
@@ -63,7 +67,18 @@ class _ScreenerPageState extends State<ScreenerPage> {
     loadPresets().then((presets) {
       if (mounted) setState(() => _savedPresets = presets);
     });
+    // Redraw the list when a star is tapped (here or on a company page).
+    watchlist.addListener(_onWatchlistChanged);
+    watchlist.load();
   }
+
+  @override
+  void dispose() {
+    watchlist.removeListener(_onWatchlistChanged);
+    super.dispose();
+  }
+
+  void _onWatchlistChanged() => setState(() {});
 
   Future<void> _load() async {
     setState(() {
@@ -134,6 +149,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
           !company.name.toLowerCase().contains(query)) {
         return false;
       }
+      if (_watchlistOnly && !watchlist.contains(company.ticker)) return false;
       if (_sector != null && company.sector != _sector) return false;
       for (final entry in _filters.entries) {
         if (!entry.value.accepts(company.metrics[entry.key])) return false;
@@ -218,7 +234,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
           _phoneToolbar(data, visible.length, columns),
           Expanded(
             child: visible.isEmpty
-                ? const Center(child: Text('No companies match the search and filters.'))
+                ? _emptyMessage()
                 : ScreenerCards(
                     companies: visible,
                     metricsByKey: metricsByKey,
@@ -239,7 +255,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
             children: [
               Expanded(
                 child: visible.isEmpty
-                    ? const Center(child: Text('No companies match the search and filters.'))
+                    ? _emptyMessage()
                     : ScreenerTable(
                         companies: visible,
                         columns: [for (final column in columns) if (!_hiddenColumns.contains(column.key)) column],
@@ -277,6 +293,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
         children: [
           SizedBox(width: 280, child: _searchBox()),
           _sectorPicker(data, expand: false),
+          _watchlistChip(),
           _filtersButton(onPressed: () => setState(() => _showFilters = !_showFilters)),
           _presetsMenu(data, iconOnly: false),
           _columnsButton(data),
@@ -286,7 +303,7 @@ class _ScreenerPageState extends State<ScreenerPage> {
     );
   }
 
-  /// Phones: search, "sector + presets" and "Filters / Sort / count" each get their own line.
+  /// Phones: search, "sector + watchlist + presets" and "Filters / Sort / count" each get their own line.
   Widget _phoneToolbar(ScreenerData data, int visibleCount, List<ScreenerColumn> columns) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(Space.md, Space.md, Space.md, Space.sm),
@@ -298,6 +315,8 @@ class _ScreenerPageState extends State<ScreenerPage> {
           Row(
             children: [
               Expanded(child: _sectorPicker(data, expand: true)),
+              const SizedBox(width: Space.sm),
+              _watchlistToggle(),
               const SizedBox(width: Space.sm),
               _presetsMenu(data, iconOnly: true),
             ],
@@ -407,6 +426,38 @@ class _ScreenerPageState extends State<ScreenerPage> {
       }
     });
     saveHiddenColumns(hidden);
+  }
+
+  Widget _emptyMessage() {
+    final text = _watchlistOnly && watchlist.length == 0
+        ? 'Your watchlist is empty. Tap the ☆ next to a company to add it.'
+        : 'No companies match the search and filters.';
+    return Center(
+      child: Padding(padding: const EdgeInsets.all(Space.lg), child: Text(text, textAlign: TextAlign.center)),
+    );
+  }
+
+  /// Wide screens: "★ Watchlist (3)" — when selected, only those companies are listed.
+  Widget _watchlistChip() {
+    return FilterChip(
+      avatar: Icon(_watchlistOnly ? Icons.star : Icons.star_border),
+      showCheckmark: false,
+      label: Text('Watchlist (${watchlist.length})'),
+      selected: _watchlistOnly,
+      onSelected: (selected) => setState(() => _watchlistOnly = selected),
+      tooltip: 'Show only the companies on your watchlist',
+    );
+  }
+
+  /// Phones: the same as an icon button, next to the sector.
+  Widget _watchlistToggle() {
+    return IconButton.outlined(
+      isSelected: _watchlistOnly,
+      onPressed: () => setState(() => _watchlistOnly = !_watchlistOnly),
+      icon: const Icon(Icons.star_border),
+      selectedIcon: const Icon(Icons.star),
+      tooltip: _watchlistOnly ? 'Show all companies' : 'Show only my watchlist (${watchlist.length})',
+    );
   }
 
   Widget _presetsMenu(ScreenerData data, {required bool iconOnly}) {

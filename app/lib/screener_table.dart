@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'format.dart';
 import 'models.dart';
 import 'theme.dart';
+import 'watchlist.dart';
 import 'widgets.dart';
 
 const double rowHeight = 32;
@@ -32,7 +33,7 @@ class ScreenerColumn {
 }
 
 const List<ScreenerColumn> frozenColumns = [
-  ScreenerColumn(key: 'ticker', label: 'Ticker', width: 76, numeric: false),
+  ScreenerColumn(key: 'ticker', label: 'Ticker', width: 100, numeric: false), // ☆ + ticker
   ScreenerColumn(key: 'name', label: 'Name', width: 200, numeric: false),
 ];
 
@@ -240,8 +241,17 @@ class _ScreenerTableState extends State<ScreenerTable> {
   Widget _cell(Company company, ScreenerColumn column) {
     final theme = Theme.of(context);
     final Widget content = switch (column.key) {
-      'ticker' => Text(company.ticker,
-          style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.primary)),
+      'ticker' => Row(
+          children: [
+            WatchStar(ticker: company.ticker, small: true),
+            const SizedBox(width: Space.xs),
+            Flexible(
+              child: Text(company.ticker,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.primary)),
+            ),
+          ],
+        ),
       'name' => Tooltip(
           message: company.name,
           waitDuration: const Duration(milliseconds: 600),

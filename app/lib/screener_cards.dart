@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'format.dart';
 import 'models.dart';
 import 'theme.dart';
+import 'watchlist.dart';
 import 'widgets.dart';
 
 /// The three numbers shown on every card.
@@ -47,6 +48,7 @@ class ScreenerCards extends StatelessWidget {
                   ),
                   const SizedBox(width: Space.sm),
                   Expanded(child: Text(company.name, overflow: TextOverflow.ellipsis)),
+                  WatchStar(ticker: company.ticker),
                 ],
               ),
               const SizedBox(height: Space.xxs),

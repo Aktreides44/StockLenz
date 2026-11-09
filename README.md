@@ -15,7 +15,10 @@ next to the sector on phones) fills in a named set of filters with one tap: four
 app — *Profitable & low debt* (net margin ≥ 0 %, debt/equity ≤ 0.5), *High return on equity* (ROE ≥ 15 %),
 *Growing revenue* (3-year revenue CAGR ≥ 10 %) and *Low P/E* (P/E TTM 0–15) — and "Save current
 filters…" stores your own (sector + filters, as JSON on the device). These are common rules of thumb
-for screening, not recommendations. On phones the company page uses
+for screening, not recommendations. The **☆** next to every company (table row, phone card, company
+page) puts it on your **watchlist**; the "Watchlist" button (a ☆ next to the sector on phones) then
+lists only those companies. The watchlist is a list of tickers saved on the device, like the other
+settings — nothing is sent to the server. On phones the company page uses
 smaller margins, shows 3 peer columns, and its yearly tables keep the row labels fixed while the years
 scroll sideways, starting at the newest year.
 
