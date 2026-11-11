@@ -1,10 +1,16 @@
 # StockLens
 
 A fundamental stock screener for long-term investors, inspired by Screener.in.
-University prototype (Medical Informatics, software engineering course), version 1.0.
+University prototype (Medical Informatics, software engineering course), **version 2.0** (tag `v2.0`).
+
+| Version | What it is |
+|---|---|
+| **v1.0** (tag `v1.0`, demo 28 Oct 2026) | Windows app, 40 companies, SEC 10-K data, Yahoo prices, offline snapshot |
+| **v2.0** (tag `v2.0`, finished 11 Nov 2026) | Hosted API on Render, web + Android + Windows, the S&P 500, Polygon prices, SEC shares, TTM figures, daily data refresh in GitHub Actions, price chart, phone layout, Columns, filter presets, watchlist, logo — see [`docs/V2_PLAN.md`](docs/V2_PLAN.md) |
+| v3 (planned) | See [`docs/V3_PLAN.md`](docs/V3_PLAN.md) |
 
 StockLens downloads the annual reports (10-K) of the S&P 500 companies (the ~500 largest US companies) from the SEC, calculates
-16 indicators such as ROE, net margin and P/E, and shows them in a Flutter app (web, Android and Windows):
+18 indicators such as ROE, net margin and P/E, and shows them in a Flutter app (web, Android and Windows):
 a sortable, filterable screener and a detail page per company. On wide screens the screener is a dense
 table; on phones (narrower than 600 px) it becomes a list of cards with market cap, P/E (FY) and ROE,
 a "Sort" menu and the filters in a bottom sheet. The 🔍 in the top bar jumps straight to a company
@@ -29,9 +35,9 @@ scroll sideways, starting at the newest year.
 ## How it fits together
 
 ```
-SEC EDGAR (10-K) ─┐
-                  ├─► pipeline (python -m pipeline.refresh) ─► backend/data/stocklens.db ─► FastAPI ─► Flutter app
-Yahoo (price)  ───┘
+SEC EDGAR (10-K, 10-Q) ─┐                     (GitHub Actions, weekdays)
+                        ├─► pipeline (python -m pipeline.refresh) ─► stocklens.db ─► FastAPI on Render ─► Flutter app
+Polygon (prices) ───────┘   Yahoo only fills gaps                    (GitHub release)                     (web / Android / Windows)
 ```
 
 | Folder | What it is |

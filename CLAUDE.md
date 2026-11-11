@@ -8,11 +8,11 @@ and it shows facts and simple rules — never investment advice.
 **v1.0 is done and tagged** (`git checkout v1.0`): the Windows app demoed on 28 Oct 2026 — 40
 companies, SEC 10-K data, yfinance prices, offline snapshot fallback.
 
-**Now building v2.** The scope, decisions and order of work are in [`docs/V2_PLAN.md`](docs/V2_PLAN.md).
-Work through its phases in order, in small steps. That plan replaces the old v1 "out of scope" list:
-build what the current phase says, and nothing from a later phase unless asked.
+**v2.0 is done** (tag `v2.0`, 11 Nov 2026): every phase of [`docs/V2_PLAN.md`](docs/V2_PLAN.md) is built — what v2
+contains is listed below. **v3 is planned** in [`docs/V3_PLAN.md`](docs/V3_PLAN.md); don't start it unless asked.
+Work in small steps; build nothing from a later plan unless asked.
 
-## v2 target (see the plan for why)
+## What v2 contains (see the plan for why)
 - **Hosted API:** the FastAPI backend runs online on **Render** (free tier first); the app talks to it,
   not to `127.0.0.1`. Settings (e.g. `SEC_USER_AGENT`) come from environment variables / Render secrets.
 - **No offline mode:** no `snapshot.json` in the app. If the API can't be reached, show
