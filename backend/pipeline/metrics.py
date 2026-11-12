@@ -172,7 +172,18 @@ METRIC_DEFINITIONS = [
     ("ps_ttm", "P/S (TTM)", "Valuation",
      "Current market cap / Revenue of the last 12 months (latest 10-K + 10-Q year to date − the same months "
      "a year earlier)", "x", False),
+    # v3 scores (pipeline/scores.py). They are calculated after all companies are built, because Value
+    # compares each company with its sector. Unit "score": shown with one decimal.
+    ("quality_score", "Quality (F-Score)", "Scores",
+     "Piotroski F-Score: 9 yes/no checks of profit, cash, debt, liquidity, new shares, margin and efficiency; "
+     "points ÷ checkable checks × 9 (0–9). Strong ≥ 8, Weak ≤ 1", "score", True),
+    ("value_score", "Value (vs sector)", "Scores",
+     "(1 − average percentile of P/E, P/B and P/S (TTM) within the sector) × 10 (0–10; higher = cheaper). "
+     "Cheap ≥ 7, Expensive ≤ 3", "score", True),
 ]
+
+# Calculated in pipeline/scores.py, not by compute_all().
+SCORE_KEYS = ["quality_score", "value_score"]
 
 # The TTM metrics use the trailing-twelve-month values from pipeline/ttm.py instead of the 10-K year.
 TTM_METRICS = {"pe_ttm": "eps_diluted", "ps_ttm": "revenue"}
@@ -192,6 +203,9 @@ FIELD_LABELS = {
     "operating_cash_flow": "Operating cash flow",
     "capex": "Capital expenditure",
     "dividends_paid": "Dividends paid",
+    "gross_profit": "Gross profit",
+    "cost_of_revenue": "Cost of revenue",
+    "diluted_shares": "Diluted shares (weighted average)",
 }
 
 # The inputs each metric needs: (raw field, how many years before the latest year).

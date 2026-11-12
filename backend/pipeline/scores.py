@@ -261,3 +261,36 @@ COMBINED_TEXT = {
 def combined_reading(quality_label, value_label):
     """One sentence for the four clear cases, otherwise None."""
     return COMBINED_TEXT.get((quality_label, value_label))
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Used by the pipeline (pipeline/refresh.py)
+# ---------------------------------------------------------------------------------------------------------------
+
+def add_scores(companies):
+    """Add both scores to every company built by refresh.build_company (changes the dicts in place).
+
+    Sets quality_score, quality_label, value_score, value_label, "scores" (all details, stored as JSON)
+    and a missing reason when a score can't be calculated.
+    """
+    ratio_keys = ("ticker", "sector", "pe_ttm", "pe", "pb", "ps_ttm")
+    values, _ = value_scores([{key: company.get(key) for key in ratio_keys} for company in companies])
+
+    for company in companies:
+        quality = piotroski_score(plain_years(company["years"]), company["sector"] == FINANCIALS)
+        value = values[company["ticker"]]
+        company["quality_score"] = quality["score"]
+        company["quality_label"] = quality["label"]
+        company["value_score"] = value["score"]
+        company["value_label"] = value["label"]
+        company["scores"] = {
+            "quality": quality,
+            "value": value,
+            "combined": combined_reading(quality["label"], value["label"]),
+        }
+        if quality["score"] is None:
+            company["missing_reasons"]["quality_score"] = (
+                f"Not enough data: {quality['checkable']} of 9 checks can be calculated (needs {MIN_CHECKABLE})")
+        if value["score"] is None:
+            company["missing_reasons"]["value_score"] = (
+                f"Not enough data: fewer than {MIN_RATIOS} valuation ratios can be compared with the sector")

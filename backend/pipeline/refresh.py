@@ -13,6 +13,7 @@ from datetime import datetime
 
 from pipeline import db
 from pipeline.extract import extract_company
+from pipeline.scores import add_scores
 from pipeline.metrics import METRIC_KEYS, NOT_APPLICABLE_FOR_FINANCIALS, compute_all, explain_missing
 from config import BACKEND_DIR
 from pipeline.price_history import update_history
@@ -133,6 +134,7 @@ def main():
     if previous is not None:
         previous.close()
 
+    add_scores(companies)  # v3: needs all companies, because Value compares each one with its sector
     db.write_database(companies, price_history=price_history, price_days=price_days)
     print()
     print(f"Wrote {len(companies)} companies to {db.DB_PATH}")

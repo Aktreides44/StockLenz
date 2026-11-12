@@ -20,6 +20,7 @@ COMPANY_COLUMNS = [
     "shares_outstanding", "shares_source", "shares_as_of",
     "latest_fiscal_year", "latest_fiscal_year_end",
     "ttm_end", "revenue_ttm", "net_income_ttm", "eps_ttm",
+    "quality_label", "value_label",
 ] + METRIC_KEYS
 
 
@@ -58,6 +59,9 @@ CREATE TABLE companies (
     eps_ttm REAL,
     not_applicable TEXT,  -- comma-separated metric keys, e.g. "current_ratio,debt_to_equity"
     missing_reasons TEXT, -- JSON object mapping metric key to why it has no value
+    quality_label TEXT,   -- v3: "Strong" / "Mixed" / "Weak" (Piotroski F-Score), NULL = not enough data
+    value_label TEXT,     -- v3: "Cheap" / "Fair" / "Expensive" (vs the sector), NULL = not enough data
+    scores TEXT,          -- v3: JSON with every check, the sector ranks and medians, and the combined text
 {metric_columns}
 );
 
@@ -119,10 +123,11 @@ def write_database(companies, path=DB_PATH, price_history=None, price_days=None)
         placeholders = ", ".join("?" for _ in COMPANY_COLUMNS)
         for company in companies:
             conn.execute(
-                f"INSERT INTO companies ({', '.join(COMPANY_COLUMNS)}, not_applicable, missing_reasons) "
-                f"VALUES ({placeholders}, ?, ?)",
-                [company[column] for column in COMPANY_COLUMNS]
-                + [",".join(company["not_applicable"]), json.dumps(company["missing_reasons"])],
+                f"INSERT INTO companies ({', '.join(COMPANY_COLUMNS)}, not_applicable, missing_reasons, scores) "
+                f"VALUES ({placeholders}, ?, ?, ?)",
+                [company.get(column) for column in COMPANY_COLUMNS]
+                + [",".join(company["not_applicable"]), json.dumps(company["missing_reasons"]),
+                   json.dumps(company.get("scores"))],
             )
             for year, data in company["years"].items():
                 for field in FIELDS:
@@ -191,6 +196,8 @@ def load_company_detail(conn, ticker):
     latest_equity = history[-1]["equity"] if history else None
     company["analysis"] = pros_and_cons(company, company["not_applicable"], latest_equity)
     company["price_history"] = load_price_history(conn, company["ticker"])
+    # v3: every check and sector rank; None for a database built before the scores existed.
+    company["scores"] = json.loads(row["scores"]) if "scores" in row.keys() and row["scores"] else None
     return company
 
 

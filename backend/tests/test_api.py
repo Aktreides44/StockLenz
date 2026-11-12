@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from api.main import app, get_db
 from pipeline import db
 from pipeline.metrics import compute_all, explain_missing
+from pipeline.scores import add_scores
 from tests.test_calculations import make_years
 
 
@@ -29,7 +30,7 @@ def make_company(ticker, sector, years):
 @pytest.fixture
 def client(tmp_path):
     test_db = tmp_path / "test.db"
-    db.write_database([
+    companies = [
         make_company("AAA", "Information Technology", make_years({
             2024: {"revenue": 100, "net_income": 10, "operating_cash_flow": 20, "capex": 5,
                    "current_assets": 30, "current_liabilities": 20},
@@ -39,7 +40,9 @@ def client(tmp_path):
         make_company("BNK", "Financials", make_years({
             2025: {"revenue": 50, "net_income": 5, "current_assets": 30, "current_liabilities": 20},
         })),
-    ], path=test_db)
+    ]
+    add_scores(companies)  # as in the pipeline
+    db.write_database(companies, path=test_db)
 
     def get_test_db():
         conn = db.connect(test_db)
@@ -119,13 +122,46 @@ def test_detail_analysis_skips_not_applicable(client):
     assert "low_debt" not in all_ids and "high_debt" not in all_ids
 
 
+def test_scores_in_list_and_detail(client):
+    # Two companies: too few years for the F-Score and too few in each sector for the ranking.
+    aaa = next(c for c in client.get("/companies").json() if c["ticker"] == "AAA")
+    assert aaa["quality_score"] is None and aaa["quality_label"] is None
+    assert aaa["missing_reasons"]["quality_score"].startswith("Not enough data")
+    assert aaa["value_score"] is None
+
+    scores = client.get("/companies/AAA").json()["scores"]
+    assert [c["key"] for c in scores["quality"]["checks"]][:2] == ["roa_positive", "ocf_positive"]
+    assert len(scores["quality"]["checks"]) == 9
+    assert set(scores["value"]["ratios"]) == {"pe", "pb", "ps"}
+    assert scores["combined"] is None
+
+
+def test_detail_of_a_database_without_scores(tmp_path):
+    """Right after a code update the server may still have yesterday's database (no scores column)."""
+    old_db = tmp_path / "old.db"
+    conn = db.connect(old_db)
+    conn.executescript("CREATE TABLE companies (ticker TEXT, name TEXT, sector TEXT, cik INTEGER,"
+                       " not_applicable TEXT, missing_reasons TEXT);"
+                       " CREATE TABLE financials (ticker TEXT, fiscal_year INTEGER, end_date TEXT, field TEXT,"
+                       " value REAL, tag TEXT);"
+                       " INSERT INTO companies VALUES ('OLD', 'Old Inc.', 'Energy', 1, '', '{}');")
+    company = db.load_company_detail(conn, "OLD")
+    conn.close()
+    assert company["scores"] is None
+    assert company["quality_score"] is None
+
+
 def test_unknown_ticker_is_404(client):
     assert client.get("/companies/NOPE").status_code == 404
 
 
 def test_metrics_definitions(client):
     metrics = {m["key"]: m for m in client.get("/metrics").json()}
-    assert len(metrics) == 18
+    assert len(metrics) == 20
+    assert metrics["quality_score"]["group"] == "Scores"
+    assert metrics["quality_score"]["unit"] == "score"
+    assert "Piotroski" in metrics["quality_score"]["formula"]
+    assert metrics["value_score"]["higher_is_better"] is True  # higher = cheaper than the sector
     assert metrics["roe"]["unit"] == "%"
     assert metrics["pe"]["higher_is_better"] is False
     for key in ("pe", "pb", "ps"):

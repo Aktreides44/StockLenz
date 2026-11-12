@@ -7,6 +7,7 @@ import pytest
 
 from pipeline.extract import extract_company
 from pipeline.scores import (
+    add_scores,
     combined_reading,
     gross_profit,
     percentile,
@@ -208,3 +209,29 @@ def test_combined_reading():
     assert combined_reading("Weak", "Cheap") == "Cheap, but weak finances — cheap for a reason?"
     assert combined_reading("Mixed", "Cheap") is None
     assert combined_reading(None, None) is None
+
+
+def test_add_scores_fills_every_company():
+    """The pipeline step: five companies in one sector, all with the GOOD history (9 of 9) and different prices."""
+    from tests.test_calculations import make_years
+
+    companies = []
+    for i, ticker in enumerate("ABCDE"):
+        companies.append({
+            "ticker": ticker, "sector": "Tech", "years": make_years(copy.deepcopy(GOOD)), "missing_reasons": {},
+            "pe_ttm": 10 * (i + 1), "pe": None, "pb": i + 1, "ps_ttm": i + 1,
+        })
+    companies.append({"ticker": "NEW", "sector": "Tech", "years": make_years({2025: GOOD[2025]}),
+                      "missing_reasons": {}, "pe_ttm": None, "pe": None, "pb": None, "ps_ttm": None})
+    add_scores(companies)
+
+    a = companies[0]
+    assert (a["quality_score"], a["quality_label"], a["value_score"], a["value_label"]) == (9.0, "Strong", 10.0, "Cheap")
+    assert a["scores"]["combined"] == "Strong finances and cheaper than its sector — worth a closer look"
+    e = companies[4]
+    assert e["scores"]["combined"] == "Strong finances, but the market already prices that in"
+
+    new = companies[5]
+    assert new["quality_score"] is None and new["value_score"] is None
+    assert new["missing_reasons"]["quality_score"] == "Not enough data: 2 of 9 checks can be calculated (needs 7)"
+    assert new["missing_reasons"]["value_score"].startswith("Not enough data")
