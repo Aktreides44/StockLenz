@@ -1,94 +1,107 @@
 # StockLens v3 — plan
 
-Status: **rules fixed 11 Nov 2026; build on 12 Nov 2026 (one day).** v2 is finished and tagged `v2.0` first.
-v3 is the third and final version.
+Status: **rules fixed 12 Nov 2026 (based on published methods); build in short sessions.** v2 is finished and
+tagged `v2.0`. v3 is the third and final version.
 
 ## Goal
-Make the "good vs bad" comparison explicit and explainable — **without predicting prices.**
+Make the "good vs bad" comparison explicit and explainable — **without predicting prices**, and with rules
+that come from published sources, not from our own opinion.
 
-> StockLens doesn't predict prices. It turns official SEC data into transparent rules that separate
-> financially healthy companies from weak ones, and it shows its reasons.
+> StockLens doesn't predict prices. It applies a published financial-health score (Piotroski F-Score) and a
+> standard sector comparison of valuation ratios to official SEC data, and it shows its reasons.
 
-Every result shows *why* (which rules passed or failed). Still **not investment advice**.
+Every result shows *why* (which checks passed or failed). Still **not investment advice**.
 
-## New tabs in the app
-The app gets a tab bar (bottom navigation bar on phones, tabs/navigation rail on wide screens):
+## Sources (cite these in the report)
+- **Quality:** Piotroski, J. D. (2000). *Value Investing: The Use of Historical Financial Statement Information
+  to Separate Winners from Losers.* Journal of Accounting Research, 38 (Supplement), 1–41.
+- **Value (compare with comparable firms):** Damodaran, A. (2012). *Investment Valuation* (3rd ed.). Wiley —
+  chapters on relative valuation (multiples compared within comparable firms / the same sector).
+- **Value (ranking by valuation ratios):** Fama, E. F., & French, K. R. (1992). *The Cross-Section of Expected
+  Stock Returns.* Journal of Finance, 47(2), 427–465.
+- Background only: Graham, B. *The Intelligent Investor* (rev. ed. 1973), ch. 14 (classic P/E and P/B limits).
 
-| Tab | What it shows |
-|---|---|
-| **Screener** | The existing table / cards (unchanged). |
-| **Strong vs Weak** | Companies with Quality ≥ 7 ("Strong") and ≤ 3 ("Weak"), side by side on wide screens, switchable on phones. Each row: score and the passed ✓ / failed ✗ rules. |
-| **Cheap vs Expensive** | Companies with Value ≥ 7 ("Cheaper than sector peers") and ≤ 3 ("More expensive than peers"), with P/E, P/B, P/S next to the sector median. |
-| **Scores** | Every company with Quality and Value (0–10), sortable, sector filter, tap → company page. |
+Check page numbers in the library / Google Scholar before submitting.
 
-The company page gets a **"Scores" section**: both scores with the full list of rules (✓ / ✗ / — and the actual value).
+## Quality — Piotroski F-Score ("is this company financially healthy and improving?")
+Nine yes/no checks, one point each. Year t = latest fiscal year, t-1 = the year before.
+"Beginning assets" = total assets at the end of the previous year (as in the paper).
 
-## Rules (fixed for v3)
+| # | Check (1 point if true) | Calculation from our data |
+|---|---|---|
+| 1 | Profitable | ROA = NI_t / Assets_t-1 > 0 |
+| 2 | Cash from operations | OCF_t > 0 |
+| 3 | More profitable than last year | ROA_t > ROA_t-1 (ROA_t-1 = NI_t-1 / Assets_t-2) |
+| 4 | Profit backed by cash (accruals) | OCF_t > NI_t |
+| 5 | Less long-term debt | LTD_t / avg(Assets_t, Assets_t-1) < LTD_t-1 / avg(Assets_t-1, Assets_t-2) |
+| 6 | Better liquidity | current ratio_t > current ratio_t-1 (not for Financials) |
+| 7 | No new shares issued | diluted weighted-average shares_t ≤ shares_t-1 (proxy, see limitations) |
+| 8 | Better gross margin | gross margin_t > gross margin_t-1 (not for Financials) |
+| 9 | Better asset turnover | Rev_t / Assets_t-1 > Rev_t-1 / Assets_t-2 |
 
-### Quality score — "is this a financially healthy company?"
-One point per rule that passes. **Score = points ÷ rules that could be checked × 10**, rounded to one decimal.
-A rule whose number is missing or "not applicable" is **skipped** (shown as "—"), never counted as pass or fail.
-Fewer than **6** checkable rules → no score ("not enough data").
+- A check whose numbers are missing (or not applicable) is **skipped** ("—"), never pass or fail.
+- **Score = points ÷ checkable checks × 9**, one decimal (so it stays on Piotroski's 0–9 scale).
+  Needs at least **7** checkable checks; otherwise "not enough data".
+- **Strong: score ≥ 8. Weak: score ≤ 1.** (Piotroski's own high / low groups: 8–9 and 0–1.) Otherwise "Mixed".
+- New SEC data needed (same companyfacts files, no extra downloads):
+  - Gross profit: `GrossProfit`; else Revenue − `CostOfRevenue` / `CostOfGoodsAndServicesSold` (that difference
+    *is* gross profit; record which was used).
+  - Diluted weighted-average shares per fiscal year: `WeightedAverageNumberOfDilutedSharesOutstanding`.
 
-| # | Rule | Metric | Pass if |
-|---|---|---|---|
-| 1 | Sales grew last year | revenue_growth | > 0 % |
-| 2 | Sales grow steadily | revenue_cagr_3y | > 5 % per year |
-| 3 | Makes a profit | net_margin | > 0 % |
-| 4 | Healthy operating margin | operating_margin | > 15 % |
-| 5 | Uses owners' money well | roe | > 15 % |
-| 6 | Uses its assets well | roa | > 5 % |
-| 7 | Generates cash | fcf | > 0 |
-| 8 | Turns sales into cash | fcf_margin | > 10 % |
-| 9 | Earnings per share growing | eps_growth | > 0 % |
-| 10 | Low debt | debt_to_equity | < 1.0 (not for Financials) |
-| 11 | Can pay short-term bills | current_ratio | > 1.0 (not for Financials) |
-
-**Strong:** score ≥ 7. **Weak:** score ≤ 3. In between: "Mixed".
-
-### Value score — "is it cheap or expensive compared with similar companies?"
-Compared **within the same sector only** (a bank and a software company have very different normal P/Es).
+## Value — sector ranking ("is it cheap or expensive compared with similar companies?")
+Compared **within the same sector only** (Damodaran: compare multiples with comparable firms).
 
 For each of **P/E (TTM)** (fallback P/E FY), **P/B** and **P/S (TTM)**:
-- only positive values count (a negative P/E means a loss — not "cheap");
-- the company's **percentile rank** in its sector: 0 = cheapest, 1 = most expensive.
+- only positive values count (a negative P/E means a loss, not "cheap");
+- percentile rank in the sector = position ÷ (count − 1): 0 = cheapest, 1 = most expensive;
+- needs at least **5** companies with that ratio in the sector. Financials: P/S skipped.
 
-**Value score = (1 − average percentile of the available ratios) × 10.**
-Needs at least 2 of the 3 ratios, and at least 5 companies with that ratio in the sector; otherwise no score.
-For Financials, P/S is skipped (bank "revenue" is not comparable).
+**Value score = (1 − average percentile of the available ratios) × 10**, one decimal; needs at least 2 ratios.
+**Cheap: ≥ 7** (roughly the cheapest 30 % of its sector). **Expensive: ≤ 3.** The app shows the sector median
+next to each ratio.
 
-**Cheap:** score ≥ 7. **Expensive:** score ≤ 3. The app always shows the sector median next to the value.
-
-### Combined reading (shown as text, never as "buy"/"sell")
-| Quality | Value | Text in the app |
+## Combined reading (text only, never "buy"/"sell")
+| Quality | Value | Text |
 |---|---|---|
 | Strong | Cheap | "Strong finances and cheaper than its sector — worth a closer look" |
 | Strong | Expensive | "Strong finances, but the market already prices that in" |
 | Weak | Cheap | "Cheap, but weak finances — cheap for a reason?" |
 | Weak | Expensive | "Weak finances and expensive" |
 
-## Build order for 12 Nov (small steps, tests after each)
-1. **Backend `pipeline/scores.py`**: `quality_score()` and `value_scores()` as pure functions returning the score
-   and the list of rule results (rule, value, threshold, passed/failed/skipped). Unit tests with hand-computed
-   examples, incl. missing data, Financials, too few rules, tiny sectors, negative P/E.
-2. **Pipeline + DB + API**: compute after all companies are built (value needs the whole sector); store
-   `quality_score`, `value_score` and the rule results (JSON) in `companies`; sector medians; add them to
-   `/companies` and `/companies/{ticker}`; `/metrics` gets the two score definitions.
-3. **App: tab bar** with the four tabs (bottom bar on phones), reusing cards/table widgets.
-4. **App: Strong vs Weak, Cheap vs Expensive, Scores tabs** + "Scores" section on the company page.
-5. **Docs**: README section "How the scores work" (rules table, limitations), CLAUDE.md, this plan. Tag `v3.0`,
-   new APK, push (ask first).
+## The app (lean version — fits in short sessions)
+- Bottom bar (phones) / navigation rail (wide screens) with **two tabs: Screener | Scores.**
+- **Scores tab:** one list with buttons at the top: **All · Strong · Weak · Cheap · Expensive**; each row shows
+  Quality (0–9) and Value (0–10) as coloured chips; sortable; sector filter; tap → company page.
+- **Company page:** new "Scores" section — both scores, every check with ✓ / ✗ / — and its numbers, the sector
+  medians, and the combined text.
+- Extra if time allows: Quality and Value as normal Screener columns (Columns picker, filters, presets);
+  Strong and Weak side by side on wide screens.
 
-If time runs short: drop the Cheap vs Expensive tab first (the Scores tab still shows Value), never the tests.
+## Build order (each step ends with tests, a commit and a short explanation)
+1. **`pipeline/scores.py`**: `piotroski_score()` and `value_scores()` as pure functions returning the score and
+   the check results (check, numbers, passed/failed/skipped). Hand-computed tests incl. missing data,
+   Financials, too few checks, tiny sectors, negative P/E. Extractor: gross profit + diluted shares.
+2. **Pipeline + DB + API**: compute after all companies are built; store scores + check results (JSON) and
+   sector medians; add to `/companies`, `/companies/{ticker}`, `/metrics`. → **push (ask first)**
+3. **App: tab bar + Scores tab.**
+4. **App: company-page Scores section.** → **push (ask first)**
+5. **Docs**: README "How the scores work" (checks, sources, limitations), CLAUDE.md, this plan.
+   Tag `v3.0`, new APK, push (ask first).
+
+If time runs short: drop the extras first, then the sector filter on the Scores tab — never the tests,
+the company-page section or the sources.
 
 ## Honesty / limitations (for the report)
-- A good *company* is not automatically a good *stock*: Strong + Expensive means "great company, but the
-  market already charges for it".
-- Thresholds (15 % ROE, 1.0 D/E, …) are common rules of thumb, not laws — the app shows them openly.
+- Piotroski tested the F-Score on high book-to-market ("value") US stocks, 1976–1996. Applying it to the whole
+  S&P 500 today is common practice, but not what the paper proved.
+- Check 7 uses the change in diluted weighted-average shares as a proxy for "issued new shares"
+  (the paper uses equity issuance); share-based pay can move it a little.
+- Skipped checks are rescaled to 0–9 — our adaptation, not in the paper.
+- A good *company* is not automatically a good *stock* (Strong + Expensive).
 - Value is relative to the sector: a whole sector can be expensive.
-- Scores use the latest fiscal year (and TTM for valuation); one bad year can move them a lot.
-- Testing the rules on past data has pitfalls (survivorship bias: today's S&P 500 list only contains
-  companies that survived; look-ahead bias). StockLens does not claim it beats the market.
+- One unusual year can move the scores a lot; scores use the latest fiscal year (TTM for valuation).
+- No back-test: today's S&P 500 list contains only survivors (survivorship bias). StockLens does not claim
+  to beat the market.
 
 ## Builds on
-- `backend/pipeline/analysis.py` (pros/cons rules) and `metrics.py`; v2 data (S&P 500, TTM, Polygon prices).
+- `backend/pipeline/metrics.py`, `extract.py`, `analysis.py`; v2 data (S&P 500, TTM, Polygon prices).
