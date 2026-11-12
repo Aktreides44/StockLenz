@@ -38,6 +38,12 @@ FIELDS = {
                "PaymentsToAcquireOtherPropertyPlantAndEquipment", "PaymentsToAcquireOtherProductiveAssets"], "USD"),
     # PaymentsOfOrdinaryDividends: used by e.g. JNJ
     "dividends_paid": (["PaymentsOfDividends", "PaymentsOfDividendsCommonStock", "PaymentsOfOrdinaryDividends"], "USD"),
+    # v3 (Piotroski F-Score, pipeline/scores.py). Gross profit = revenue − cost of revenue; when a company
+    # doesn't report GrossProfit, scores.py calculates it from the cost of revenue.
+    "gross_profit": (["GrossProfit"], "USD"),
+    "cost_of_revenue": (["CostOfRevenue", "CostOfGoodsAndServicesSold"], "USD"),
+    # Average number of shares in the year, including options etc. that could become shares ("diluted").
+    "diluted_shares": (["WeightedAverageNumberOfDilutedSharesOutstanding"], "shares"),
 }
 
 ANNUAL_FORMS = {"10-K", "10-K/A"}
