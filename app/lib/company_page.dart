@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'company_chart.dart';
+import 'company_scores.dart';
 import 'company_sections.dart';
 import 'data_service.dart';
 import 'models.dart';
@@ -39,7 +40,7 @@ class CompanyPage extends StatefulWidget {
 
 class _CompanyPageState extends State<CompanyPage> {
   static const sections = [
-    'Summary', 'Price', 'Chart', 'Analysis', 'Peers', 'Profit & Loss', 'Balance Sheet', 'Cash Flow', 'Ratios',
+    'Summary', 'Scores', 'Price', 'Chart', 'Analysis', 'Peers', 'Profit & Loss', 'Balance Sheet', 'Cash Flow', 'Ratios',
   ];
 
   // Each section gets a key, so we can find where it is and scroll to it.
@@ -145,6 +146,7 @@ class _CompanyPageState extends State<CompanyPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     section('Summary', SummarySection(company: detail.company, metricsByKey: metricsByKey)),
+                    section('Scores', ScoresSection(company: detail.company, scores: detail.scores)),
                     section(
                       'Price',
                       SectionCard(

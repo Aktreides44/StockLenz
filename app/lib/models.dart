@@ -200,6 +200,7 @@ class CompanyDetail {
     required this.pros,
     required this.cons,
     this.priceHistory = const [],
+    this.scores,
   });
 
   final Company company;
@@ -211,6 +212,9 @@ class CompanyDetail {
 
   /// Daily closing prices of the last year, oldest first (empty if the server has none yet).
   final List<PricePoint> priceHistory;
+
+  /// v3: every Quality check and Value ratio; null if the server's database has no scores yet.
+  final CompanyScores? scores;
 
   factory CompanyDetail.fromJson(
     Map<String, dynamic> json,
@@ -226,6 +230,118 @@ class CompanyDetail {
         for (final point in (json['price_history'] as List<dynamic>?) ?? [])
           PricePoint.fromJson(point as Map<String, dynamic>),
       ],
+      scores: json['scores'] == null ? null : CompanyScores.fromJson(json['scores'] as Map<String, dynamic>),
+    );
+  }
+}
+
+/// One of the nine Piotroski checks, e.g. "Cash from operations > 0".
+class ScoreCheck {
+  const ScoreCheck({required this.key, required this.label, required this.passed, required this.values, this.skipReason});
+
+  final String key;
+  final String label;
+
+  /// true = passed (1 point), false = failed, null = skipped (numbers missing or not meaningful).
+  final bool? passed;
+
+  /// The numbers the check compared, e.g. {"now": 0.37, "before": 0.28}.
+  final Map<String, double?> values;
+  final String? skipReason;
+
+  factory ScoreCheck.fromJson(Map<String, dynamic> json) {
+    return ScoreCheck(
+      key: json['key'] as String,
+      label: json['label'] as String,
+      passed: json['passed'] as bool?,
+      values: (json['values'] as Map<String, dynamic>).map((key, value) => MapEntry(key, _toDouble(value))),
+      skipReason: json['skip_reason'] as String?,
+    );
+  }
+}
+
+/// One valuation ratio compared with the company's sector.
+class ValueRatio {
+  const ValueRatio({
+    required this.key,
+    required this.label,
+    this.value,
+    this.percentile,
+    this.sectorMedian,
+    required this.sectorCount,
+    this.skipReason,
+  });
+
+  final String key;
+  final String label;
+  final double? value;
+
+  /// 0 = the cheapest in the sector, 1 = the most expensive; null when not ranked.
+  final double? percentile;
+  final double? sectorMedian;
+
+  /// How many companies in the sector have this ratio.
+  final int sectorCount;
+  final String? skipReason;
+
+  factory ValueRatio.fromJson(String key, Map<String, dynamic> json) {
+    return ValueRatio(
+      key: key,
+      label: json['label'] as String,
+      value: _toDouble(json['value']),
+      percentile: _toDouble(json['percentile']),
+      sectorMedian: _toDouble(json['sector_median']),
+      sectorCount: json['sector_count'] as int,
+      skipReason: json['skip_reason'] as String?,
+    );
+  }
+}
+
+/// Both v3 scores of one company with all their reasons (backend/pipeline/scores.py).
+class CompanyScores {
+  const CompanyScores({
+    this.qualityScore,
+    this.qualityLabel,
+    required this.points,
+    required this.checkable,
+    required this.checks,
+    this.valueScore,
+    this.valueLabel,
+    required this.ratios,
+    this.combined,
+  });
+
+  final double? qualityScore;
+  final String? qualityLabel;
+
+  /// Checks passed, and checks that could be calculated (the score is points ÷ checkable × 9).
+  final int points;
+  final int checkable;
+  final List<ScoreCheck> checks;
+
+  final double? valueScore;
+  final String? valueLabel;
+  final List<ValueRatio> ratios;
+
+  /// One sentence for the clear cases (e.g. Strong + Cheap), otherwise null.
+  final String? combined;
+
+  factory CompanyScores.fromJson(Map<String, dynamic> json) {
+    final quality = json['quality'] as Map<String, dynamic>;
+    final value = json['value'] as Map<String, dynamic>;
+    return CompanyScores(
+      qualityScore: _toDouble(quality['score']),
+      qualityLabel: quality['label'] as String?,
+      points: quality['points'] as int,
+      checkable: quality['checkable'] as int,
+      checks: [for (final check in quality['checks'] as List<dynamic>) ScoreCheck.fromJson(check as Map<String, dynamic>)],
+      valueScore: _toDouble(value['score']),
+      valueLabel: value['label'] as String?,
+      ratios: [
+        for (final entry in (value['ratios'] as Map<String, dynamic>).entries)
+          ValueRatio.fromJson(entry.key, entry.value as Map<String, dynamic>),
+      ],
+      combined: json['combined'] as String?,
     );
   }
 }
