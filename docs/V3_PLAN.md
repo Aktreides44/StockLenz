@@ -1,7 +1,8 @@
 # StockLens v3 — plan
 
-Status: **rules fixed 12 Nov 2026 (based on published methods); build in short sessions.** v2 is finished and
-tagged `v2.0`. v3 is the third and final version.
+Status: **v3 finished (13 Nov 2026), tagged `v3.0`** — all five build steps done. Rules fixed 12 Nov 2026 (based on
+published methods). v3 is the third and final version. Done beyond the lean plan: Quality and Value are also screener
+columns (Columns picker, filters, presets). Not done (extra): Strong and Weak side by side on wide screens.
 
 ## Goal
 Make the "good vs bad" comparison explicit and explainable — **without predicting prices**, and with rules

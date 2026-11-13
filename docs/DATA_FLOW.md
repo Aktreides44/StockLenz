@@ -188,7 +188,7 @@ At the end it prints a **coverage table**: for each metric, how many companies h
 
 | Table | One row per | Holds |
 |---|---|---|
-| `companies` | company | ticker, name, sector, price + source + date, shares + source, the 18 metrics, missing reasons |
+| `companies` | company | ticker, name, sector, price + source + date, shares + source, the 18 metrics + 2 scores (v3: labels and all checks as JSON in `scores`), missing reasons |
 | `financials` | company × fiscal year | the raw yearly values and which XBRL tag each came from |
 | `metric_definitions` | metric | label, formula, unit, "higher is better" |
 

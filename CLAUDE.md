@@ -9,8 +9,18 @@ and it shows facts and simple rules — never investment advice.
 companies, SEC 10-K data, yfinance prices, offline snapshot fallback.
 
 **v2.0 is done** (tag `v2.0`, 11 Nov 2026): every phase of [`docs/V2_PLAN.md`](docs/V2_PLAN.md) is built — what v2
-contains is listed below. **v3 is planned** in [`docs/V3_PLAN.md`](docs/V3_PLAN.md); don't start it unless asked.
-Work in small steps; build nothing from a later plan unless asked.
+contains is listed below.
+
+**v3.0 is done** (tag `v3.0`, 13 Nov 2026) — the final version, see [`docs/V3_PLAN.md`](docs/V3_PLAN.md) and the README
+section "How the scores work":
+- `backend/pipeline/scores.py`: Quality = Piotroski F-Score (9 checks, skipped checks rescaled, Strong ≥ 8 / Weak ≤ 1),
+  Value = P/E (TTM, fallback FY), P/B, P/S (TTM) ranked within the sector (≥ 5 companies, ≥ 2 ratios; Cheap ≥ 7 /
+  Expensive ≤ 3), combined sentence. `add_scores()` runs in `refresh.py` after all companies are built.
+- Extractor fields `gross_profit`, `cost_of_revenue`, `diluted_shares`. Metrics `quality_score` / `value_score`
+  (group "Scores", unit "score"); `quality_label` / `value_label` columns; all checks as JSON in `scores` (detail API).
+- App: tabs Screener | Scores (`NavigationRail` wide, `NavigationBar` phones, `IndexedStack`), `scores_view.dart`
+  (Scores tab, `ScoreChip`), `company_scores.dart` (company-page section).
+Rules: never "buy"/"sell" wording; a missing number skips a check, never passes or fails it.
 
 ## What v2 contains (see the plan for why)
 - **Hosted API:** the FastAPI backend runs online on **Render** (free tier first); the app talks to it,

@@ -1,16 +1,16 @@
 # StockLens
 
 A fundamental stock screener for long-term investors, inspired by Screener.in.
-University prototype (Medical Informatics, software engineering course), **version 2.0** (tag `v2.0`).
+University prototype (Medical Informatics, software engineering course), **version 3.0** (tag `v3.0`) — the final version.
 
 | Version | What it is |
 |---|---|
 | **v1.0** (tag `v1.0`, demo 28 Oct 2026) | Windows app, 40 companies, SEC 10-K data, Yahoo prices, offline snapshot |
 | **v2.0** (tag `v2.0`, finished 11 Nov 2026) | Hosted API on Render, web + Android + Windows, the S&P 500, Polygon prices, SEC shares, TTM figures, daily data refresh in GitHub Actions, price chart, phone layout, Columns, filter presets, watchlist, logo — see [`docs/V2_PLAN.md`](docs/V2_PLAN.md) |
-| v3 (planned) | See [`docs/V3_PLAN.md`](docs/V3_PLAN.md) |
+| **v3.0** (tag `v3.0`, finished 13 Nov 2026) | Two tabs (Screener · Scores): a **Quality** score (Piotroski F-Score) and a **Value** score (valuation ratios ranked within the sector) for every company, with every reason on the company page — see [How the scores work](#how-the-scores-work) and [`docs/V3_PLAN.md`](docs/V3_PLAN.md) |
 
 StockLens downloads the annual reports (10-K) of the S&P 500 companies (the ~500 largest US companies) from the SEC, calculates
-18 indicators such as ROE, net margin and P/E, and shows them in a Flutter app (web, Android and Windows):
+18 indicators such as ROE, net margin and P/E plus two scores (Quality and Value), and shows them in a Flutter app (web, Android and Windows):
 a sortable, filterable screener and a detail page per company. On wide screens the screener is a dense
 table; on phones (narrower than 600 px) it becomes a list of cards with market cap, P/E (FY) and ROE,
 a "Sort" menu and the filters in a bottom sheet. The 🔍 in the top bar jumps straight to a company
@@ -313,3 +313,79 @@ missing (`backend/pipeline/ttm.py`). The company page shows which 12 months the 
 
 A rule is skipped when its metric is missing or not applicable (so banks never get a debt rule).
 Rules live in `backend/pipeline/analysis.py`.
+
+## How the scores work
+
+v3 adds two scores to every company (`backend/pipeline/scores.py`, calculated once a day by the pipeline after all
+companies are built). The app shows them in the **Scores** tab (buttons All · Strong · Weak · Cheap · Expensive,
+sector filter, sort by Quality or Value), as the screener columns *Quality (F-Score)* and *Value (vs sector)*, and
+with every reason in the **Scores** section of each company page.
+
+> StockLens doesn't predict prices. It applies a published financial-health score and a standard sector comparison
+> of valuation ratios to official SEC data, and shows its reasons. **Not investment advice.**
+
+### Quality — Piotroski F-Score (0–9): "is the company financially healthy and improving?"
+
+Nine yes/no checks, one point each. *t* = latest fiscal year, *t−1* = the year before; "assets at the start of the
+year" = total assets at the end of the year before (as in the paper).
+
+| # | Check (1 point if true) | Calculation |
+|---|---|---|
+| 1 | Profitable | ROA = net income_t ÷ assets_t−1 > 0 |
+| 2 | Cash from operations | operating cash flow_t > 0 |
+| 3 | More profitable than last year | ROA_t > ROA_t−1 |
+| 4 | Profit backed by cash | operating cash flow_t > net income_t |
+| 5 | Less long-term debt | long-term debt ÷ average assets: t < t−1 |
+| 6 | Better liquidity | current ratio_t > current ratio_t−1 (not for Financials) |
+| 7 | No new shares | diluted weighted-average shares_t ≤ shares_t−1 |
+| 8 | Better gross margin | gross profit ÷ revenue: t > t−1 (not for Financials) |
+| 9 | Better asset turnover | revenue_t ÷ assets_t−1 > revenue_t−1 ÷ assets_t−2 |
+
+- A check with missing numbers (or not meaningful for banks and insurers) is **skipped** (—): never a pass or a fail.
+- **Score = points ÷ checkable checks × 9**, one decimal; at least 7 checkable checks, otherwise "not enough data".
+- **Strong ≥ 8, Weak ≤ 1** (Piotroski's own high and low groups), otherwise Mixed.
+- New SEC fields for this: `GrossProfit` (else revenue − `CostOfRevenue` / `CostOfGoodsAndServicesSold`) and
+  `WeightedAverageNumberOfDilutedSharesOutstanding`, from the same companyfacts files.
+
+### Value — sector ranking (0–10): "is it cheap or expensive compared with similar companies?"
+
+- Ratios: **P/E (TTM)** (P/E FY when there is no TTM value), **P/B** and **P/S (TTM)** (not for Financials).
+- Only positive values count: a negative P/E means a loss, not "cheap".
+- Each ratio is ranked **within the company's own sector**: percentile = position ÷ (count − 1), 0 = cheapest,
+  1 = most expensive (equal values share their average position). Needs at least 5 companies with that ratio.
+- **Value score = (1 − average percentile) × 10**, one decimal; needs at least 2 ranked ratios.
+  **Cheap ≥ 7** (about the cheapest 30 % of the sector), **Expensive ≤ 3**, otherwise Fair.
+- The company page shows each ratio next to the **sector median** and "cheaper than N % of the sector".
+
+### Combined reading (text only, never "buy" or "sell")
+
+| Quality | Value | Text |
+|---|---|---|
+| Strong | Cheap | "Strong finances and cheaper than its sector — worth a closer look" |
+| Strong | Expensive | "Strong finances, but the market already prices that in" |
+| Weak | Cheap | "Cheap, but weak finances — cheap for a reason?" |
+| Weak | Expensive | "Weak finances and expensive" |
+
+### Sources
+
+- Piotroski, J. D. (2000). Value Investing: The Use of Historical Financial Statement Information to Separate
+  Winners from Losers. *Journal of Accounting Research*, 38 (Supplement), 1–41.
+- Damodaran, A. (2012). *Investment Valuation* (3rd ed.). Wiley — relative valuation: compare multiples with
+  comparable firms.
+- Fama, E. F., & French, K. R. (1992). The Cross-Section of Expected Stock Returns. *Journal of Finance*, 47(2),
+  427–465 — ranking stocks by valuation ratios.
+- Background: Graham, B. *The Intelligent Investor* (rev. ed. 1973), ch. 14.
+
+### Limitations (be honest about these)
+
+- Piotroski tested the F-Score on high book-to-market ("value") US stocks, 1976–1996 — not on today's S&P 500.
+- In the S&P 500 (large, established companies) a **Weak** score (0–1 of 9) is very rare; on 13 Nov 2026 no
+  company had one (68 Strong, 388 Mixed, 42 without enough data). The Weak button then explains why it is empty.
+- Banks and insurers often have too few checks (no current ratio, no gross margin, often no long-term debt tag),
+  so many of them get "not enough data".
+- Check 7 uses diluted weighted-average shares as a proxy for "issued new shares" (the paper uses equity issuance);
+  share-based pay can move it a little.
+- Rescaling skipped checks to 0–9 is our adaptation, not in the paper.
+- A good *company* is not automatically a good *stock* (Strong + Expensive); a whole sector can be expensive.
+- One unusual year can move the scores a lot. No back-test: today's S&P 500 contains only survivors
+  (survivorship bias). StockLens does not claim to beat the market.
