@@ -18,7 +18,7 @@ class MetricDefinition {
   final String group;
   final String formula;
 
-  /// "%", "x" (a ratio) or "USD".
+  /// "%", "x" (a ratio), "USD" or "score" (the v3 scores, 0–9 / 0–10).
   final String unit;
   final bool higherIsBetter;
 
@@ -49,6 +49,8 @@ class Company {
     required this.latestFiscalYear,
     required this.latestFiscalYearEnd,
     this.ttmEnd,
+    this.qualityLabel,
+    this.valueLabel,
     required this.metrics,
     required this.missingReasons,
     required this.notApplicable,
@@ -80,6 +82,11 @@ class Company {
   /// Where the trailing 12 months of the (TTM) metrics end, e.g. "2026-06-27" (the latest 10-Q).
   final String? ttmEnd;
 
+  /// v3 scores: "Strong" / "Mixed" / "Weak" (Piotroski F-Score) and "Cheap" / "Fair" / "Expensive" (vs the
+  /// sector); null when there is not enough data. The numbers are in [metrics] ("quality_score", "value_score").
+  final String? qualityLabel;
+  final String? valueLabel;
+
   /// Metric key -> value. null means missing (shown as "—"), never 0.
   final Map<String, double?> metrics;
 
@@ -104,6 +111,8 @@ class Company {
       latestFiscalYear: json['latest_fiscal_year'] as int?,
       latestFiscalYearEnd: json['latest_fiscal_year_end'] as String?,
       ttmEnd: json['ttm_end'] as String?,
+      qualityLabel: json['quality_label'] as String?,
+      valueLabel: json['value_label'] as String?,
       metrics: {for (final definition in definitions) definition.key: _toDouble(json[definition.key])},
       missingReasons: reasons.map((key, value) => MapEntry(key, value as String)),
       notApplicable: ((json['not_applicable'] as List<dynamic>?) ?? []).cast<String>(),

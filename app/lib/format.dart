@@ -4,13 +4,15 @@
 /// Shown instead of a number when a value is missing. Never 0.
 const String missingValue = '—';
 
-/// Format a metric value for display, based on its unit ("%", "x" or "USD").
+/// Format a metric value for display, based on its unit ("%", "x", "USD" or "score").
 String formatMetric(double value, String unit) {
   switch (unit) {
     case '%':
       return '${value.toStringAsFixed(1)}%';
     case 'USD':
       return formatMoney(value);
+    case 'score': // Quality 0–9, Value 0–10
+      return value.toStringAsFixed(1);
     default: // ratios such as P/E or current ratio
       return value.toStringAsFixed(2);
   }

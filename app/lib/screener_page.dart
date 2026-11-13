@@ -1,6 +1,7 @@
-// Screen 1: the screener. Search, sector filter, min/max filters and a sortable list of companies.
-// Wide screens get the dense table with a filter panel on the right; phones get cards,
-// a "Sort" menu and the filters in a bottom sheet.
+// The home screen with two tabs (v3): "Screener" and "Scores" (scores_view.dart). Both use the same loaded data.
+// Screener: search, sector filter, min/max filters and a sortable list of companies.
+// Wide screens get the dense table with a filter panel on the right and the tabs in a rail on the left;
+// phones get cards, a "Sort" menu, the filters in a bottom sheet and the tabs in a bar at the bottom.
 import 'package:flutter/material.dart';
 
 import 'columns_dialog.dart';
@@ -13,6 +14,7 @@ import 'models.dart';
 import 'presets.dart';
 import 'screener_cards.dart';
 import 'screener_table.dart';
+import 'scores_view.dart';
 import 'theme.dart';
 import 'watchlist.dart';
 import 'widgets.dart';
@@ -51,6 +53,9 @@ class _ScreenerPageState extends State<ScreenerPage> {
 
   /// Goes up by one when a preset is applied, so the filter panel is rebuilt with the new numbers in its boxes.
   int _filtersVersion = 0;
+
+  /// 0 = Screener tab, 1 = Scores tab.
+  int _tab = 0;
 
   String _sortKey = 'market_cap';
   bool _sortAscending = false;
@@ -192,7 +197,8 @@ class _ScreenerPageState extends State<ScreenerPage> {
           children: [
             Image.asset(logoAsset, height: 28, excludeFromSemantics: true),
             const SizedBox(width: Space.sm),
-            const Text('StockLens'),
+            // Flexible: on very narrow phones the name ends with "…" instead of overflowing.
+            const Flexible(child: Text('StockLens', overflow: TextOverflow.ellipsis)),
           ],
         ),
         actions: [
@@ -212,9 +218,41 @@ class _ScreenerPageState extends State<ScreenerPage> {
           const SizedBox(width: Space.sm),
         ],
       ),
-      body: _buildBody(),
+      body: isPhone(context)
+          ? _buildBody()
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                NavigationRail(
+                  selectedIndex: _tab,
+                  onDestinationSelected: (tab) => setState(() => _tab = tab),
+                  labelType: NavigationRailLabelType.all,
+                  destinations: [
+                    for (final tab in _tabs)
+                      NavigationRailDestination(icon: Icon(tab.icon), selectedIcon: Icon(tab.selectedIcon), label: Text(tab.label)),
+                  ],
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(child: _buildBody()),
+              ],
+            ),
+      bottomNavigationBar: isPhone(context)
+          ? NavigationBar(
+              selectedIndex: _tab,
+              onDestinationSelected: (tab) => setState(() => _tab = tab),
+              destinations: [
+                for (final tab in _tabs)
+                  NavigationDestination(icon: Icon(tab.icon), selectedIcon: Icon(tab.selectedIcon), label: tab.label),
+              ],
+            )
+          : null,
     );
   }
+
+  static const _tabs = [
+    (label: 'Screener', icon: Icons.table_rows_outlined, selectedIcon: Icons.table_rows),
+    (label: 'Scores', icon: Icons.insights_outlined, selectedIcon: Icons.insights),
+  ];
 
   Widget _buildBody() {
     final data = _data;
@@ -222,6 +260,20 @@ class _ScreenerPageState extends State<ScreenerPage> {
       if (_loading) return const LoadingMessage();
       return ConnectionError(message: _error ?? 'No data', onRetry: _load);
     }
+    // IndexedStack keeps both tabs alive, so the search text and filters stay when you switch tabs.
+    return IndexedStack(
+      index: _tab,
+      children: [
+        _screenerBody(data),
+        ScoresView(
+          companies: data.companies,
+          onCompanyTap: (company) => openCompanyPage(context, company.ticker, data),
+        ),
+      ],
+    );
+  }
+
+  Widget _screenerBody(ScreenerData data) {
 
     final visible = _visibleCompanies(data.companies);
     final metricsByKey = {for (final m in data.metrics) m.key: m};
